@@ -1,0 +1,23 @@
+FROM jjoneson/workforce-builder-ui:latest AS builder
+
+WORKDIR /app
+
+COPY ./workforce-core /app/workforce-core
+RUN yarn workspace workforce-core run build
+
+COPY ./workforce-api-client /app/workforce-api-client
+RUN yarn workspace workforce-api-client run build
+
+COPY ./workforce-ui-core /app/workforce-ui-core
+RUN yarn workspace workforce-ui-core run build
+
+ENV PUBLIC_URL=/excelsior
+
+COPY ./excelsior /app/excelsior/
+RUN yarn workspace excelsior run build
+
+FROM nginxinc/nginx-unprivileged:1.25-alpine
+COPY --from=builder /app/excelsior/build /usr/share/nginx/html
+COPY ./excelsior/nginx.conf /etc/nginx/conf.d/default.conf
+
+CMD ["nginx", "-g", "daemon off;"]

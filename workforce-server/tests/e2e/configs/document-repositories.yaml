@@ -1,0 +1,11 @@
+documentRepositories:
+  - name: github-docs
+    description: "Workforce Docs"
+    type: "git-document-repository"
+    credential: "github-docs"
+    variables:
+      model: text-embedding-3-small
+      repo: workforce-docs
+      file_regex: ".*.md"
+      owner: "devbots-llc"
+      branch: main

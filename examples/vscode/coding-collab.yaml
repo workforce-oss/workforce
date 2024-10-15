@@ -1,0 +1,93 @@
+credentials:
+  - name: native-channel
+    type: native-channel
+  - name: github-pull-request
+    type: github-pull-request-resource
+    variables:
+      username: <git username>
+      access_token: <git access token>
+  - name: github-coding-tool
+    type: coding-tool
+    variables:
+     index_repo_username: <index repo username>
+     index_repo_password: <index repo password>
+---
+skills:
+- name: coding
+---
+flows:
+- name: Coding Collaboration
+  description: Collaborate on coding tasks
+  status: active
+
+  channels:
+    - name: Native Channel
+      description: Native Channel
+      type: native-channel
+      credential: native-channel
+      variables:
+        channel_name: coding-collab
+        anonymous_access: false
+        oauth2_issuer_uri: http://localhost:8085/insecure
+        oauth2_audience: "https://api/"
+        oauth2_claims: ""
+
+  tools:
+  - name: Send Collab Url
+    description: Send a collab url to the Channel
+    type: message-channel-tool
+    channel: Native Channel
+  - name: Coding Tool
+    description: A tool that interacts with the code
+    type: coding-tool
+    credential: github-coding-tool
+    channel: Native Channel
+    variables:
+      mode: local
+      index_repo_location: https://github.com/workforce-oss/collaborative-coding-seed.git
+      index_repo_branch: main
+      server_url: http://vscode-extension-server:3000
+  
+  tasks:
+  - name: Collaborate
+    description: Collaborate on a coding task
+    type: simple-task
+    costLimit: 2.00
+    inputs:
+      message: Native Channel
+    triggers:
+      - Native Channel
+    requiredSkills:
+      - coding
+    tools:
+      - name: Coding Tool
+      - name: Send Collab Url
+    variables:
+      prompt_template: >-
+        Your task is to collaborate on a coding task. Here are the steps:
+
+        1. Get the collaboration URL
+        2. Send the Collaboration URL
+        3. Wait for the user to join the collaboration
+        4. Collaborate on the coding task
+        5. Commit and push the changes
+
+
+        Notes:
+        - The user can see the code you write in real-time, so you do not have to send the code directly to the user.
+        - Do not send the code directly to the user
+        - Do not send file content directly to the user
+        - Always send the collaboration URL before starting work
+        - Wait for the user to join the collaboration before starting work
+        - You will have to iterate multiple times. Ask the user to review your changes after each iteration.
+        - Always check for reference projects that may be used before creating a new project. Look for Reference Projects specifically. They are different than normal projects.
+        - Before making updates to a file, always check the full content of the file first.
+
+
+        IMPORTANT:
+        - Only commit and push the changes after the user has explicitly given permission to do so.
+        
+        Task:
+        {{message}}
+      system_message_template: >-
+        You are an expert software engineer who loves pair programming. You are well-known for your intelligence, humility, and brevity.

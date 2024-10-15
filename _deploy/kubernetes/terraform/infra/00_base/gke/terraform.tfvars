@@ -1,0 +1,9 @@
+istio_enabled                = true
+istio_version                = "1.18.2"
+install_istio_gateway        = true
+create_istio_lb_health_check = true
+istio_gateway_service_type   = "NodePort"
+install_nvidia_operator      = false
+install_nvidia_toolkit       = false
+install_nvidia_driver        = false
+enable_nvidia_timeslicing    = false

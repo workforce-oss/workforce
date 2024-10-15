@@ -1,0 +1,23 @@
+credentials:
+- name: openai
+  type: ai-worker
+  variables:
+    api_token: <OpenaAI API Token>
+- name: openai-native-channel
+  type: worker-native-token
+  variables:
+    token: test
+---
+skills:
+- name: conversation
+---
+workers:
+- name: Claude
+  type: ai-worker
+  credential: openai
+  channelUserConfig:
+    native-channel: openai-native-channel
+  skills: ["conversation"] # Specifies the skills that the worker has
+  wipLimit: 10 # Specifies the maximum number of tasks that can be in progress at any given time
+  variables:
+    model: "gpt-4o"

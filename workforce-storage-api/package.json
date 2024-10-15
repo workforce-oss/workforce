@@ -1,0 +1,50 @@
+{
+    "name": "workforce-storage-api",
+    "version": "0.1.0",
+    "description": "A service to handle file storage",
+    "main": "dist/index.js",
+    "author": "Jeff Joneson",
+    "license": "Apache-2.0",
+    "type": "module",
+    "engines": {
+        "node": ">=20.11.0"
+    },
+    "scripts": {
+        "start:local": "npx ts-node src/index.ts",
+        "start:search": "npx ts-node src/index.search.ts",
+        "start:upload": "npx ts-node src/index.upload.ts",
+        "start:worker": "npx ts-node src/index.worker.ts",
+        "package": "esbuild --bundle src/index.ts --outfile=dist/index.mjs --format=esm --platform=node --target=node20 --external:aws-sdk --external:nock --external:mock-aws-s3 --loader:.html=text --banner:js='import { createRequire as topLevelCreateRequire } from \"module\";\n const require = topLevelCreateRequire(import.meta.url);'",
+        "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'tests/**/*.ts'",
+        "build": "npx tsc",
+        "start:kubernetes": "npx ts-node src/index.ts"
+    },
+    "dependencies": {
+        "body-parser": "^1.20.2",
+        "cors": "^2.8.5",
+        "dotenv": "^16.3.1",
+        "express": "^4.18.2",
+        "express-oauth2-jwt-bearer": "^1.5.0",
+        "multer": "^1.4.5-lts.1",
+        "node-fetch": "^3.3.2",
+        "openai": "^4.28.0",
+        "rxjs": "^7.8.1",
+        "sequelize": "^6.32.1",
+        "sequelize-typescript": "^2.1.5",
+        "ts-node": "^10.9.1",
+        "weaviate-ts-client": "^2.0.0",
+        "workforce-core": "^0.1.0"
+    },
+    "devDependencies": {
+        "@types/cors": "^2.8.13",
+        "@types/express": "^4.17.17",
+        "@types/multer": "^1.4.11",
+        "@types/node": "^20.16.10",
+        "esbuild": "^0.24.0",
+        "nodemon": "^2.0.22",
+        "ts-loader": "^9.5.1",
+        "typescript": "^5.1.3",
+        "webpack": "^5.91.0",
+        "webpack-cli": "^5.1.4"
+    }
+}

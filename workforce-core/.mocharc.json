@@ -1,0 +1,8 @@
+{ 
+    "import": "tsm",
+    "trace-uncaught": true,
+    "node-option": [
+        "loader=tsm",
+        "require=ts-node/register"
+    ]
+}

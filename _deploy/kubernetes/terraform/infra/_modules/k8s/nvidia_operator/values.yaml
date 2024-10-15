@@ -1,0 +1,19 @@
+driver:
+  enabled: ${install_driver}
+toolkit:
+  enabled: ${install_toolkit}
+devicePlugin:
+  config:
+    name: time-slicing
+    create: true
+    default: timeslicing
+    data: 
+      timeslicing: |-
+        version: v1
+        flags:
+          migStrategy: none
+        sharing:
+          timeSlicing:
+            resources:
+              - name: nvidia.com/gpu
+                replicas: 3

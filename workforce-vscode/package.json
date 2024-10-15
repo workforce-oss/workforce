@@ -1,0 +1,19 @@
+{
+  "private": true,
+  "name": "workforce-vscode",
+  "version": "0.1.0",
+  "scripts": {
+    "build:lib": "yarn workspace lib run build",
+    "build:server": "yarn workspace server run build",
+    "vscode:extension": "yarn workspace workforce-vscode run extension",
+    "vscode:prepublish" : "yarn workspace workforce-vscode run vscode:prepublish"
+  },
+  "workspaces": [
+    "workforce-vscode",
+    "lib",
+    "server"
+  ],
+  "dependencies": {
+    "puppeteer": "^22.6.5"
+  }
+}

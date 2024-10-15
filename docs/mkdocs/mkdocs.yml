@@ -1,0 +1,27 @@
+site_name: Workforce Docs
+theme: readthedocs
+plugins:
+  - search
+  - mermaid2
+nav:
+- Home: index.md
+- Flows: 
+  - Overview: flows/flow.md
+  - Objects: flows/objects.md
+- Tasks:
+  - Overview: flows/tasks/task.md
+  - 'Simple Task': flows/tasks/simple-task.md
+- Workers:
+  - Overview: flows/workers/worker.md
+  - 'AI Worker': flows/workers/ai-worker.md
+- Channels:
+  - Overview: flows/channels/channel.md
+  - Talkbox: flows/channels/talkbox.md
+  - Slack: flows/channels/slack.md
+- Resources:
+  - Overview: flows/resources/resource.md
+  - 'GitHub Repo': flows/resources/github-repo.md
+- Tools:
+  - Overview: flows/tools/tool.md
+  - 'Web Service': flows/tools/web-service.md
+  - 'Template Engine': flows/tools/template-engine.md

@@ -1,0 +1,126 @@
+{
+  "name": "workforce-vscode",
+  "displayName": "workforce",
+  "description": "Integrate With Workforce",
+  "version": "0.0.1",
+  "publisher": "jjoneson",
+  "engines": {
+    "vscode": "^1.88.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": true
+    },
+    "virtualWorkspaces": true
+  },
+  "activationEvents": [
+    "onStartupFinished"
+  ],
+  "extensionKind": [
+    "workspace"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "configuration": {
+      "title:": "workforce",
+      "properties": {
+        "workforce-vscode.workspaceRoot": {
+          "type": "string",
+          "default": "${userHome}/workforce-workspace",
+          "description": "The root path for your workspace"
+        },
+        "workforce-vscode.chatEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable the chat feature"
+        },
+        "workforce-vscode.authEnabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable the auth feature"
+        },
+        "workforce-vscode.chatScriptUrl": {
+          "type": "string",
+          "default": "http://localhost:8085/embedded-chat/static/js/main.js",
+          "description": "The URL for the chat script"
+        },
+        "workforce-vscode.authIssuerUrl": {
+          "type": "string",
+          "default": "http://localhost:8085/insecure",
+          "description": "The URL for the auth issuer"
+        },
+        "workforce-vscode.socketUrl": {
+          "type": "string",
+          "default": "http://localhost:8085/vscode-server/socket",
+          "description": "The URL for the socket server"
+        }
+      }
+    },
+    "viewsContainers": {
+      "panel": [
+        {
+          "id": "workforce-chat",
+          "title": "Workforce Chat",
+          "icon": "$(comment-discussion)"
+        }
+      ]
+    },
+    "views": {
+      "workforce-chat": [
+        {
+          "type": "webview",
+          "id": "workforce.chat",
+          "name": "Workforce Chat",
+          "contextualTitle": "Workforce Chat",
+          "icon": "$(comment-discussion)"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "workforce.logout",
+        "title": "Log out of workforce"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "yarn run package",
+    "compile": "webpack",
+    "watch": "webpack --watch",
+    "package": "webpack --mode production --devtool hidden-source-map",
+    "compile-tests": "tsc -p . --outDir out",
+    "watch-tests": "tsc -p . -w --outDir out",
+    "pretest": "yarn run compile-tests && yarn run compile && yarn run lint",
+    "lint": "eslint src --ext ts",
+    "test": "vscode-test",
+    "extension": "vsce package --allow-missing-repository -o dist/extension.vsix"
+  },
+  "devDependencies": {
+    "@types/mocha": "^10.0.6",
+    "@types/node": "18.x",
+    "@types/vscode": "^1.88.0",
+    "@types/ws": "^8.5.10",
+    "@typescript-eslint/eslint-plugin": "^7.4.0",
+    "@typescript-eslint/parser": "^7.4.0",
+    "@vscode/test-cli": "^0.0.8",
+    "@vscode/test-electron": "^2.3.9",
+    "@vscode/vsce": "^2.25.0",
+    "eslint": "^8.57.0",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.3.3",
+    "webpack": "^5.91.0",
+    "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "@types/lodash": "^4.17.4",
+    "bufferutil": "^4.0.8",
+    "json-stringify-deterministic": "^1.0.12",
+    "lib": "0.0.1",
+    "lodash": "^4.17.21",
+    "utf-8-validate": "^6.0.3",
+    "ws": "^8.16.0"
+  }
+}

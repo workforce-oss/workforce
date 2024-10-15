@@ -1,0 +1,24 @@
+credentials:
+- name: anthropic
+  type: ai-worker
+  variables:
+    api_token: <Anthropic API Token>
+- name: anthropic-native-channel
+  type: worker-native-token
+  variables:
+    token: test
+---
+skills:
+- name: conversation
+- name: coding
+---
+workers:
+- name: Claude
+  type: ai-worker
+  credential: anthropic
+  channelUserConfig:
+    native-channel: anthropic-native-channel
+  skills: ["conversation", "coding"] # Specifies the skills that the worker has
+  wipLimit: 10 # Specifies the maximum number of tasks that can be in progress at any given time
+  variables:
+    model: claude-3-5-sonnet-20240620

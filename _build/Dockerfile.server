@@ -1,0 +1,16 @@
+FROM jjoneson/workforce-builder:latest AS builder
+
+WORKDIR /app
+
+COPY ./workforce-core /app/workforce-core
+RUN yarn workspace workforce-core run build
+
+COPY ./workforce-server /app/workforce-server
+
+RUN yarn workspace workforce-server run package
+
+FROM jjoneson/workforce-base-server:latest
+
+COPY --from=builder /app/workforce-server/dist/index.mjs /app/workforce-server/dist/index.mjs
+
+CMD ["node", "/app/workforce-server/dist/index.mjs"]

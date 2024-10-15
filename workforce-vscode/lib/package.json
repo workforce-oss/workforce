@@ -1,0 +1,17 @@
+{
+    "name": "lib",
+    "displayName": "robot.dev lib",
+    "description": "A library for robot.dev",
+    "version": "0.0.1",
+    "main": "dist/index.js",
+    "types": "dist/index.d.ts",
+    "scripts": {
+        "build": "tsc",
+        "test": "mocha --exit --extensions ts,tsx 'tests/**/*.ts'",
+        "test:file": "mocha --exitå --extensions ts,tsx tests/helpers/*.ts",
+        "test:coverage": "nyc npm run test"
+    },
+    "dependencies": {
+        "json-stringify-deterministic": "^1.0.12"
+    }
+}

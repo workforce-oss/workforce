@@ -1,0 +1,77 @@
+{
+  "name": "workforce-ui",
+  "version": "0.1.0",
+  "private": true,
+  "license": "Apache-2.0",
+  "author": "Jeff Joneson",
+  "homepage": "/",
+  "dependencies": {
+    "@emotion/react": "^11.11.0",
+    "@emotion/styled": "^11.11.0",
+    "@mui/icons-material": "^5.11.16",
+    "@mui/material": "^5.13.2",
+    "@tailwindcss/forms": "^0.5.3",
+    "@types/node": "^16.18.31",
+    "@types/react-dom": "^18.2.4",
+    "@types/react-router-dom": "^5.3.3",
+    "crypto-browserify": "^3.12.0",
+    "dagre": "^0.8.5",
+    "lodash": "^4.17.21",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.16.0",
+    "react-scripts": "5.0.1",
+    "reactflow": "^11.7.2",
+    "recharts": "^2.9.3",
+    "rxjs": "^7.8.1",
+    "tailwindcss-scoped-preflight": "^3.2.1",
+    "typescript": "^4.9.5",
+    "uuid": "^9.0.0",
+    "web-vitals": "^2.1.4",
+    "webpack": "^5.85.0",
+    "webpack-dev-server": "^4.15.0",
+    "workforce-api-client": "0.1.0",
+    "workforce-core": "0.1.0",
+    "workforce-ui-core": "0.1.0",
+    "yaml": "^2.5.1",
+    "zundo": "^2.2.0",
+    "zustand": "^4.3.8"
+  },
+  "scripts": {
+    "start": "PUBLIC_URL=workforce-ui react-scripts start --port=3000",
+    "dev": "react-app-rewired start --env=dev --port=3000 --watch",
+    "build": "GENERATE_SOURCEMAP=false react-app-rewired build",
+    "build:dev": "GENERATE_SOURCEMAP=true react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-scripts eject"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@tailwindcss/typography": "^0.5.9",
+    "@types/async-lock": "^1.4.0",
+    "@types/chai": "^4.3.5",
+    "@types/dagre": "^0.7.49",
+    "@types/lodash": "^4.14.194",
+    "@types/mocha": "^10.0.1",
+    "@types/prismjs": "^1.26.0",
+    "@types/react": "^18.2.0",
+    "@types/yaml": "^1.9.7",
+    "chai": "^4.3.7",
+    "mocha": "^10.2.0",
+    "react-app-rewired": "^2.2.1",
+    "tailwindcss": "^3.3.2",
+    "ts-node": "^10.9.1",
+    "webpack-cli": "^5.1.1"
+  }
+}

@@ -1,0 +1,53 @@
+{
+	"name": "workforce-ui-embedded-chat",
+	"version": "0.1.0",
+    "module": "esm",
+	"private": true,
+	"homepage": ".",
+	"sideEffects": false,
+	"scripts": {
+		"start": "react-scripts start --port=3008",
+		"dev": "react-scripts start --env=dev --port=3008 --watch",
+		"build": "GENERATE_SOURCEMAP=false react-scripts build --verbose",
+		"build:dev": "GENERATE_SOURCEMAP=true react-scripts build",
+		"test": "react-scripts test",
+		"eject": "react-scripts eject"
+	},
+	"browserslist": {
+		"production": [
+			">0.2%",
+			"not dead",
+			"not op_mini all"
+		],
+		"development": [
+			"last 1 chrome version",
+			"last 1 firefox version",
+			"last 1 safari version"
+		]
+	},
+	"dependencies": {
+		"@emotion/react": "^11.11.1",
+		"@emotion/styled": "^11.11.0",
+		"@heroicons/react": "^2.1.3",
+		"@jsonforms/core": "^3.1.0",
+		"@jsonforms/material-renderers": "^3.1.0",
+		"@jsonforms/react": "^3.1.0",
+		"@mui/icons-material": "^5.11.16",
+		"@mui/material": "^5.13.2",
+		"@mui/x-date-pickers": "^6.18.2",
+		"react": "^18.2.0",
+        "react-icons": "^5.2.1",
+		"react-markdown": "^9.0.1",
+		"rehype-highlight": "^7.0.0",
+		"remark-gfm": "^4.0.0",
+		"rxjs": "^7.8.1",
+		"workforce-ui-core": "^0.1.0",
+        "workforce-api-client": "^0.1.0",
+		"zundo": "^2.0.0-beta.18",
+		"zustand": "^4.3.8"
+	},
+	"devDependencies": {
+		"@types/react": "^18.2.0",
+		"typescript": "^5.3.2"
+	}
+}

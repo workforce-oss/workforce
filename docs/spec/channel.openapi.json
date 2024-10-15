@@ -1,0 +1,302 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Custom Channel Implementation",
+    "description": "Spec for Custom Channel Implementation",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/register": {
+      "post": {
+        "summary": "Register a channel",
+        "description": "Register a channel to manage via this API",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChannelConfig"
+              }
+            }
+          }
+        },
+        "callbacks": {
+          "ChannelMessageEvent": {
+            "{$request.body#/orgId}/{$request.body#/id}/chat" :{
+              "description": "This is a websocket endpoint that will send and receive messages for the channel",
+              "get": {
+                "requestBody": {
+                  "description": "Message received by the channel",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/ChannelMessageEvent"
+                      }
+                    }
+                  }
+                },
+                "responses": {
+                  "default": {
+                    "description": "Message sent to the channel",
+                    "content": {
+                      "application/json": {
+                        "schema": {
+                          "$ref": "#/components/schemas/MessageRequest"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "./base.openapi.json#/components/responses/RegistrationResponse"
+          }
+        }
+      }
+    },
+    "/destroy/{id}": {
+      "$ref": "./base.openapi.json#/paths/~1destroy~1{id}"
+    },
+    "/variablesSchema": {
+      "$ref": "./base.openapi.json#/paths/~1variablesSchema"
+    },
+    "/message": {
+      "post": {
+        "summary": "Send a message to the channel",
+        "description": "Send a message to the channel",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MessageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "./base.openapi.json#/components/responses/APIResponse"
+          }
+        }
+      }
+    },
+    "/establishSession": {
+      "post": {
+        "summary": "Establish a session with the channel",
+        "description": "This is called when a new task execution begins that uses this channel",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "taskExecutionId": {
+                    "type": "string"
+                  },
+                  "originalMessageData": {
+                    "type": "object",
+                    "description": "Data from the original message that triggered the task execution"
+                  }
+                },
+                "required": [
+                  "taskExecutionId"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "./base.openapi.json#/components/responses/APIResponse"
+          }
+        }
+      }
+    },
+    "/join": {
+      "post": {
+        "summary": "Join a session with the channel",
+        "description": "This is called when a worker joins a task execution that uses this channel",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "workerId": {
+                    "type": "string"
+                  },
+                  "token": {
+                    "type": "string",
+                    "description": "Token to authenticate the worker"
+                  },
+                  "username": {
+                    "type": "string",
+                    "description": "Username of the worker"
+                  },
+                  "taskExecutionId": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "workerId",
+                  "token"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "./base.openapi.json#/components/responses/APIResponse"
+          }
+        }
+      }
+    }  
+  },
+  "components": {
+    "schemas": {
+      "ChannelConfig": {
+        "$ref": "./base.openapi.json#/components/schemas/BaseConfig"
+      },
+      "MessageRequest": {
+        "type": "object",
+        "properties": {
+          "channelId": {
+            "type": "string"
+          },
+          "workerId": {
+            "type": "string"
+          },
+          "taskExecutionId": {
+            "type": "string"
+          },
+          "senderId": {
+            "type": "string"
+          },
+          "messageId": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "number",
+            "description": "Unix timestamp in milliseconds"
+          },
+          "image": {
+            "type": "string",
+            "description": "Image URL or base64 encoded image"
+          },
+          "toolCalls": {
+            "type": "array",
+            "items": {
+              "$ref": "./base.openapi.json#/components/schemas/ToolCall"
+            }
+          },
+          "final": {
+            "type": "boolean",
+            "description": "Messages can be sent incrementally. This flag indicates this is the final part of the message."
+          },
+          "username": {
+            "type": "string",
+            "description": "Username of the sender"
+          },
+          "newConversation": {
+            "type": "boolean",
+            "description": "Flag to indicate if this is a new conversation"
+          },
+          "channelMessageData": {
+            "type": "object",
+            "description": "Data specific to the channel. This is a free form object that can contain data needed for the channel implementation, such as a thread id."
+          },
+          "ignoreResponse": {
+            "type": "boolean",
+            "description": "Flag to indicate that any response will be ignored"
+          },
+          "messageType": {
+            "type": "string",
+            "description": "Type of message. This can be used to differentiate between different types of messages, such as a message that is a response to a question."
+          },
+          "completionFunction": {
+            "type": "object",
+            "description": "The schema of the function that is called when the task is completed"
+          }
+        },
+        "required": [
+          "channelId",
+          "workerId",
+          "taskExecutionId",
+          "senderId",
+          "messageId",
+          "message",
+          "timestamp"
+        ]
+      },
+      "ChannelMessageEvent": {
+        "type": "object",
+        "description": "Event to send to the workforce platform when a message is received by the channel",
+        "properties": {
+          "channelId": {
+            "type": "string"
+          },
+          "senderId": {
+            "type": "string",
+            "description": "UserId of the sender"
+          },
+          "users": {
+            "type": "array",
+            "description": "List of userIds sending the message. This will generally be the same as senderId, but can be different if the message is sent on behalf of another user.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "messageId": {
+            "type": "string",
+            "description": "The channel implementation-specific message ID"
+          },
+          "message": {
+            "type": "string",
+            "description": "The message content"
+          },
+          "taskExecutionId": {
+            "type": "string",
+            "description": "ID of the task execution the message is related to. If no task execution is sent, then this will trigger a new task execution."
+          },
+          "channelMessageData": {
+            "type": "object",
+            "description": "Data specific to the channel. This is a free form object that can contain data needed for the channel implementation, such as a thread id. It will be included in the message request object sent to the /message endpoint for messages related to the associated taskExecutionId."
+          },
+          "image": {
+            "type": "string",
+            "description": "Image URL or base64 encoded image"
+          },
+          "messageType": {
+            "type": "string",
+            "description": "Type of message. This can be used to differentiate between different types of messages, such as a message that is a response to a question."
+          },
+          "toolCalls": {
+            "type": "array",
+            "description": "List of tool calls that are part of the message. This may be used to provide responses to tool calls received on the messageRequest endpoint, for rich user interfaces that implement them. A common example would be for dynamically generated forms.",
+            "items": {
+              "$ref": "./base.openapi.json#/components/schemas/ToolCall"
+            }
+          }
+        },
+        "required": [
+          "channelId",
+          "senderId",
+          "messageId",
+          "message",
+          "users"
+        ]
+      }
+    }
+  }
+}

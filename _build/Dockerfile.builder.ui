@@ -1,0 +1,9 @@
+FROM jjoneson/workforce-builder:latest
+
+WORKDIR /app
+
+COPY workforce-ui/package.json ./workforce-ui/
+COPY workforce-ui-embedded-chat/package.json ./workforce-ui-embedded-chat/
+COPY excelsior/package.json ./excelsior/
+
+RUN yarn install

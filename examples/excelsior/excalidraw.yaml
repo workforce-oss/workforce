@@ -1,0 +1,104 @@
+credentials:
+  - name: native-channel
+    type: native-channel
+---
+flows:
+- name: Excalidraw
+  description: New Flow
+  status: active
+  channels:
+    - name: Native Channel
+      description: Native Channel
+      type: native-channel
+      variables:
+        channel_name: excelsior
+        anonymous_access: true
+        oauth2_issuer_uri: ""
+        oauth2_claims: ""
+      credential: native-channel
+  resources: []
+  tools:
+    - name: Excalidraw Tool
+      description: A tool that interacts with Excalidraw.
+      type: excalidraw-tool
+      channel: Native Channel
+  trackers: []
+  tasks:
+    - name: Chat
+      description: A simple task.
+      type: simple-task
+      requiredSkills:
+        - conversation
+      inputs:
+        message: Native Channel
+      triggers:
+        - Native Channel
+      subtasks:
+        - name: Excalidraw
+      variables:
+        prompt_template: "{{message}}"
+        system_message_template: >-
+          You are a helpful assistant that users can interact with to collaborate
+          on documents.
+
+          Use the tools available to you to help the user with their task. Do not tell the user about the tools you are using, just use them to help the user.
+
+          If a summary was receieved, take the appropriate action based on the summary. Lots of summaries will explain what a user wants to do next, assume that's what they want to do next.
+
+    - name: Excalidraw
+      description: A task that uses Excalidraw.
+      purpose: Creating Diagrams with Excalidraw
+      type: simple-task
+      requiredSkills:
+        - conversation
+      inputs:
+        message: Chat
+      tools:
+        - name: Excalidraw Tool
+      variables:
+        prompt_template: >-
+          IMPORTANT: If the user is done with the diagram, and wants to move on to another task such as creating a presentation, complete the task and provide a summary of what we did. In the summary, provide an explanation of what the user wanted to do next. You do not need to ask the user to review the summary.
+
+          Only create diagrams with Excalidraw, no other tasks are appropriate.
+          
+          Here is your initial request:
+
+          {{message}}
+
+          You can go ahead and just start working. The user thinks they are already in a conversation with you. You don't need to acknowledge or repeat back the request.
+
+          DO NOT START YOUR MESSAGE WITH AN ACKNOWLEDGEMENT LIKE "Certainly!"
+
+        system_message_template: >-
+          You are an expert at creating diagrams with Excalidraw.
+
+          Prefer using the put method of excalidraw to add multiple elements at once, rather than one at a time.
+
+          Make sure when you create lines and arrows that you set the correct x, y, width, and height to ensure they connect to the start and end bindings.
+
+
+          Always make the text alignment for containers top left.
+
+
+          Try to make sure everything is big enough to fit all components.
+
+          You don't need to include kubernetes infrastructure, each application can be a single box.
+
+          Do include cloud components though.
+
+
+          Try to put the components in vertical ranks based on their connectivity.
+
+          Databases, caches, and queues should be at the bottom.
+
+          APIs and UIs should be at the top.
+
+          Internal communication should be in the middle.
+
+          If things are connected, make sure that lines do not overlap with other elements.
+
+
+          Try to add as many elements per request at a time as possible, but if you need to think through certain things, that's fine too.
+
+          Expand existing elements if you need to fit more content in them.
+

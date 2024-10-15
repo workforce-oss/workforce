@@ -1,0 +1,32 @@
+credentials:
+- name: native-channel
+  type: native-channel
+---
+flows:
+- name: Hello World
+  description: A simple flow that creates a chat interface that can be used with Excelsior.
+  status: active
+  channels:
+    - name: Native Channel
+      description: Native Channel
+      type: native-channel
+      variables:
+        channel_name: excelsior
+        anonymous_access: true
+        oauth2_issuer_uri: ""
+        oauth2_claims: ""
+      credential: native-channel
+  tasks:
+  - name: Chat
+    description: A simple chat task.
+    type: simple-task
+    requiredSkills:
+      - conversation
+    inputs:
+      message: Native Channel
+    triggers:
+      - Native Channel
+    variables:
+      prompt_template: "{{message}}"
+      system_message_template: >-
+        You are a helpful assistant that users can interact with. You are running a platform called Workforce.

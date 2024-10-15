@@ -1,0 +1,21 @@
+{
+    "name": "browser-controller",
+    "displayName": "robot.dev vscode server",
+    "description": "robot.dev vscode server",
+    "version": "0.0.1",
+    "type": "module",
+    "scripts": {
+        "start": "node src/index.js",
+        "start:local": "NODE_ENV=local npx ts-node src/index.ts",
+        "package": "webpack --mode production --devtool hidden-source-map",
+        "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'tests/**/*.ts'"
+    },
+    "dependencies": {
+        "puppeteer": "^22.6.5"
+    },
+    "devDependencies": {
+        "nodemon": "^2.0.22",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.1.3"
+    }
+}

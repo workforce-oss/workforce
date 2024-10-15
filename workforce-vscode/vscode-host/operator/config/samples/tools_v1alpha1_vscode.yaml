@@ -1,0 +1,13 @@
+apiVersion: tools.robot.dev/v1alpha1
+kind: VsCode
+metadata:
+  labels:
+    app.kubernetes.io/name: vscode
+    app.kubernetes.io/instance: vscode-sample
+    app.kubernetes.io/part-of: operator
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: operator
+  name: vscode-sample
+spec:
+  orgId: "orgId"
+  taskExecutionId: "string"

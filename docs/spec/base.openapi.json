@@ -1,0 +1,431 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Workforce Base Object API",
+    "description": "Workforce Base Object API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/register": {
+      "post": {
+        "summary": "Register an Object",
+        "description": "Register an Object",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BaseConfig"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "success",
+                        "error"
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/destroy/{id}": {
+      "post": {
+        "summary": "Destroy an Object",
+        "description": "Destroy an Object",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "enum": [
+                        "success",
+                        "error"
+                      ]
+                    },
+                    "message": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/variablesSchema": {
+      "get": {
+        "summary": "Get Variables Schema",
+        "description": "Get Variables Schema",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VariablesSchema"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BaseConfig": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "orgId": {
+            "type": "string"
+          },
+          "flowId": {
+            "type": "string"
+          },
+          "variables": {
+            "type": "object"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "channel",
+              "document_repository",
+              "resource",
+              "task",
+              "tracker",
+              "worker"
+            ]
+          },
+          "subtype": {
+            "type": "string"
+          }
+        }
+      },
+      "ToolCall": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of the tool"
+          },
+          "arguments": {
+            "type": "object",
+            "description": "Arguments for the tool"
+          },
+          "timestamp": {
+            "type": "number",
+            "description": "Unix timestamp in milliseconds"
+          },
+          "call_id": {
+            "type": "string",
+            "description": "Unique ID for the call"
+          },
+          "sessionId": {
+            "type": "string",
+            "description": "Session ID for the call"
+          },
+          "result": {
+            "type": "object",
+            "description": "Result of the call"
+          },
+          "image": {
+            "type": "string",
+            "description": "URL or base64 encoded image. This is an image that is sent to the worker."
+          },
+          "humanState": {
+            "$ref": "#/components/schemas/HumanState"
+          },
+          "toolRequestId": {
+            "type": "string",
+            "description": "ID of the tool request"
+          },
+          "toolType": {
+            "type": "string",
+            "description": "Type of the tool"
+          }
+        },
+        "required": [
+          "name",
+          "arguments"
+        ]
+      },
+      "ToolState": {
+        "type": "object",
+        "description": "Tool state for the current Task Execution",
+        "properties": {
+          "toolId": {
+            "type": "string",
+            "description": "ID of the tool"
+          },
+          "taskExecutionId": {
+            "type": "string",
+            "description": "ID of the task execution"
+          },
+          "timestamp": {
+            "type": "number",
+            "description": "Unix timestamp in milliseconds"
+          },
+          "humanState": {
+            "$ref": "#/components/schemas/HumanState"
+          },
+          "machineState": {
+            "type": "object",
+            "description": "Machine state of the tool. This is the state used by the worker."
+          },
+          "machineImage": {
+            "type": "string",
+            "description": "URL or base64 encoded image. This is an image representing what the worker sees."
+          }
+        }
+      },
+      "HumanState": {
+        "type": "object",
+        "description": "Human state of the tool. This is the state used by the end user.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Name of state object"
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of the human state"
+          },
+          "embed": {
+            "type": "string",
+            "description": "Embed URL or raw HTML"
+          },
+          "directUrl": {
+            "type": "string",
+            "description": "Direct URL to state object"
+          }
+        }
+      },
+      "VariablesSchema": {
+        "type": "object",
+        "properties": {
+          "required": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": {
+          "$ref": "#/components/schemas/VariablesSchemaElement"
+        }
+      },
+      "VariablesSchemaElement": {
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "string",
+              "number",
+              "boolean",
+              "array",
+              "object"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "default": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "array"
+              },
+              {
+                "type": "object"
+              }
+            ]
+          },
+          "enum": {
+            "description": "Enum values for the variable",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "min": {
+            "description": "Minimum value for the variable",
+            "type": "number"
+          },
+          "max": {
+            "description": "Maximum value for the variable",
+            "type": "number"
+          },
+          "x-workforce-multiline": {
+            "description": "Mark a string variable as multiline",
+            "type": "boolean"
+          },
+          "x-workforce-sensitive": {
+            "description": "Mark a variable as sensitive",
+            "type": "boolean"
+          },
+          "x-workforce-required-for": {
+            "type": "array",
+            "description": "List of conditions for which the variable is required",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "description": "Name of the variable",
+                  "type": "string"
+                },
+                "option": {
+                  "description": "Value of the variable",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "x-workforce-optional-for": {
+            "type": "array",
+            "description": "List of conditions for which the variable is optional",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "description": "Name of the variable",
+                  "type": "string"
+                },
+                "option": {
+                  "description": "Value of the variable",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "x-workforce-hidden": {
+            "description": "Mark a variable as hidden",
+            "type": "boolean"
+          },
+          "x-workforce-advanced": {
+            "description": "Mark a variable as advanced",
+            "type": "boolean"
+          }
+        }
+      },
+      "APIResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "success",
+              "error"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "status",
+          "message"
+        ]
+      },
+      "RegistrationResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "success",
+              "error"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "webSocketUrl": {
+            "type": "string",
+            "description": "A URL that can be used to establish a WebSocket connection to this server instead of using the workforce-provided websocket. This allows the workforce platform to initiate the connection, which is useful for environments where the workforce platform is behind a firewall."
+          }
+        },
+        "required": [
+          "status",
+          "message"
+        ]
+      } 
+    },
+    "responses": {
+      "APIResponse": {
+        "description": "API Response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/APIResponse"
+            }
+          }
+        }
+      },
+      "RegistrationResponse": {
+        "description": "Registration Response",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/RegistrationResponse"
+            }
+          }
+        }
+      }
+    }
+  }
+}

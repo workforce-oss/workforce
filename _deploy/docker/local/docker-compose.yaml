@@ -1,0 +1,193 @@
+name: workforce
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+
+
+services:
+  proxy:
+    image: nginxinc/nginx-unprivileged:1.25-alpine
+    hostname: proxy
+    ports:
+      - "8085:8085"
+    restart: unless-stopped
+    stop_grace_period: 1s
+    depends_on:
+      - workforce-all
+      - workforce-ui
+      - workforce-embedded-chat
+      - excelsior
+      - vscode-extension-server
+      # - weaviate
+      # - storage-api
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      frontend:
+      backend:
+  workforce-all:
+    image: jjoneson/workforce-server:latest
+    hostname: workforce
+    restart: unless-stopped
+    depends_on:
+      - redis
+      - weaviate
+      - postgres
+      - storage-api
+      - nlm-ingestor
+    volumes:
+      - ./encryption/private.pem:/data/private.pem
+      - ./encryption/public.pem:/data/public.pem
+    env_file:
+      - workforce-server.env
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+      start_interval: 5s
+
+  storage-api:
+    image: jjoneson/workforce-storage-api:latest
+    hostname: storage-api
+    restart: unless-stopped
+    depends_on:
+      - postgres
+      - weaviate
+      - redis
+    volumes:
+      - ./encryption/private.pem:/data/private.pem
+      - ./encryption/public.pem:/data/public.pem
+      - storage-api-data:/tmp
+    networks:
+      - backend
+    env_file:
+      - workforce-storage-api.env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 5s
+      start_interval: 5s
+
+  workforce-ui:
+    image: jjoneson/workforce-ui:latest
+    hostname: workforce-ui
+    restart: unless-stopped
+    depends_on:
+      - workforce-all
+    networks:
+      - backend
+  workforce-embedded-chat:
+    image: jjoneson/workforce-embedded-chat:latest
+    hostname: workforce-embedded-chat
+    restart: unless-stopped
+    depends_on:
+      - workforce-all
+    networks:
+      - backend
+  excelsior:
+    image: jjoneson/excelsior:latest
+    hostname: excelsior
+    restart: unless-stopped
+    depends_on:
+      - workforce-all
+      - workforce-ui
+    networks:
+      - backend
+  vscode-extension-server:
+    image: jjoneson/vscode-extension-server:latest
+    hostname: vscode-extension-server
+    restart: unless-stopped
+    stop_grace_period: 1s
+    volumes:
+      - vscode-extension-server-data:/data
+    environment:
+      PORT: '3000'
+    networks:
+      - backend
+  redis:
+    image: redis/redis-stack-server:7.2.0-v8
+    hostname: redis
+    restart: unless-stopped
+    networks:
+      - backend
+    environment:
+      REDIS_ARGS: "--requirepass redis-password"
+    volumes:
+      - redis-data:/data
+      - ${PWD}/redis/users.acl:/etc/redis/users.acl
+      - ${PWD}/redis/redis-stack.conf:/redis-stack.conf
+  postgres:
+    image: postgres:13.3
+    hostname: postgres
+    restart: unless-stopped
+    networks:
+      - backend
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: app
+      POSTGRES_PASSWORD: workforce
+      POSTGRES_DB: app
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+  weaviate:
+    image: cr.weaviate.io/semitechnologies/weaviate:1.26.6
+    hostname: weaviate
+    ports:
+      - "8091:8080"
+    command:
+      - --host
+      - 0.0.0.0
+      - --port
+      - '8080'
+      - --scheme
+      - http
+    restart: unless-stopped
+    networks:
+      - frontend
+      - backend
+    volumes:
+      - weaviate-data:/var/lib/weaviate
+    environment:
+      AUTHENTICATION_ANONYMOUS_ACCESS_ENABLED: 'false'
+      AUTHENTICATION_APIKEY_ENABLED: 'true'
+      AUTHENTICATION_APIKEY_USERS: 'workforce@example.com'
+      AUTHENTICATION_APIKEY_ALLOWED_KEYS: 'workforce-key'
+      PERSISTENCE_DATA_PATH: '/var/lib/weaviate'
+      DEFAULT_VECTORIZER_MODULE: 'none'
+  # weaviate-ui:
+  #   image: naaive/weaviate-ui:latest
+  #   hostname: weaviate-ui
+  #   restart: unless-stopped
+  #   depends_on:
+  #     - weaviate
+  #   ports:
+  #     - "8077:7777"
+  #   networks:
+  #     - frontend
+  #     - backend
+  #   environment:
+  #     WEAVIATE_URL: 'http://weaviate:8080'
+  #     WEAVIATE_API_KEYS: 'workforce-key'
+  nlm-ingestor:
+    image: ghcr.io/nlmatics/nlm-ingestor:latest
+    hostname: nlm-ingestor
+    restart: unless-stopped
+    stop_grace_period: 1s
+    networks:
+      - backend
+
+volumes:
+  redis-data:
+  vscode-extension-server-data:
+  storage-api-data:
+  weaviate-data:
+  postgres-data:

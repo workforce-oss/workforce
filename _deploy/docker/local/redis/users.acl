@@ -1,0 +1,2 @@
+user default on ~* &* +@all >redis-password
+user workforce allkeys allchannels +@all on >redis-password

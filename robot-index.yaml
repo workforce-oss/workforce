@@ -1,0 +1,549 @@
+projects:
+- name: Channel Object
+  slug: channel-object
+  description: "Channel Object\nThis is the channel object for the Workforce Lib."
+  location: "workforce-core/src/objects/channel"
+  projectType: "workforce-core-ts"
+  language: "typescript"
+  referenceProjectLocation: "workforce-core-reference"
+  projectFiles:
+  - location: db.ts
+    projectFileType: "base-db"
+    description: "Contains the schema for the channel object."
+  - location: db.message.ts
+    projectFileType: "secondary-db"
+    description: "Contains the schema for the channel message object."
+  - location: db.session.ts
+    projectFileType: "secondary-db"
+    description: "Contains the schema for the channel session object."
+  - location: model.ts
+    projectFileType: "base-object-model"
+    description: "Contains the model for the channel object."
+  - location: base.ts
+    projectFileType: "base-object"
+    description: "Contains the object class for the channel object."
+  - location: cache.ts
+    projectFileType: "base-object-lib"
+    description: "Contains the cache logic for the channel object."
+  - location: broker.ts
+    projectFileType: "broker"
+    description: "Contains the broker logic for the channel object."
+  - location: api.ts
+    projectFileType: "base-api"
+    description: "Contains the restful endpoints for the channel object."
+  - locatoin: api.message.ts
+    projectFileType: "secondary-api"
+    description: "Contains the restful endpoints for the channel message object." 
+  - location: api.session.ts
+    projectFileType: "secondary-api"
+    description: "Contains the restful endpoints for the channel session object."
+  - location: impl/discord/discord_channel_metadata.ts
+    projectFileType: "subtype-metadata"
+    description: "Contains the metadata for the discord channel object."
+  - location: impl/discord/discord_channel.ts
+    projectFileType: "subtype-implementation"
+    description: "Contains the implementation for the discord channel object."
+  - location: impl/native/native_channel_model.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Contains the model for the native channel object."
+  - location: impl/native/native_channel_metadata.ts
+    projectFileType: "subtype-metadata"
+    description: "Contains the metadata for the native channel object."
+  - location: impl/native/native_channel.ts
+    projectFileType: "subtype-implementation"
+    description: "Contains the implementation for the native channel object."
+  - location: impl/slack/slack_channel_metadata.ts
+    projectFileType: "subtype-metadata"
+    description: "Contains the metadata for the slack channel object."
+  - location: impl/slack/slack_channel.ts
+    projectFileType: "subtype-implementation"
+    description: "Contains the implementation for the slack channel object."
+  - location: factory/config_factory.ts
+    projectFileType: "config-factory"
+    description: "Contains the factory class for creating channel object configuration."
+  - location: factory/factory.ts
+    projectFileType: "object-factory"
+    description: "Contains the factory class for creating channel objects."
+
+- name: Document Repository Object
+  slug: document-repository-object
+  location: "workforce-core/src/objects/document_repository"
+  description: "Document Repository Object\nThis is the document repository object for the Workforce Lib."
+  projectType: "workforce-core-ts"
+  language: "typescript"
+  referenceProjectLocation: "workforce-core-reference"
+  projectFiles:
+  - location: db.ts
+    projectFileType: "base-db"
+    description: "Contains the schema for the document repository object."
+  - location: db.document.ts
+    projectFileType: "secondary-db"
+    description: "Contains the schema for the document object."
+  - location: model.ts
+    projectFileType: "base-object-model"
+    description: "Contains the model for the document repository object."
+  - location: base.ts
+    projectFileType: "base-object"
+    description: "Contains the object class for the document repository object."
+  - location: broker.ts
+    projectFileType: "broker"
+    description: "Contains the broker logic for the document repository object."
+  - location: api.ts
+    projectFileType: "base-api"
+    description: "Contains the restful endpoints for the document repository object."
+  - location: impl/git/git_document_repository_metadata.ts
+    projectFileType: "subtype-metadata"
+    description: "Contains the metadata for the git document repository object."
+  - location: impl/git/git_document_repository.ts
+    projectFileType: "subtype-implementation"
+    description: "Contains the implementation for the git document repository object."
+  - location: impl/internal/internal_document_repository_metadata.ts
+    projectFileType: "subtype-metadata"
+    description: "Contains the metadata for the internal document repository object."
+  - location: impl/internal/internal_document_repository.ts
+    projectFileType: "subtype-implementation"
+    description: "Contains the implementation for the internal document repository object."
+  - location: impl/lib/embeddings/embedding_client_factory.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Contains the factory class for creating embedding clients."
+  - location: impl/lib/embeddings/embedding_client_openai.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Contains the implementation for the openai embedding client."
+  - location: impl/lib/embeddings/embedding_client.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Contains the embedding client interface."
+  - location: impl/lib/embeddings/embedding_models.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Contains the models for the embedding client."
+  - location: impl/lib/parser/nlm_ingestor_client.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Contains the implementation for the nlm ingestor client."
+  - location: impl/lib/parser/nlm_ingestor_model.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Contains the model for the nlm ingestor client."
+  - location: impl/lib/parser/nlm_ingestor_parser.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Contains the parser for the nlm ingestor client."
+  - location: impl/storage/storage_api_client.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Contains the api client for the storage service."
+  - location: impl/vectordb/model.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Contains the model for the vectordb client."
+  - location: impl/vectordb/vectordb_client_factory.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Contains the factory class for creating vectordb clients."
+  - location: impl/vectordb/vectordb_client.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Contains the interface for the vectordb client."
+  - location: impl/vectordb/weaviate_classes.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Contains the classes for the weaviate data model."
+  - location: impl/vectordb/weaviate_client.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Contains the weaviate vectordb client."
+  - location: impl/lib/model.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Contains common models used throughout various implementations."
+  
+
+- name: Documentation Object
+  slug: documentation-object
+  description: "Documentation Object\nThis is the documentation object for the Workforce Lib."
+  location: "workforce-core/src/objects/documentation"
+  projectType: "workforce-core-ts"
+  language: "typescript"
+  referenceProjectLocation: "workforce-core-reference"
+  projectFiles:
+  - location: db.ts
+    projectFileType: "base-db"
+    description: "Contains the schema for the documentation object."
+  - location: model.ts
+    projectFileType: "base-object-model"
+    description: "Contains the model for the documentation object."
+  - location: base.ts
+    projectFileType: "base-object"
+    description: "Contains the object class for the documentation object."
+  - location: api.ts
+    projectFileType: "base-api"
+    description: "Contains the restful endpoints for the documentation object."
+  - location: impl/default/default_documentation_metadata.ts
+    projectFileType: "subtype-metadata"
+    description: "Contains the default metadata for the documentation object."
+  - location: impl/default/default_documentation.ts
+    projectFileType: "subtype-implementation"
+    description: "Contains the default implementation for the documentation object."
+  - location: factory/config_factory.ts
+    projectFileType: "config-factory"
+    description: "Contains the factory class for creating documentation object configuration."
+  - location: factory/factory.ts
+    projectFileType: "object-factory"
+    description: "Contains the factory class for creating documentation objects."
+
+- name: Flow Object
+  slug: flow-object
+  description: "Flow Object\nA Flow is a special type of object that serves as a composition of other objects."
+  projectType: "workforce-core-ts"
+  language: "typescript"
+  referenceProjectLocation: "workforce-core-reference"
+  projectFiles:
+  - location: db.ts
+    projectFileType: "base-db"
+    description: "Contains the schema for the flow object. There is also translation logic between the API, DB, and Object models. Names are translated to Ids, and vice versa."
+  - location: model.ts
+    projectFileType: "base-object-model"
+    description: "Contains the model for the flow object."
+  - location: validation.ts
+    projectFileType: "base-object-lib"
+    description: "Contains the validation logic for the flow object."
+  - location: api.ts
+    projectFileType: "base-api"
+    description: "Contains the restful endpoints for the flow object."
+
+- name: Resource Object
+  slug: resource-object
+  description: "Resource Object\nThis is the resource object for the Workforce Lib."
+  location: "workforce-core/src/objects/resource"
+  projectType: "workforce-core-ts"
+  language: "typescript"
+  referenceProjectLocation: "workforce-core-reference"
+  projectFiles:
+  - location: db.ts
+    projectFileType: "base-db"
+    description: "Contains the schema for the resource object."
+  - location: db.resource_version.ts
+    projectFileType: "secondary-db"
+    description: "Contains the schema for the resource version object."
+  - location: db.resource_write.ts
+    projectFileType: "secondary-db"
+    description: "Contains the schema for the resource write object."
+  - location: model.ts
+    projectFileType: "base-object-model"
+    description: "Contains the model for the resource object."
+  - location: base.ts
+    projectFileType: "base-object"
+    description: "Contains the object class for the resource object."
+  - location: broker.ts
+    projectFileType: "broker"
+    description: "Contains the broker logic for the resource object."
+  - location: api.ts
+    projectFileType: "base-api"
+    description: "Contains the restful endpoints for the resource object."
+  - location: api.resource_version.ts
+    projectFileType: "secondary-api"
+    description: "Contains the restful endpoints for the resource version object."
+  - location: api.resource_write.ts
+    projectFileType: "secondary-api"
+    description: "Contains the restful endpoints for the resource write object."
+  - location: impl/github/github_resource_metadata.ts
+    projectFileType: "subtype-metadata"
+    description: "Contains the metadata for the github resource object."
+  - location: impl/github/github_resource.ts
+    projectFileType: "subtype-implementation"
+    description: "Contains the implementation for the github resource object."
+  - location: factory/config_factory.ts
+    projectFileType: "config-factory"
+    description: "Contains the factory class for creating resource object configuration."
+  - location: factory/factory.ts
+    projectFileType: "object-factory"
+    description: "Contains the factory class for creating resource objects."
+
+- name: Task Object
+  slug: task-object
+  description: "Task Object\nThis is the task object for the Workforce Lib."
+  location: "workforce-core/src/objects/task"
+  projectType: "workforce-core-ts"
+  language: "typescript"
+  referenceProjectLocation: "workforce-core-reference"
+  projectFiles:
+  - location: db.ts
+    projectFileType: "base-db"
+    description: "Contains the schema for the task object."
+  - location: db.task_execution.ts
+    projectFileType: "secondary-db"
+    description: "Contains the schema for the task execution object."
+  - location: model.ts
+    projectFileType: "base-object-model"
+    description: "Contains the model for the task object."
+  - location: base.ts
+    projectFileType: "base-object"
+    description: "Contains the object class for the task object."
+  - location: broker.ts
+    projectFileType: "broker"
+    description: "Contains the broker logic for the task object."
+  - location: broker.mapping.ts
+    projectFileType: "base-object-lib"
+    description: "Contains input mapping logic for the task object."
+  - location: broker.outputs.ts
+    projectFileType: "base-object-lib"
+    description: "Contains output logic for the task object."
+  - location: broker.subscriptions.ts
+    projectFileType: "base-object-lib"
+    description: "Contains subscription logic for the task object."
+  - location: api.ts
+    projectFileType: "base-api"
+    description: "Contains the restful endpoints for the task object."
+  - location: api.task_execution.ts
+    projectFileType: "secondary-api"
+    description: "Contains the restful endpoints for the task execution object."
+  - location: impl/simple/simple_task_metadata.ts
+    projectFileType: "subtype-metadata"
+    description: "Contains the metadata for the simple task object."
+  - location: impl/simple/simple_task.ts
+    projectFileType: "subtype-implementation"
+    description: "Contains the implementation for the simple task object."
+  - location: factory/config_factory.ts
+    projectFileType: "config-factory"
+    description: "Contains the factory class for creating task object configuration."
+  - location: factory/factory.ts
+    projectFileType: "object-factory"
+    description: "Contains the factory class for creating task objects."
+
+- name: Tool Object
+  slug: tool-object
+  description: "Tool Object\nThis is the tool object for the Workforce Lib."
+  location: "workforce-core/src/objects/tool"
+  projectType: "workforce-core-ts"
+  language: "typescript"
+  referenceProjectLocation: "workforce-core-reference"
+  projectFiles:
+  - location: db.ts
+    projectFileType: "base-db"
+    description: "Contains the schema for the tool object."
+  - location: db.tool_request.ts
+    projectFileType: "secondary-db"
+    description: "Contains the schema for the tool request object."
+  - location: model.ts
+    projectFileType: "base-object-model"
+    description: "Contains the model for the tool object."
+  - location: base.ts
+    projectFileType: "base-object"
+    description: "Contains the object class for the tool object."
+  - location: broker.ts
+    projectFileType: "broker"
+    description: "Contains the broker logic for the tool object."
+  - location: api.ts
+    projectFileType: "base-api"
+    description: "Contains the restful endpoints for the tool object."
+  - location: api.tool_request.ts
+    projectFileType: "secondary-api"
+    description: "Contains the restful endpoints for the tool request object."
+  - location: impl/coding/api_schema.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Contains the schema for the coding tool api."
+  - location: impl/coding/coding_tool_metadata.ts
+    projectFileType: "subtype-metadata"
+    description: "Contains the metadata for the coding tool object."
+  - location: impl/coding/coding_tool.ts
+    projectFileType: "subtype-implementation"
+    description: "Contains the implementation for the coding tool object."
+  - location: impl/coding/k8s_manager.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Manages vscode k8s resources."
+  - location: impl/github_board_ticket/github_board_ticket_metadata.ts
+    projectFileType: "subtype-metadata"
+    description: "Contains the metadata for the github board ticket tool."
+  - location: impl/github_board_ticket/github_board_ticket.ts
+    projectFileType: "subtype-implementation"
+    description: "Contains the implementation for the github board ticket tool."
+  - location: impl/openapi/openapi_tool_metadata.ts
+    projectFileType: "subtype-metadata"
+    description: "Contains the metadata for the openapi tool object."
+  - location: impl/openapi/openapi_tool.ts
+    projectFileType: "subtype-implementation"
+    description: "Contains the implementation for the openapi tool object."
+  - location: impl/openapi/openapi_auth_helper.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Contains the auth helper for the openapi tool."
+  - location: impl/openapi/openapi_types.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Contains types for authentication."
+  - location: impl/trello_ticket/trello_ticket_metadata.ts
+    projectFileType: "subtype-metadata"
+    description: "Contains the metadata for the trello ticket tool."
+  - location: impl/trello_ticket/trello_ticket.ts
+    projectFileType: "subtype-implementation"
+    description: "Contains the implementation for the trello ticket tool."
+  - location: factory/config_factory.ts
+    projectFileType: "config-factory"
+    description: "Contains the factory class for creating tool object configuration."
+  - location: factory/factory.ts
+    projectFileType: "object-factory"
+    description: "Contains the factory class for creating tool objects."
+
+- name: Tracker Object
+  slug: tracker-object
+  description: "Tracker Object\nThis is the tracker object for the Workforce Lib."
+  location: "workforce-core/src/objects/tracker"
+  projectType: "workforce-core-ts"
+  language: "typescript"
+  referenceProjectLocation: "workforce-core-reference"
+  projectFiles:
+  - location: db.ts
+    projectFileType: "base-db"
+    description: "Contains the schema for the tracker object."
+  - location: db.ticket_request.ts
+    projectFileType: "secondary-db"
+    description: "Contains the schema for the ticket request object."
+  - location: model.ts
+    projectFileType: "base-object-model"
+    description: "Contains the model for the tracker object."
+  - location: base.ts
+    projectFileType: "base-object"
+    description: "Contains the object class for the tracker object."
+  - location: broker.ts
+    projectFileType: "broker"
+    description: "Contains the broker logic for the tracker object."
+  - location: api.ts
+    projectFileType: "base-api"
+    description: "Contains the restful endpoints for the tracker object."
+  - location: api.ticket_request.ts
+    projectFileType: "secondary-api"
+    description: "Contains the restful endpoints for the ticket request object."
+  - location: impl/github_board/github_board_tracker_metadata.ts
+    projectFileType: "subtype-metadata"
+    description: "Contains the metadata for the github board tracker."
+  - location: impl/github_board/github_board_tracker.ts
+    projectFileType: "subtype-implementation"
+    description: "Contains the implementation for the github board tracker."
+  - location: impl/tello/trello_tracker_metadata.ts
+    projectFileType: "subtype-metadata"
+    description: "Contains the metadata for the trello tracker."
+  - location: impl/trello/trello_tracker.ts
+    projectFileType: "subtype-implementation"
+    description: "Contains the implementation for the trello tracker."
+  - location: factory/config_factory.ts
+    projectFileType: "config-factory"
+    description: "Contains the factory class for creating tracker object configuration."
+  - location: factory/factory.ts
+    projectFileType: "object-factory"
+    description: "Contains the factory class for creating tracker objects."
+
+- name: Worker Object
+  slug: worker-object
+  description: "Worker Object\nThis is the worker object for the Workforce Lib."
+  location: "workforce-core/src/objects/worker"
+  projectType: "workforce-core-ts"
+  language: "typescript"
+  referenceProjectLocation: "workforce-core-reference"
+  projectFiles:
+  - location: db.ts
+    projectFileType: "base-db"
+    description: "Contains the schema for the worker object."
+  - location: db.skill.ts
+    projectFileType: "secondary-db"
+    description: "Contains the schema for the skill object."
+  - location: db.work_request.ts
+    projectFileType: "secondary-db"
+    description: "Contains the schema for the work request object."
+  - location: db.worker_chat_session.ts
+    projectFileType: "secondary-db"
+    description: "Contains the schema for the worker chat session object."
+  - location: db.worker_chat_message.ts
+    projectFileType: "secondary-db"
+    description: "Contains the schema for the worker chat message object."
+  - location: service.queue.ts
+    projectFileType: "base-object-lib"
+    description: "Contains the queue logic for the worker object."
+  - location: model.ts
+    projectFileType: "base-object-model"
+    description: "Contains the model for the worker object."
+  - location: base.ts
+    projectFileType: "base-object"
+    description: "Contains the object class for the worker object."
+  - location: broker.ts
+    projectFileType: "broker"
+    description: "Contains the broker logic for the worker object."
+  - location: api.ts
+    projectFileType: "base-api"
+    description: "Contains the restful endpoints for the worker object."
+  - location: api.skill.ts
+    projectFileType: "secondary-api"
+    description: "Contains the restful endpoints for the skill object."
+  - location: api.work_request.ts
+    projectFileType: "secondary-api"
+    description: "Contains the restful endpoints for the work request object."
+  - location: api.worker_chat_session.ts
+    projectFileType: "secondary-api"
+    description: "Contains the restful endpoints for the worker chat session object."
+  - location: impl/ai/ai_models.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Contains the models for the ai worker."
+  - location: impl/ai/ai_service.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Contains the service for the ai worker."
+  - location: impl/ai/ai_service_factory.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Contains the factory for creating ai services."
+  - location: impl/ai/ai_worker_metadata.ts
+    projectFileType: "subtype-metadata"
+    description: "Contains the metadata for the ai worker."
+  - location: impl/ai/ai_worker.ts
+    projectFileType: "subtype-implementation"
+    description: "Contains the implementation for the ai worker."
+  - location: impl/ai/groq_service.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Contains the groq ai service."
+  - location: impl/ai/openai_service.ts
+    projectFileType: "subtype-implementation-lib"
+    description: "Contains the openai ai service."
+  - location: factory/config_factory.ts
+    projectFileType: "config-factory"
+    description: "Contains the factory class for creating worker object configuration."
+  - location: factory/factory.ts
+    projectFileType: "object-factory"
+    description: "Contains the factory class for creating worker objects."
+
+referenceProjects:
+- name: "Workforce Lib Reference"
+  slug: "workforce-core-reference"
+  description: "Workforce Lib Reference\nThis is the reference documentation for the Workforce Lib."
+  location: "workforce-core-reference"
+  projectType: "workforce-core-ts"
+  language: "typescript"
+  projectFileTypes:
+    - name: "package-json"
+      description: "The package.json is the manifest file for Node.js projects and can contain metadata about the project, such as the project name, version, and dependencies."
+      priority: 0
+    - name: "base-object-model"
+      description: "The base-object-model contains models for a specific object type. Also contains subtype information. Should be updated whenever a new subtype is added."
+      priority: 1
+    - name: "base-db"
+      description: "The base-db is the base class for sequelize data models."
+      priority: 2
+    - name: "secondary-db"
+      description: "The secondary-db is a secondary class for related sequelize data models."
+      priority: 3
+    - name: "base-object-lib"
+      description: "The base-object-lib is a file that extracts complex logic from the base-object."
+      priority: 4
+    - name: "base-object"
+      description: "The base-object is the base class for a specific object type."
+      priority: 5
+    - name: "broker"
+      description: "The broker is designed to mediate communication between objects."
+      priority: 6
+    - name: "base-api"
+      description: "The base-api manages a set of restful endpoints for a specific object type."
+      priority: 6
+    - name: "secondary-api"
+      description: "The secondary-api manages a set of restful endpoints for a related object type."
+      priority: 7
+    - name: "subtype-metadata"
+      description: "The subtype-metadata contains configuration data for a a specific object subtype."
+      priority: 8
+    - name: "subtype-implementation-lib"
+      description: "A subtype-implementation-lib is a file that extracts complex logic from the subtype-implementation."
+      priority: 9
+    - name: "subtype-implementation"
+      description: "The subtype-implementation contains an implementation of a specific object subtype."
+      priority: 10
+    - name: "object-factory"
+      description: "The object-factory is a factory class for creating objects. This should be updated whenever a new subtype is added."
+      priority: 11
+    - name: "config-factory"
+      description: "The config-factory is a factory class for creating object configuration. This should be updated whenever a new subtype is added."
+      priority: 12
+  projectFiles: []
+  
+

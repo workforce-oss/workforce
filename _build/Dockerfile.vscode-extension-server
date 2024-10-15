@@ -1,0 +1,30 @@
+FROM node:20-alpine AS builder
+RUN apk add g++ make py3-pip
+
+WORKDIR /app
+COPY package.json package.json
+COPY yarn.lock yarn.lock
+COPY lib/package.json lib/package.json
+COPY server/package.json server/package.json
+COPY workforce-vscode/package.json workforce-vscode/package.json
+
+RUN yarn install
+
+COPY lib/ lib/
+RUN yarn workspace lib install && yarn workspace lib run build
+
+COPY server/ server/
+RUN yarn workspace server install && yarn workspace server run package
+
+COPY workforce-vscode/ workforce-vscode/
+RUN npm -w workforce-vscode pkg set 'contributes.configuration.properties[workforce-vscode.chatEnabled].default'=false \
+    && npm -w workforce-vscode pkg set 'contributes.configuration.properties[workforce-vscode.socketUrl].default'='http://localhost:8085/vscode-extension-server/socket' \
+    && npm -w workforce-vscode pkg set 'contributes.configuration.properties[workforce-vscode.authEnabled].default'=false 
+RUN yarn workspace workforce-vscode install && yarn workspace workforce-vscode run extension
+
+FROM node:20-alpine
+
+COPY --from=builder /app/server/dist /app/server/dist
+COPY --from=builder /app/workforce-vscode/dist/extension.vsix /app/server/dist/extension.vsix
+
+CMD ["node", "/app/server/dist/index.js"]

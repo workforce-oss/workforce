@@ -1,0 +1,27 @@
+{
+  "private": true,
+  "scripts": {
+    "docker": "_build/build.sh && _deploy/docker/local/deploy.sh",
+    "docker:build": "_build/build.sh all",
+    "docker:build:backend": "_build/build.sh backend",
+    "docker:build:frontend": "_build/build.sh frontend",
+    "docker:build:extension": "_build/build.sh extension",
+    "docker:local": "_deploy/docker/local/deploy.sh",
+    "docker:push": "_build/build.sh && _build/push.sh"
+  },
+  "workspaces": [
+    "excelsior",
+    "workforce-api-client",
+    "workforce-cli",
+    "workforce-core",
+    "workforce-server",
+    "workforce-storage-api",
+    "workforce-ui",
+    "workforce-ui-core",
+    "workforce-ui-embedded-chat"
+  ],
+  "dependencies": {
+    "pg": "^8.11.3"
+  },
+  "devDependencies": {}
+}
