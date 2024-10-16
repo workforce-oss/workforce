@@ -27,7 +27,7 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	toolsv1alpha1 "github.com/devbots-llc/workforce-vscode/api/v1alpha1"
+	toolsv1alpha1 "github.com/workforce-oss/workforce-vscode/api/v1alpha1"
 )
 
 var _ = Describe("VsCode Controller", func() {

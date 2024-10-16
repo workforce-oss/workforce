@@ -17,8 +17,7 @@ resource "keycloak_openid_client" "workforce-ui" {
     "http://localhost:3001",
     "http://localhost:3001/workforce-ui/",
     "http://localhost:3001/workforce-ui/callback",
-    "http://localhost:3001/workforce-ui/*",
-    "vscode://DevBots.robot-dev-vscode/auth"
+    "http://localhost:3001/workforce-ui/*"
   ]
   web_origins = [
     "+"

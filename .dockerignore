@@ -10,12 +10,25 @@
 # Custom
 **/prod.sh
 
+#Examples
+**/examples*
 
+**/.git*
 # Keys
 **/*.pem
 
+**/.idea*
+**/.vscode*
+
+**/tests*
+
 # credentials
 **/credentials.yaml
+
+# terraform environments
+**/_deploy/kubernetes/terraform/**/terraform.*.tfvars
+**/.terraform/
+**/terraform.tfstate*
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 **/report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json

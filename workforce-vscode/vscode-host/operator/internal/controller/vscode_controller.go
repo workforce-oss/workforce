@@ -33,7 +33,7 @@ import (
 	"sigs.k8s.io/controller-runtime/pkg/client"
 	"sigs.k8s.io/controller-runtime/pkg/log"
 
-	toolsv1alpha1 "github.com/devbots-llc/workforce-vscode/api/v1alpha1"
+	toolsv1alpha1 "github.com/workforce-oss/workforce-vscode/api/v1alpha1"
 )
 
 // VsCodeReconciler reconciles a VsCode object

@@ -20,6 +20,9 @@ examples/backup
 # Keys
 *.pem
 
+# Others
+**/Dockerfile.bogus
+
 # credenitals
 credentials.yaml
 

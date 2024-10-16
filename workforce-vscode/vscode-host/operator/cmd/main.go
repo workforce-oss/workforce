@@ -34,8 +34,8 @@ import (
 	metricsserver "sigs.k8s.io/controller-runtime/pkg/metrics/server"
 	"sigs.k8s.io/controller-runtime/pkg/webhook"
 
-	toolsv1alpha1 "github.com/devbots-llc/workforce-vscode/api/v1alpha1"
-	"github.com/devbots-llc/workforce-vscode/internal/controller"
+	toolsv1alpha1 "github.com/workforce-oss/workforce-vscode/api/v1alpha1"
+	"github.com/workforce-oss/workforce-vscode/internal/controller"
 	istiov1alph3 "istio.io/client-go/pkg/apis/networking/v1alpha3"
 	//+kubebuilder:scaffold:imports
 )

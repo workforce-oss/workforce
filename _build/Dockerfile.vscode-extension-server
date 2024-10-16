@@ -17,9 +17,9 @@ COPY server/ server/
 RUN yarn workspace server install && yarn workspace server run package
 
 COPY workforce-vscode/ workforce-vscode/
-RUN npm -w workforce-vscode pkg set 'contributes.configuration.properties[workforce-vscode.chatEnabled].default'=false \
-    && npm -w workforce-vscode pkg set 'contributes.configuration.properties[workforce-vscode.socketUrl].default'='http://localhost:8085/vscode-extension-server/socket' \
-    && npm -w workforce-vscode pkg set 'contributes.configuration.properties[workforce-vscode.authEnabled].default'=false 
+RUN npm -w workforce-vscode pkg set 'contributes.configuration.properties[workforce-vscode.chatEnabled].default'=true \
+    && npm -w workforce-vscode pkg set 'contributes.configuration.properties[workforce-vscode.socketUrl].default'='http://localhost:8085/vscode-server/socket' \
+    && npm -w workforce-vscode pkg set 'contributes.configuration.properties[workforce-vscode.authEnabled].default'=true 
 RUN yarn workspace workforce-vscode install && yarn workspace workforce-vscode run extension
 
 FROM node:20-alpine

@@ -290,41 +290,6 @@ const App = () => {
                                             console.error(error);
                                         }
                                     }}
-                                    // onMessageInput={(message) => {
-                                    //     setMessages([...messages, {
-                                    //         messageId: new Date().getTime().toString(),
-                                    //         senderId: localTurn ? "local" : "remote",
-                                    //         message: message,
-                                    //         timestamp: new Date().getTime(),
-                                    //         final: true,
-                                    //     }]);
-                                    //     if (messages.length === 3) {
-                                    //         // setToolOutputs([{
-                                    //         //     arguments: {},
-                                    //         //     name: "Python",
-                                    //         //     type: "interpreter",
-                                    //         // }])
-                                    //         setToolOutputs([{
-                                    //             name: "Slides",
-                                    //             arguments: {},
-                                    //             humanState: {
-                                    //                 name: "Slides",
-                                    //                 embed: "https://docs.google.com/presentation/d/e/2PACX-1vTiWmbyjY6nmVN_uVQVeqof7_NfhProPgV4SER8yEpY1ITXsMBnIWcgAikAWaEgU97FpjsB91usD67B/embed?start=false&loop=false&delayms=3000",
-                                    //                 directUrl: "https://docs.google.com/presentation/d/1JAw26SKWGw7SKuiI3CXSUrhnKiLOEqZdr3kWjwVzm3Q/edit?usp=sharing",
-                                    //                 type: "iframe",
-                                    //             }
-                                    //         }]);
-                                    //         // setToolOutputs([{
-                                    //         //     arguments: {},
-                                    //         //     name: "Pull Request",
-                                    //         //     type: "iframe",
-                                    //         //     humanState: "https://github.com/devbots-llc/workforce-manager/pull/45"
-                                    //         // }]);
-                                    //         setToolOutputHidden(false);
-                                    //     }
-                                    //     console.log(messages);
-                                    //     setLocalTurn(!localTurn);
-                                    // }}
                                     sessionId={sessionId}
                                 />
                                 }

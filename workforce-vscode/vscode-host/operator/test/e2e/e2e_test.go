@@ -24,7 +24,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
-	"github.com/devbots-llc/workforce-vscode/test/utils"
+	"github.com/workforce-oss/workforce-vscode/test/utils"
 )
 
 const namespace = "operator-system"

@@ -32,7 +32,7 @@ import (
 	logf "sigs.k8s.io/controller-runtime/pkg/log"
 	"sigs.k8s.io/controller-runtime/pkg/log/zap"
 
-	toolsv1alpha1 "github.com/devbots-llc/workforce-vscode/api/v1alpha1"
+	toolsv1alpha1 "github.com/workforce-oss/workforce-vscode/api/v1alpha1"
 	//+kubebuilder:scaffold:imports
 )
 

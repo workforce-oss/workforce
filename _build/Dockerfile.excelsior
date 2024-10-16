@@ -1,4 +1,4 @@
-FROM jjoneson/workforce-builder-ui:latest AS builder
+FROM ghcr.io/workforce-oss/workforce-builder-ui:latest AS builder
 
 WORKDIR /app
 

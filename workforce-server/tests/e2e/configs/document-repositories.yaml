@@ -7,5 +7,5 @@ documentRepositories:
       model: text-embedding-3-small
       repo: workforce-docs
       file_regex: ".*.md"
-      owner: "devbots-llc"
+      owner: "workforce-oss"
       branch: main

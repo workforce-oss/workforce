@@ -29,7 +29,7 @@ services:
       frontend:
       backend:
   workforce-all:
-    image: jjoneson/workforce-server:latest
+    image: ghcr.io/workforce-oss/workforce-server:latest
     hostname: workforce
     restart: unless-stopped
     depends_on:
@@ -54,7 +54,7 @@ services:
       start_interval: 5s
 
   storage-api:
-    image: jjoneson/workforce-storage-api:latest
+    image: ghcr.io/workforce-oss/workforce-storage-api:latest
     hostname: storage-api
     restart: unless-stopped
     depends_on:
@@ -78,7 +78,7 @@ services:
       start_interval: 5s
 
   workforce-ui:
-    image: jjoneson/workforce-ui:latest
+    image: ghcr.io/workforce-oss/workforce-ui:latest
     hostname: workforce-ui
     restart: unless-stopped
     depends_on:
@@ -86,7 +86,7 @@ services:
     networks:
       - backend
   workforce-embedded-chat:
-    image: jjoneson/workforce-embedded-chat:latest
+    image: ghcr.io/workforce-oss/workforce-embedded-chat:latest
     hostname: workforce-embedded-chat
     restart: unless-stopped
     depends_on:
@@ -94,7 +94,7 @@ services:
     networks:
       - backend
   excelsior:
-    image: jjoneson/excelsior:latest
+    image: ghcr.io/workforce-oss/excelsior:latest
     hostname: excelsior
     restart: unless-stopped
     depends_on:
@@ -103,7 +103,7 @@ services:
     networks:
       - backend
   vscode-extension-server:
-    image: jjoneson/vscode-extension-server:latest
+    image: ghcr.io/workforce-oss/vscode-extension-server:latest
     hostname: vscode-extension-server
     restart: unless-stopped
     stop_grace_period: 1s

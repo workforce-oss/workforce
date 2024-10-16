@@ -29,7 +29,7 @@ export class LocalManager implements VsCodeInstanceManager {
 
     getCollabUrl(args: { orgId: string; taskExecutionId: string; repoUrl: string; channelId?: string, threadId?: string }): string {
         const encodedRepoUrl = encodeURIComponent(args.repoUrl);
-        let uri = `vscode://jjoneson.workforce-vscode/task-execution?task_execution_id=${args.taskExecutionId}&repo_url=${encodedRepoUrl}&org_id=${args.orgId}`;
+        let uri = `vscode://workforce-oss.workforce-vscode/task-execution?task_execution_id=${args.taskExecutionId}&repo_url=${encodedRepoUrl}&org_id=${args.orgId}`;
         if (args.channelId) {
             uri += `&channel_id=${args.channelId}`;
         }

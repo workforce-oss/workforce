@@ -8,10 +8,11 @@
 **/.pnpm-debug.log*
 
 # Custom
-**/prod.sh
+**/.*prod.sh
 **/.git
 **/.gitignore
 
+**/example.yaml
 
 # Keys
 **/*.pem

@@ -1,4 +1,4 @@
-module github.com/devbots-llc/workforce-vscode
+module github.com/workforce-oss/workforce-vscode
 
 go 1.21
 

@@ -3,7 +3,7 @@
   "displayName": "workforce",
   "description": "Integrate With Workforce",
   "version": "0.0.1",
-  "publisher": "jjoneson",
+  "publisher": "workforce-oss",
   "engines": {
     "vscode": "^1.88.0"
   },

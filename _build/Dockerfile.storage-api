@@ -1,4 +1,4 @@
-FROM jjoneson/workforce-builder:latest AS builder
+FROM ghcr.io/workforce-oss/workforce-builder:latest AS builder
 
 WORKDIR /app
 
@@ -9,7 +9,7 @@ COPY ./workforce-storage-api /app/workforce-storage-api
 
 RUN yarn workspace workforce-storage-api run package
 
-FROM jjoneson/workforce-base-server:latest
+FROM ghcr.io/workforce-oss/workforce-base-server:latest
 
 COPY --from=builder /app/workforce-storage-api/dist/index.mjs /app/workforce-storage-api/dist/index.mjs
 
