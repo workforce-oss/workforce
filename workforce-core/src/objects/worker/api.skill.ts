@@ -1,5 +1,5 @@
 import bodyParser from "body-parser";
-import express from "express";
+import express, { Router } from "express";
 import { reviver } from "../../util/json.js";
 import { CrudHandlers } from "../base/api.js";
 import { SkillDb } from "./db.skill.js";
@@ -151,7 +151,7 @@ export function SkillHandlers(): CrudHandlers {
     }
 }
 
-export const SkillRoutes = express.Router({ mergeParams: true });
+export const SkillRoutes: Router = express.Router({ mergeParams: true });
 const Handlers = SkillHandlers();
 SkillRoutes.post("/", ...Handlers.create);
 SkillRoutes.get("/:id", ...Handlers.read);

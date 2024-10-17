@@ -1,5 +1,5 @@
 import bodyParser from "body-parser";
-import express, { RequestHandler } from "express";
+import express, { RequestHandler, Router } from "express";
 import { Logger } from "../../logging/logger.js";
 import { ToolDb } from "./db.js";
 import { ToolStateDb } from "./db.state.js";
@@ -59,5 +59,5 @@ export function ToolImageHandlers(): Record<string, RequestHandler[]> {
     };
 }
 
-export const ToolImageRoutes = express.Router({ mergeParams: true });
+export const ToolImageRoutes: Router = express.Router({ mergeParams: true });
 ToolImageRoutes.get("/", ToolImageHandlers().get);

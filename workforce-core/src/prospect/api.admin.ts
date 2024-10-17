@@ -12,7 +12,7 @@ function validateAdmin(req: express.Request, res: express.Response, next: expres
     next();
 }
 
-export const AdminProspectRoutes = Router({ mergeParams: true });
+export const AdminProspectRoutes: Router = Router({ mergeParams: true });
 AdminProspectRoutes.get("/",
     validateAdmin,
     (req: express.Request, res: express.Response, next: express.NextFunction) => {

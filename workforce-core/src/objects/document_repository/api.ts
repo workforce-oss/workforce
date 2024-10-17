@@ -8,7 +8,7 @@ import { Logger } from "../../logging/logger.js";
 import { AuthorizationHelper } from "../../identity/authorization_helper.js";
 import { Op } from "sequelize";
 
-export const DocumentRepositoryRoutes = Router({ mergeParams: true });
+export const DocumentRepositoryRoutes: Router = Router({ mergeParams: true });
 const Handlers = ModelHandlers('document_repository');
 DocumentRepositoryRoutes.post("/", ...Handlers.create);
 DocumentRepositoryRoutes.get("/:id", ...Handlers.read);

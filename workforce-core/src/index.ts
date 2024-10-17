@@ -9,6 +9,7 @@ export type { VariableSchemaValidationError } from "./objects/base/variables_sch
 export { Logger } from "./logging/logger.js";
 
 export { formatCredentials, formatWorkers, formatDocumentRepositories, formatFlow } from "./util/transforms.js";
+export { isSafeId } from "./util/util.js";
 
 
 export { OrgDb } from "./identity/db.org.js";

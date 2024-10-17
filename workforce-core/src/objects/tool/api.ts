@@ -2,7 +2,7 @@ import { Router } from "express";
 import { ModelHandlers } from "../base/api.js";
 
 
-export const ToolRoutes = Router({ mergeParams: true });
+export const ToolRoutes: Router = Router({ mergeParams: true });
 const Handlers = ModelHandlers('tool');
 ToolRoutes.post("/", ...Handlers.create);
 ToolRoutes.get("/:id", ...Handlers.read);

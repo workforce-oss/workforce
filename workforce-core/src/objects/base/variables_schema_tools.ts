@@ -39,20 +39,26 @@ export function convertVariablesSchemaToJsonSchema(schema: Map<string, VariableS
     };
     for (const [key, element] of schema.entries()) {
         const prop: Record<string, unknown> = {
-            type: element.type,
-            description: element.description,
-            default: element.default,
-            "x-workforce-multiline": element.multiline,
-            "x-workforce-sensitive": element.sensitive,
-            enum: element.options,
-            "x-workforce-required-for": element.requiredFor,
-            "x-workforce-optional-for": element.optionalFor,
-            minimum: element.min,
-            maximum: element.max,
-            "x-workforce-hidden": element.hidden,
-            "x-workforce-advanced": element.advanced,
+            type: element.type ?? null,
+            description: element.description ?? null,
+            default: element.default ?? null,
+            "x-workforce-multiline": element.multiline ?? null,
+            "x-workforce-sensitive": element.sensitive ?? null,
+            enum: element.options ?? null,
+            "x-workforce-required-for": element.requiredFor ?? null,
+            "x-workforce-optional-for": element.optionalFor ?? null,
+            minimum: element.min ?? null,
+            maximum: element.max ?? null,
+            "x-workforce-hidden": element.hidden ?? null,
+            "x-workforce-advanced": element.advanced ?? null,
         };
         jsonSchema.properties[key] = prop;
+        // filter out null values
+        for (const key of Object.keys(prop)) {
+            if (prop[key] === null) {
+                delete prop[key];
+            }
+        }
         if (element.required) {
             jsonSchema.required.push(key);
         }

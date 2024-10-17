@@ -1,5 +1,5 @@
 import bodyParser from "body-parser";
-import express, { RequestHandler } from "express";
+import express, { RequestHandler, Router } from "express";
 import { WhereOptions } from "sequelize";
 import { Logger } from "../../logging/logger.js";
 import { reviver } from "../../util/json.js";
@@ -228,7 +228,7 @@ export const validateFlow: RequestHandler = (req: express.Request, res: express.
     next();
 }
 
-export const FlowRoutes = express.Router({ mergeParams: true });
+export const FlowRoutes: Router = express.Router({ mergeParams: true });
 const Handlers = FlowHandlers();
 FlowRoutes.post("/", ...Handlers.create);
 FlowRoutes.get("/:id", ...Handlers.read);

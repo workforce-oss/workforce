@@ -1,5 +1,5 @@
 import bodyParser from "body-parser";
-import express, { RequestHandler } from "express";
+import express, { RequestHandler, Router } from "express";
 import { Logger } from "../../logging/logger.js";
 import { TaskDb } from "../task/db.js";
 import { TaskExecutionDb } from "../task/db.task_execution.js";
@@ -65,5 +65,5 @@ export function WorkerChatSessionHandlers(): Record<string, RequestHandler[]> {
     }
 }
 
-export const WorkerChatSessionRoutes = express.Router({mergeParams: true});
+export const WorkerChatSessionRoutes: Router = express.Router({mergeParams: true});
 WorkerChatSessionRoutes.get("/", WorkerChatSessionHandlers().list);

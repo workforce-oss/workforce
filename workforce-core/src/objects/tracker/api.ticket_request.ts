@@ -1,4 +1,4 @@
-import express, { RequestHandler } from "express";
+import express, { RequestHandler, Router } from "express";
 import { Logger } from "../../logging/logger.js";
 import { TrackerDb } from "./db.js";
 import { TicketRequestDb } from "./db.ticket_request.js";
@@ -42,5 +42,5 @@ export function TicketRequestHandlers(): Record<string, RequestHandler[]> {
     };
 }
 
-export const TicketRequestRoutes = express.Router({ mergeParams: true});
+export const TicketRequestRoutes: Router = express.Router({ mergeParams: true});
 TicketRequestRoutes.get("/", TicketRequestHandlers().list);

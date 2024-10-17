@@ -74,7 +74,7 @@ export function OrgUserHandlers(): Record<string, RequestHandler[]> {
     }
 }
 
-export const OrgUserRoutes = Router({ mergeParams: true });
+export const OrgUserRoutes: Router = Router({ mergeParams: true });
 const handlers = OrgUserHandlers();
 OrgUserRoutes.post("/", handlers.create);
 OrgUserRoutes.get("/", handlers.list);

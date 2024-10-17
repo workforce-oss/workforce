@@ -6,7 +6,7 @@ import { Logger } from "../logging/logger.js";
 import { CustomMetrics } from "../metrics/api.js";
 import { Prospect } from "./model.js";
 
-export const PublicProspectRoutes = Router({ mergeParams: true });
+export const PublicProspectRoutes: Router = Router({ mergeParams: true });
 PublicProspectRoutes.post("/", bodyParser.json(),
     (req: express.Request, res: express.Response) => {
         ProspectDb.create(req.body as Prospect).then((prospect) => {

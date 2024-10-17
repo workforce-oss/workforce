@@ -40,7 +40,7 @@ export class GithubBoardTracker extends Tracker<TrackerConfig> {
                 this.refresh().catch((err) => {
                     this.logger.error("refreshDaemon() error refreshing", err);
                 });
-            }, Math.max(config.pollingInterval ?? 60000, 5000));
+            }, Math.max((config.pollingInterval ?? 60) * 1000, 5000));
         }
     }
 

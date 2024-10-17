@@ -1,5 +1,5 @@
 import bodyParser from "body-parser";
-import express from "express";
+import express, { Router } from "express";
 import { EncryptionService } from "../crypto/encryption_service.js";
 import { WorkforceClient } from "../identity/model.js";
 import { Logger } from "../logging/logger.js";
@@ -117,7 +117,7 @@ export function SecretHandlers(): CrudHandlers {
     }
 }
 
-export const SecretRoutes = express.Router({ mergeParams: true });
+export const SecretRoutes: Router = express.Router({ mergeParams: true });
 const Handlers = SecretHandlers();
 SecretRoutes.post("/", ...Handlers.create);
 SecretRoutes.get("/:id", ...Handlers.read);

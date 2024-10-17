@@ -79,7 +79,7 @@ export const toolStore = create<ToolState>()(
 				console.log("addToolCalls, modifiedSelectedSession", modifiedSelectedSession);
 				set({
 					toolSessions: [...newToolSessions],
-					selectedToolCalls: [...modifiedSelectedSession.toolCalls] ?? [],
+					selectedToolCalls: [...modifiedSelectedSession.toolCalls ?? []],
 					selectedMachineState: { ...modifiedSelectedSession.machineState },
 				});
 			} else {

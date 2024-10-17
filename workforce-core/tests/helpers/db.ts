@@ -184,7 +184,7 @@ export async function createBasicDocumentationConfig(orgId: string, name: string
         repository: "test-document-repository",
         description: "test",
         type: "documentation",
-        subtype: "default",
+        subtype: "default-documentation",
         orgId: orgId,
         documents: [documentDb.name],
     };

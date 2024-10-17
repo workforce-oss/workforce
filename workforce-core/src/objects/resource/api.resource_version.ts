@@ -42,5 +42,5 @@ export function ResourceVersionHandlers(): Record<string, RequestHandler[]> {
 	};
 }
 
-export const ResourceVersionRoutes = Router({ mergeParams: true});
+export const ResourceVersionRoutes: Router = Router({ mergeParams: true});
 ResourceVersionRoutes.get("/", ResourceVersionHandlers().list);

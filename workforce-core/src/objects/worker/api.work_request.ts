@@ -1,4 +1,4 @@
-import express, { RequestHandler } from "express";
+import express, { RequestHandler, Router } from "express";
 import { Logger } from "../../logging/logger.js";
 import { WorkerDb } from "./db.js";
 import { WorkRequestDb } from "./db.work_request.js";
@@ -115,6 +115,6 @@ export function WorkRequestHandlers(): Record<string, RequestHandler[]> {
 	};
 }
 
-export const WorkRequestRoutes = express.Router({ mergeParams: true });
+export const WorkRequestRoutes: Router = express.Router({ mergeParams: true });
 WorkRequestRoutes.get("/", WorkRequestHandlers().list);
 WorkRequestRoutes.delete("/:id", WorkRequestHandlers().delete);

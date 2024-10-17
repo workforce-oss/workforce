@@ -21,7 +21,7 @@ const itemCategories: ItemCategoryType[] = [
 		items: [
 			{
 				type: "documentation",
-				subtype: "default",
+				subtype: "default-documentation",
 				name: "Documentation",
 				color: CustomColors.documentRepository,
 			}

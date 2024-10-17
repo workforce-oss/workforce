@@ -1,4 +1,4 @@
-import express, { RequestHandler } from "express";
+import express, { RequestHandler, Router } from "express";
 import { Logger } from "../../logging/logger.js";
 import { ResourceWriteDb } from "./db.resource_write.js";
 import { ResourceDb } from "./db.js";
@@ -43,5 +43,5 @@ export function ResourceWriteHandlers(): Record<string, RequestHandler[]> {
     }
 }                    
 
-export const ResourceWriteRoutes = express.Router({ mergeParams: true});
+export const ResourceWriteRoutes: Router = express.Router({ mergeParams: true});
 ResourceWriteRoutes.get("/", ResourceWriteHandlers().list);

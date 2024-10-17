@@ -189,7 +189,7 @@ export function CredentialHandlers(): CrudHandlers {
 }
 
 
-export const CredentialRoutes = Router({ mergeParams: true });
+export const CredentialRoutes: Router = Router({ mergeParams: true });
 const Handlers = CredentialHandlers();
 CredentialRoutes.post("/", ...Handlers.create);
 CredentialRoutes.get("/:id", ...Handlers.read);

@@ -1,6 +1,6 @@
 import { BaseConfig } from "../base/model.js";
 
-export const documentationTypes = ["default"] as const;
+export const documentationTypes = ["default-documentation"] as const;
 export type DocumentationType = typeof documentationTypes[number];
 
 export interface DocumentationConfig extends BaseConfig {

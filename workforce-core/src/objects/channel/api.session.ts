@@ -39,5 +39,5 @@ export function ChannelSessionHandlers(): Record<string, RequestHandler[]> {
 	};
 }
 
-export const ChannelSessionRoutes = Router({ mergeParams: true });
+export const ChannelSessionRoutes: Router = Router({ mergeParams: true });
 ChannelSessionRoutes.get("/", ChannelSessionHandlers().list);

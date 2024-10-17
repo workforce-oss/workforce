@@ -10,6 +10,10 @@
 # Custom
 **/prod.sh
 
+**/_build*
+
+**/_deploy*
+
 #Examples
 **/examples*
 

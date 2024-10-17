@@ -123,7 +123,7 @@ export function UserHandlers(): CrudHandlers {
     };
 }
 
-export const UserRoutes = Router({ mergeParams: true });
+export const UserRoutes: Router = Router({ mergeParams: true });
 const Handlers = UserHandlers();
 UserRoutes.post("/", ...Handlers.create);
 UserRoutes.get("/:id", ...Handlers.read);

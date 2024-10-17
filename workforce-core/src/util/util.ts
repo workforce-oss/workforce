@@ -11,3 +11,7 @@ export function isCompleteSentence(text?: string): boolean {
     }
     return text.trimEnd().endsWith(".") || text.trimEnd().endsWith("!") || text.trimEnd().endsWith("?") || text.endsWith("\n");
 }
+
+export function isSafeId(id: string): boolean {
+    return /^[a-zA-Z0-9_-]+$/.test(id);
+}

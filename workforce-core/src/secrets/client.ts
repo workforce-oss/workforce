@@ -39,7 +39,9 @@ export class SecretServiceClient extends ApiClient {
     secretId?: string
   ): Promise<string | undefined> {
     await this.checkAuthentication();
+
     const method = secretId ? "PUT" : "POST";
+
     const url = secretId
       ? `${this._apiUrl}/secrets/${secretId}`
       : `${this._apiUrl}/secrets`;

@@ -9,7 +9,7 @@ export class DefaultDocumentationMetadata {
             id: crypto.randomUUID(),
             orgId,
             type: "documentation",
-            subtype: "default",
+            subtype: "default-documentation",
             name: "Documentation",
             description: "Documentation",
             variables: {
@@ -24,7 +24,7 @@ export class DefaultDocumentationMetadata {
     static variablesSchema(): VariablesSchema {
         const schema = new Map<string, VariableSchemaElement>();
         const type = "documentation";
-        const subtype = "default";
+        const subtype = "default-documentation";
         schema.set("desiredTokens", {
             type: "number",
             required: false,

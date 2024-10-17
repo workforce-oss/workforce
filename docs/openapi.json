@@ -1,0 +1,2635 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Workforce API",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/flows": {
+      "get": {
+        "summary": "Get all flows",
+        "responses": {
+          "200": {
+            "description": "A list of flows",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/flow"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new flow",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/flow"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The created flow",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/flow"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/flows/{id}": {
+      "get": {
+        "summary": "Get a flow by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The flow",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/flow"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a flow by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/flow"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated flow",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/flow"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a flow by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The deleted flow",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/flow"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workers": {
+      "get": {
+        "summary": "Get all workers",
+        "responses": {
+          "200": {
+            "description": "A list of workers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/worker"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new worker",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/worker"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The created worker",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/worker"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/workers/{id}": {
+      "get": {
+        "summary": "Get a worker by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The worker",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/worker"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a worker by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/worker"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated worker",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/worker"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a worker by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The deleted worker",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/worker"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/document-repositories": {
+      "get": {
+        "summary": "Get all document_repositorys",
+        "responses": {
+          "200": {
+            "description": "A list of document_repositorys",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/document_repository"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new document_repository",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/document_repository"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The created document_repository",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/document_repository"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/document-repositories/{id}": {
+      "get": {
+        "summary": "Get a document_repository by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The document_repository",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/document_repository"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a document_repository by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/document_repository"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated document_repository",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/document_repository"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a document_repository by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The deleted document_repository",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/document_repository"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/skills": {
+      "get": {
+        "summary": "Get all skills",
+        "responses": {
+          "200": {
+            "description": "A list of skills",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/skill"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new skill",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/skill"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The created skill",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/skill"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/skills/{id}": {
+      "get": {
+        "summary": "Get a skill by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The skill",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/skill"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a skill by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/skill"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated skill",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/skill"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a skill by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The deleted skill",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/skill"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/credentials": {
+      "get": {
+        "summary": "Get all credentials",
+        "responses": {
+          "200": {
+            "description": "A list of credentials",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/credential"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new credential",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/credential"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The created credential",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/credential"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/credentials/{id}": {
+      "get": {
+        "summary": "Get a credential by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The credential",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/credential"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "summary": "Update a credential by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/credential"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The updated credential",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/credential"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a credential by ID",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The deleted credential",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/credential"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "flow": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/object"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string",
+                "enum": [
+                  "active",
+                  "inactive"
+                ]
+              },
+              "channels": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/channel"
+                }
+              },
+              "documentation": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/documentation"
+                }
+              },
+              "resources": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/resource"
+                }
+              },
+              "tasks": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/task"
+                }
+              },
+              "tools": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/tool"
+                }
+              },
+              "trackers": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/tracker"
+                }
+              }
+            },
+            "required": [
+              "status"
+            ]
+          }
+        ]
+      },
+      "skill": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ]
+      },
+      "channel": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of the channel",
+            "enum": [
+              "discord-channel",
+              "native-channel",
+              "slack-channel"
+            ]
+          },
+          "credential": {
+            "type": "string"
+          },
+          "variables": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/discord_channel_variables"
+              },
+              {
+                "$ref": "#/components/schemas/native_channel_variables"
+              },
+              {
+                "$ref": "#/components/schemas/slack_channel_variables"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "credential",
+          "variables"
+        ]
+      },
+      "channel_user_credential": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of the channel_user_credential",
+            "enum": [
+              "worker-discord-token",
+              "worker-native-token",
+              "worker-slack-token"
+            ]
+          },
+          "credential": {
+            "type": "string"
+          },
+          "variables": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/worker_discord_token_variables"
+              },
+              {
+                "$ref": "#/components/schemas/worker_native_token_variables"
+              },
+              {
+                "$ref": "#/components/schemas/worker_slack_token_variables"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "credential",
+          "variables"
+        ]
+      },
+      "credential": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of the credential",
+            "enum": [
+              "ai-worker",
+              "api-resource",
+              "coding-tool",
+              "default-documentation",
+              "discord-channel",
+              "excalidraw-tool",
+              "git-document-repository",
+              "github-board-ticket-tool",
+              "github-board-tracker",
+              "github-pull-request-resource",
+              "github-repo-resource",
+              "google-drive-tool",
+              "google-slides-tool",
+              "human-worker",
+              "internal-document-repository",
+              "message-channel-tool",
+              "native-channel",
+              "openapi-channel-tool",
+              "openapi-tool",
+              "raw-text-resource",
+              "simple-task",
+              "slack-channel",
+              "structured-task",
+              "template-tool",
+              "trello-ticket-tool",
+              "trello-tracker",
+              "web-service-tool",
+              "worker-discord-token",
+              "worker-native-token",
+              "worker-slack-token"
+            ]
+          },
+          "credential": {
+            "type": "string"
+          },
+          "variables": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ai_worker_credential"
+              },
+              {
+                "$ref": "#/components/schemas/api_resource_credential"
+              },
+              {
+                "$ref": "#/components/schemas/coding_tool_credential"
+              },
+              {
+                "$ref": "#/components/schemas/default_documentation_credential"
+              },
+              {
+                "$ref": "#/components/schemas/discord_channel_credential"
+              },
+              {
+                "$ref": "#/components/schemas/excalidraw_tool_credential"
+              },
+              {
+                "$ref": "#/components/schemas/git_document_repository_credential"
+              },
+              {
+                "$ref": "#/components/schemas/github_board_ticket_tool_credential"
+              },
+              {
+                "$ref": "#/components/schemas/github_board_tracker_credential"
+              },
+              {
+                "$ref": "#/components/schemas/github_pull_request_resource_credential"
+              },
+              {
+                "$ref": "#/components/schemas/github_repo_resource_credential"
+              },
+              {
+                "$ref": "#/components/schemas/google_drive_tool_credential"
+              },
+              {
+                "$ref": "#/components/schemas/google_slides_tool_credential"
+              },
+              {
+                "$ref": "#/components/schemas/human_worker_credential"
+              },
+              {
+                "$ref": "#/components/schemas/internal_document_repository_credential"
+              },
+              {
+                "$ref": "#/components/schemas/message_channel_tool_credential"
+              },
+              {
+                "$ref": "#/components/schemas/native_channel_credential"
+              },
+              {
+                "$ref": "#/components/schemas/openapi_channel_tool_credential"
+              },
+              {
+                "$ref": "#/components/schemas/openapi_tool_credential"
+              },
+              {
+                "$ref": "#/components/schemas/raw_text_resource_credential"
+              },
+              {
+                "$ref": "#/components/schemas/simple_task_credential"
+              },
+              {
+                "$ref": "#/components/schemas/slack_channel_credential"
+              },
+              {
+                "$ref": "#/components/schemas/structured_task_credential"
+              },
+              {
+                "$ref": "#/components/schemas/template_tool_credential"
+              },
+              {
+                "$ref": "#/components/schemas/trello_ticket_tool_credential"
+              },
+              {
+                "$ref": "#/components/schemas/trello_tracker_credential"
+              },
+              {
+                "$ref": "#/components/schemas/web_service_tool_credential"
+              },
+              {
+                "$ref": "#/components/schemas/worker_discord_token_credential"
+              },
+              {
+                "$ref": "#/components/schemas/worker_native_token_credential"
+              },
+              {
+                "$ref": "#/components/schemas/worker_slack_token_credential"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "credential",
+          "variables"
+        ]
+      },
+      "documentation": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of the documentation",
+            "enum": [
+              "default-documentation"
+            ]
+          },
+          "repository": {
+            "type": "string",
+            "description": "The name of the document repository to use."
+          },
+          "documents": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The list of documents from the repository to use. Null or Empty means all"
+          },
+          "variables": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/default_documentation_variables"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "repository",
+          "variables"
+        ]
+      },
+      "document_repository": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of the document_repository",
+            "enum": [
+              "git-document-repository",
+              "internal-document-repository"
+            ]
+          },
+          "credential": {
+            "type": "string"
+          },
+          "documentChunkStrategy": {
+            "type": "string",
+            "enum": [
+              "none",
+              "sentence",
+              "paragraph",
+              "section"
+            ],
+            "description": "The strategy to use for chunking documents."
+          },
+          "variables": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/git_document_repository_variables"
+              },
+              {
+                "$ref": "#/components/schemas/internal_document_repository_variables"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "credential",
+          "variables"
+        ]
+      },
+      "resource": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of the resource",
+            "enum": [
+              "api-resource",
+              "github-pull-request-resource",
+              "github-repo-resource",
+              "raw-text-resource"
+            ]
+          },
+          "credential": {
+            "type": "string"
+          },
+          "example": {
+            "type": "string",
+            "description": "An example value of an output for the resource."
+          },
+          "variables": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/api_resource_variables"
+              },
+              {
+                "$ref": "#/components/schemas/github_pull_request_resource_variables"
+              },
+              {
+                "$ref": "#/components/schemas/github_repo_resource_variables"
+              },
+              {
+                "$ref": "#/components/schemas/raw_text_resource_variables"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "credential",
+          "variables"
+        ]
+      },
+      "task": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of the task",
+            "enum": [
+              "simple-task",
+              "structured-task"
+            ]
+          },
+          "requiredSkills": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The list of skills needed for this task."
+          },
+          "defaultChannel": {
+            "type": "string",
+            "description": "The default channel to use for communication."
+          },
+          "tracker": {
+            "type": "string",
+            "description": "The Name of the tracker to use for execution."
+          },
+          "documentation": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The list of documentation names to use."
+          },
+          "tools": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/tool_reference"
+            },
+            "description": "The list of tools needed for this task."
+          },
+          "triggers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The list of channels or resources to trigger the task."
+          },
+          "inputs": {
+            "type": "object",
+            "description": "The map of inputs for this task. Keys can be used in task templates using handlebars syntax. I.E., and input of message may map to a channel name, and then in the task template, you can use {{message}}",
+            "additionalProperties": {
+              "oneOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              ]
+            }
+          },
+          "outputs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The list of outputs for this task."
+          },
+          "subtasks": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/subtask"
+            },
+            "description": "The list of subtasks for this task."
+          },
+          "costLimit": {
+            "type": "number",
+            "description": "The cost limit for each execution of this task."
+          },
+          "variables": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/simple_task_variables"
+              },
+              {
+                "$ref": "#/components/schemas/structured_task_variables"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "variables"
+        ]
+      },
+      "tool": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of the tool",
+            "enum": [
+              "coding-tool",
+              "excalidraw-tool",
+              "github-board-ticket-tool",
+              "google-drive-tool",
+              "google-slides-tool",
+              "message-channel-tool",
+              "openapi-channel-tool",
+              "openapi-tool",
+              "template-tool",
+              "trello-ticket-tool",
+              "web-service-tool"
+            ]
+          },
+          "credential": {
+            "type": "string"
+          },
+          "channel": {
+            "type": "string",
+            "description": "The channel for the tool to use for dynamic user interaction"
+          },
+          "variables": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/coding_tool_variables"
+              },
+              {
+                "$ref": "#/components/schemas/excalidraw_tool_variables"
+              },
+              {
+                "$ref": "#/components/schemas/github_board_ticket_tool_variables"
+              },
+              {
+                "$ref": "#/components/schemas/google_drive_tool_variables"
+              },
+              {
+                "$ref": "#/components/schemas/google_slides_tool_variables"
+              },
+              {
+                "$ref": "#/components/schemas/message_channel_tool_variables"
+              },
+              {
+                "$ref": "#/components/schemas/openapi_channel_tool_variables"
+              },
+              {
+                "$ref": "#/components/schemas/openapi_tool_variables"
+              },
+              {
+                "$ref": "#/components/schemas/template_tool_variables"
+              },
+              {
+                "$ref": "#/components/schemas/trello_ticket_tool_variables"
+              },
+              {
+                "$ref": "#/components/schemas/web_service_tool_variables"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "credential",
+          "variables"
+        ]
+      },
+      "tracker": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of the tracker",
+            "enum": [
+              "github-board-tracker",
+              "trello-tracker"
+            ]
+          },
+          "credential": {
+            "type": "string"
+          },
+          "webhooksEnabled": {
+            "type": "boolean",
+            "description": "Whether or not webhooks are enabled for this tracker."
+          },
+          "pollingInterval": {
+            "type": "number",
+            "description": "The interval in seconds to poll for updates if webhooks are not enabled"
+          },
+          "variables": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/github_board_tracker_variables"
+              },
+              {
+                "$ref": "#/components/schemas/trello_tracker_variables"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "credential",
+          "variables"
+        ]
+      },
+      "worker": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "The type of the worker",
+            "enum": [
+              "ai-worker",
+              "human-worker"
+            ]
+          },
+          "credential": {
+            "type": "string"
+          },
+          "channelUserConfig": {
+            "type": "object",
+            "description": "A map of channel types to channel user credential names",
+            "properties": {
+              "slack-channel": {
+                "type": "string"
+              },
+              "native-channel": {
+                "type": "string"
+              },
+              "discord-channel": {
+                "type": "string"
+              }
+            }
+          },
+          "skills": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The list of skills the worker has."
+          },
+          "wipLimit": {
+            "type": "number",
+            "description": "The number of tasks a worker can have in progress at a time."
+          },
+          "variables": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ai_worker_variables"
+              },
+              {
+                "$ref": "#/components/schemas/human_worker_variables"
+              }
+            ]
+          }
+        },
+        "required": [
+          "type",
+          "credential",
+          "variables"
+        ]
+      },
+      "object": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The unique identifier for the object"
+          },
+          "orgId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The unique identifier for the organization the object belongs to"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "description"
+        ]
+      },
+      "tool_reference": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "output": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "subtask": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "async": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "discord_channel_variables": {
+        "type": "object",
+        "properties": {
+          "channel_id": {
+            "type": "string",
+            "description": "The Discord channel to send messages to",
+            "x-workforce-sensitive": false
+          }
+        },
+        "required": [
+          "channel_id"
+        ]
+      },
+      "native_channel_variables": {
+        "type": "object",
+        "properties": {
+          "channel_name": {
+            "type": "string",
+            "description": "A unique name for the channel",
+            "x-workforce-sensitive": false
+          },
+          "anonymous_access": {
+            "type": "boolean",
+            "description": "Allow anonymous access to the channel",
+            "x-workforce-sensitive": false
+          },
+          "voice_enabled": {
+            "type": "boolean",
+            "description": "Enable voice input for the channel",
+            "x-workforce-sensitive": false,
+            "x-workforce-advanced": true
+          },
+          "oauth2_issuer_uri": {
+            "type": "string",
+            "description": "Tokens from this issuer will be accepted",
+            "x-workforce-sensitive": false
+          },
+          "oauth2_audience": {
+            "type": "string",
+            "description": "The audience for the token",
+            "x-workforce-sensitive": false
+          },
+          "oauth2_claims": {
+            "type": "string",
+            "description": "A JSON object containing the claims to be verified",
+            "x-workforce-multiline": true,
+            "x-workforce-sensitive": false
+          }
+        },
+        "required": [
+          "channel_name"
+        ]
+      },
+      "slack_channel_variables": {
+        "type": "object",
+        "properties": {
+          "channel_id": {
+            "type": "string",
+            "description": "The Slack channel to send messages to",
+            "x-workforce-sensitive": false
+          }
+        },
+        "required": [
+          "channel_id"
+        ]
+      },
+      "worker_discord_token_variables": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "channel token",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "worker_native_token_variables": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "channel token",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "worker_slack_token_variables": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "channel token",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [
+          "token"
+        ]
+      },
+      "default_documentation_variables": {
+        "type": "object",
+        "properties": {
+          "desiredTokens": {
+            "type": "number",
+            "description": "The desired number of tokens to generate.",
+            "default": 512
+          },
+          "maxTokens": {
+            "type": "number",
+            "description": "The maximum number of tokens to generate.",
+            "default": 1024
+          },
+          "retrievalScope": {
+            "type": "string",
+            "description": "The scope of the retrieval.",
+            "default": "section",
+            "enum": [
+              "repository",
+              "document",
+              "section",
+              "chunk"
+            ]
+          },
+          "tokenFillStrategy": {
+            "type": "string",
+            "description": "The strategy for filling tokens.",
+            "default": "default",
+            "enum": [
+              "default",
+              "chunk_first",
+              "fill_section",
+              "fill_document"
+            ]
+          }
+        },
+        "required": []
+      },
+      "git_document_repository_variables": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "array",
+            "description": "The name of the model to use for embedding.",
+            "default": "text-embedding-3-small",
+            "enum": [
+              "text-embedding-3-small",
+              "text-embedding-3-large",
+              "text-embedding-ada-002"
+            ]
+          },
+          "repo": {
+            "type": "string",
+            "description": "The name(slug) of the Github repository to use."
+          },
+          "file_regex": {
+            "type": "string",
+            "description": "The regex to use to match the files in the repository."
+          },
+          "owner": {
+            "type": "string",
+            "description": "The name(slug) of owner of the Github repository."
+          },
+          "branch": {
+            "type": "string",
+            "description": "The branch name.",
+            "default": "main"
+          }
+        },
+        "required": [
+          "model",
+          "repo",
+          "file_regex",
+          "owner"
+        ]
+      },
+      "internal_document_repository_variables": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "array",
+            "description": "The name of the model to use for embedding.",
+            "default": "text-embedding-3-small",
+            "enum": [
+              "text-embedding-3-small",
+              "text-embedding-3-large",
+              "text-embedding-ada-002"
+            ]
+          }
+        },
+        "required": [
+          "model"
+        ]
+      },
+      "api_resource_variables": {
+        "type": "object",
+        "properties": {
+          "schema_url": {
+            "type": "string",
+            "description": "A URL to a valid OpenAPI schema."
+          },
+          "raw_schema": {
+            "type": "string",
+            "description": "A valid OpenAPI schema.",
+            "x-workforce-multiline": true
+          },
+          "fetch_path": {
+            "type": "string",
+            "description": "The path to use for fetching data from the API."
+          },
+          "fetch_method": {
+            "type": "string",
+            "description": "The HTTP method to use for fetching data from the API.",
+            "enum": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          },
+          "webhook_path": {
+            "type": "string",
+            "description": "The path that defines the webhook endpoint."
+          },
+          "create_path": {
+            "type": "string",
+            "description": "The path to use for creating new objects in the API."
+          },
+          "create_method": {
+            "type": "string",
+            "description": "The HTTP method to use for creating new objects in the API.",
+            "enum": [
+              "GET",
+              "POST",
+              "PUT",
+              "PATCH",
+              "DELETE"
+            ]
+          }
+        },
+        "required": []
+      },
+      "github_pull_request_resource_variables": {
+        "type": "object",
+        "properties": {
+          "repo": {
+            "type": "string",
+            "description": "The name(slug) of the Github repository to use."
+          },
+          "owner": {
+            "type": "string",
+            "description": "The name(slug) of owner of the Github repository."
+          }
+        },
+        "required": [
+          "repo",
+          "owner"
+        ]
+      },
+      "github_repo_resource_variables": {
+        "type": "object",
+        "properties": {
+          "repo": {
+            "type": "string",
+            "description": "The name(slug) of the Github repository to use."
+          },
+          "owner": {
+            "type": "string",
+            "description": "The name(slug) of owner of the Github repository."
+          },
+          "branch": {
+            "type": "string",
+            "description": "The branch name.",
+            "default": "main"
+          },
+          "path_template": {
+            "type": "string",
+            "description": "The path template to use to generate the path to the file. This can also just be the name of a particular or directory. Defaults to {{filename}}.",
+            "default": "{{filename}}"
+          },
+          "org_name": {
+            "type": "string",
+            "description": "The name of the Github organization to use for webhooks."
+          },
+          "webhooks_enabled": {
+            "type": "boolean",
+            "description": "Whether to enable webhooks for this resource.",
+            "default": false,
+            "x-workforce-advanced": true
+          }
+        },
+        "required": [
+          "repo",
+          "owner",
+          "org_name"
+        ]
+      },
+      "raw_text_resource_variables": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string",
+            "description": "The text to use as the resource.",
+            "x-workforce-multiline": true
+          }
+        },
+        "required": [
+          "text"
+        ]
+      },
+      "simple_task_variables": {
+        "type": "object",
+        "properties": {
+          "purpose": {
+            "type": "string",
+            "description": "The purpose of the task",
+            "x-workforce-multiline": true
+          },
+          "prompt_template": {
+            "type": "string",
+            "description": "The template for the prompt",
+            "x-workforce-multiline": true
+          },
+          "system_message_template": {
+            "type": "string",
+            "description": "Template for a guidance message to steer the model.",
+            "x-workforce-multiline": true
+          }
+        },
+        "required": [
+          "prompt_template"
+        ]
+      },
+      "structured_task_variables": {
+        "type": "object",
+        "properties": {
+          "acceptance_critera": {
+            "type": "string",
+            "description": "The acceptance criteria for the task.",
+            "x-workforce-multiline": true
+          },
+          "instructions": {
+            "type": "string",
+            "description": "Instructions explaining to the worker how to complete the task.",
+            "x-workforce-multiline": true
+          },
+          "context": {
+            "type": "string",
+            "description": "Context that the worker should be aware of when completing the task.",
+            "x-workforce-multiline": true
+          },
+          "definition_of_done": {
+            "type": "string",
+            "description": "A set of conditions that must be met for the task to be considered done.",
+            "x-workforce-multiline": true
+          }
+        },
+        "required": [
+          "acceptance_critera",
+          "instructions",
+          "context"
+        ]
+      },
+      "coding_tool_variables": {
+        "type": "object",
+        "properties": {
+          "index_repo_location": {
+            "type": "string",
+            "description": "A URL to a mono repository without the scheme. Example github.com/my/repo."
+          },
+          "index_repo_branch": {
+            "type": "string",
+            "description": "The branch of the mono repository to use.",
+            "default": "main"
+          },
+          "mode": {
+            "type": "string",
+            "description": "The mode to run the tool in.",
+            "default": "local",
+            "enum": [
+              "local",
+              "remote"
+            ]
+          },
+          "server_url": {
+            "type": "string",
+            "description": "The URL of the local server to run the tool on. Required if mode is local. ",
+            "default": "http://localhost:8085/vscode-extension-server"
+          },
+          "read_only": {
+            "type": "boolean",
+            "description": "Whether the tool is read only.",
+            "default": false
+          }
+        },
+        "required": [
+          "index_repo_location",
+          "mode"
+        ]
+      },
+      "excalidraw_tool_variables": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "github_board_ticket_tool_variables": {
+        "type": "object",
+        "properties": {
+          "purpose": {
+            "type": "string",
+            "description": "The purpose of the tool",
+            "x-workforce-multiline": true
+          },
+          "org_name": {
+            "type": "string",
+            "description": "The name of the Github Organization"
+          },
+          "project_name": {
+            "type": "string",
+            "description": "The name of the Github Project"
+          },
+          "column_name": {
+            "type": "string",
+            "description": "The name of the column where tickets should be placed"
+          }
+        },
+        "required": [
+          "purpose",
+          "org_name",
+          "project_name",
+          "column_name"
+        ]
+      },
+      "google_drive_tool_variables": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "google_slides_tool_variables": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "message_channel_tool_variables": {
+        "type": "object",
+        "properties": {},
+        "required": []
+      },
+      "openapi_channel_tool_variables": {
+        "type": "object",
+        "properties": {
+          "schema_url": {
+            "type": "string",
+            "description": "A URL to a valid OpenAPI schema."
+          },
+          "raw_schema": {
+            "type": "string",
+            "description": "A valid OpenAPI schema.",
+            "x-workforce-multiline": true
+          }
+        },
+        "required": []
+      },
+      "openapi_tool_variables": {
+        "type": "object",
+        "properties": {
+          "schema_url": {
+            "type": "string",
+            "description": "A URL to a valid OpenAPI schema."
+          },
+          "raw_schema": {
+            "type": "string",
+            "description": "A valid OpenAPI schema.",
+            "x-workforce-multiline": true
+          }
+        },
+        "required": []
+      },
+      "template_tool_variables": {
+        "type": "object",
+        "properties": {
+          "template_location": {
+            "type": "string",
+            "description": "The location of the template."
+          },
+          "template_schema_location": {
+            "type": "string",
+            "description": "The location of the template schema."
+          }
+        },
+        "required": [
+          "template_location",
+          "template_schema_location"
+        ]
+      },
+      "trello_ticket_tool_variables": {
+        "type": "object",
+        "properties": {
+          "purpose": {
+            "type": "string",
+            "description": "The purpose of the tool.",
+            "x-workforce-multiline": true
+          },
+          "board_name": {
+            "type": "string",
+            "description": "The name of the Trello Board."
+          },
+          "column_name": {
+            "type": "string",
+            "description": "The name of the column to create the ticket in."
+          },
+          "label": {
+            "type": "string",
+            "description": "The name of the label to apply to the ticket."
+          }
+        },
+        "required": [
+          "purpose",
+          "board_name",
+          "column_name",
+          "label"
+        ]
+      },
+      "web_service_tool_variables": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "The URL of the web service."
+          },
+          "method": {
+            "type": "string",
+            "description": "The HTTP method to use. Defaults to GET.",
+            "default": "GET"
+          },
+          "schema_url": {
+            "type": "string",
+            "description": "A URL to a json schema with the request body schema.  Required if method is POST or PUT."
+          },
+          "visualizer_url": {
+            "type": "string",
+            "description": "A URL to a visualizer."
+          },
+          "action_caption_webhook_base_url": {
+            "type": "string",
+            "description": "The base URL to use for action caption webhooks."
+          },
+          "username": {
+            "type": "string",
+            "description": "The username to use for basic authentication."
+          }
+        },
+        "required": [
+          "url",
+          "schema_url"
+        ]
+      },
+      "github_board_tracker_variables": {
+        "type": "object",
+        "properties": {
+          "org_name": {
+            "type": "string",
+            "description": "The name of the Github Organization"
+          },
+          "project_name": {
+            "type": "string",
+            "description": "The name of the Github Project"
+          },
+          "to_do_column": {
+            "type": "string",
+            "description": "The name of the column where tickets should be pulled from or placed in.",
+            "default": "Todo"
+          },
+          "in_progress_column": {
+            "type": "string",
+            "description": "The name of the column for tickets that are currently being worked.",
+            "default": "In Progress"
+          },
+          "done_column": {
+            "type": "string",
+            "description": "The column where tickets are put when they are done.",
+            "default": "Done"
+          }
+        },
+        "required": [
+          "org_name",
+          "project_name"
+        ]
+      },
+      "trello_tracker_variables": {
+        "type": "object",
+        "properties": {
+          "board_name": {
+            "type": "string",
+            "description": "The name of the Trello Board"
+          },
+          "to_do_column": {
+            "type": "string",
+            "description": "The name of the column where tickets should be pulled from or placed in.",
+            "default": "To Do"
+          },
+          "in_progress_column": {
+            "type": "string",
+            "description": "The name of the column for tickets that are currently being worked.",
+            "default": "Doing"
+          },
+          "done_column": {
+            "type": "string",
+            "description": "The column where tickets are put when they are done.",
+            "default": "Done"
+          },
+          "label": {
+            "type": "string",
+            "description": "The name of the label to watch."
+          }
+        },
+        "required": [
+          "board_name",
+          "to_do_column",
+          "in_progress_column",
+          "done_column",
+          "label"
+        ]
+      },
+      "ai_worker_variables": {
+        "type": "object",
+        "properties": {
+          "model": {
+            "type": "string",
+            "description": "The name of the model to use for inference",
+            "default": "gpt-3.5-turbo",
+            "enum": [
+              "gpt-3.5-turbo",
+              "gpt-3.5-turbo-instruct",
+              "gpt-3.5-turbo-16k",
+              "gpt-4",
+              "gpt-4-32k",
+              "gpt-4-0125-preview",
+              "gpt-4o",
+              "claude-3-5-sonnet-20240620",
+              "claude-3-opus-20240229",
+              "claude-3-haiku-20240307",
+              "llama3-8b-8192",
+              "llama3-70b-8192",
+              "llama2-70b-4096",
+              "mixtral-8x7b-32768",
+              "gemma-7b-it"
+            ]
+          },
+          "temperature": {
+            "type": "number",
+            "description": "The temperature parameter of the model, lower values are more deterministic, higher are more random.",
+            "default": 0,
+            "minimum": 0,
+            "maximum": 1
+          },
+          "max_tokens": {
+            "type": "number",
+            "description": "The maximum number of tokens to generate",
+            "default": 2048,
+            "minimum": 1,
+            "maximum": 128000
+          },
+          "top_p": {
+            "type": "number",
+            "description": "The top P value to use.  Higher values are more deterministic, lower values are more chaotic.",
+            "default": 1,
+            "minimum": 0,
+            "maximum": 1
+          }
+        },
+        "required": [
+          "model"
+        ]
+      },
+      "human_worker_variables": {
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "type": "string",
+            "description": "The user id of the worker"
+          }
+        },
+        "required": [
+          "user_id"
+        ]
+      },
+      "discord_channel_credential": {
+        "type": "object",
+        "properties": {
+          "bot_token": {
+            "type": "string",
+            "description": "The Discord bot token",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [
+          "bot_token"
+        ],
+        "description": "The sensitive variables for the discord-channel channel"
+      },
+      "native_channel_credential": {
+        "type": "object",
+        "properties": {
+          "openai_token": {
+            "type": "string",
+            "description": "OpenAI API token",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [],
+        "description": "The sensitive variables for the native-channel channel"
+      },
+      "slack_channel_credential": {
+        "type": "object",
+        "properties": {
+          "app_token": {
+            "type": "string",
+            "description": "The Slack app token",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [
+          "app_token"
+        ],
+        "description": "The sensitive variables for the slack-channel channel"
+      },
+      "worker_discord_token_credential": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "channel token",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "description": "The sensitive variables for the worker-discord-token channel_user_credential"
+      },
+      "worker_native_token_credential": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "channel token",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "description": "The sensitive variables for the worker-native-token channel_user_credential"
+      },
+      "worker_slack_token_credential": {
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "channel token",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [
+          "token"
+        ],
+        "description": "The sensitive variables for the worker-slack-token channel_user_credential"
+      },
+      "default_documentation_credential": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "description": "The sensitive variables for the default-documentation documentation"
+      },
+      "git_document_repository_credential": {
+        "type": "object",
+        "properties": {
+          "model_api_key": {
+            "type": "string",
+            "description": "The API key for the model.",
+            "x-workforce-sensitive": true
+          },
+          "access_token": {
+            "type": "string",
+            "description": "The token to use for authentication.",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [
+          "model_api_key"
+        ],
+        "description": "The sensitive variables for the git-document-repository document_repository"
+      },
+      "internal_document_repository_credential": {
+        "type": "object",
+        "properties": {
+          "model_api_key": {
+            "type": "string",
+            "description": "The API key for the model.",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [
+          "model_api_key"
+        ],
+        "description": "The sensitive variables for the internal-document-repository document_repository"
+      },
+      "api_resource_credential": {
+        "type": "object",
+        "properties": {
+          "custom_headers": {
+            "type": "string",
+            "description": "Custom headers to include in the request. Provide a JSON object.",
+            "x-workforce-multiline": true,
+            "x-workforce-sensitive": true
+          },
+          "username": {
+            "type": "string",
+            "description": "The username to use for basic authentication.",
+            "x-workforce-sensitive": true
+          },
+          "password": {
+            "type": "string",
+            "description": "The password to use for basic authentication.",
+            "x-workforce-sensitive": true
+          },
+          "bearer_token": {
+            "type": "string",
+            "description": "The bearer token to use for bearer token authentication.",
+            "x-workforce-sensitive": true
+          },
+          "api_key": {
+            "type": "string",
+            "description": "The API key to use for API key authentication.",
+            "x-workforce-sensitive": true
+          },
+          "mtls_cert": {
+            "type": "string",
+            "description": "The certificate to use for mTLS authentication.",
+            "x-workforce-multiline": true,
+            "x-workforce-sensitive": true
+          },
+          "mtls_key": {
+            "type": "string",
+            "description": "The key to use for mTLS authentication.",
+            "x-workforce-multiline": true,
+            "x-workforce-sensitive": true
+          },
+          "mtls_ca": {
+            "type": "string",
+            "description": "The CA to use for mTLS authentication.",
+            "x-workforce-multiline": true,
+            "x-workforce-sensitive": true
+          },
+          "client_id": {
+            "type": "string",
+            "description": "The client ID to use for Oauth2 authentication.",
+            "x-workforce-sensitive": true
+          },
+          "client_secret": {
+            "type": "string",
+            "description": "The client secret to use for Oauth2 authentication.",
+            "x-workforce-sensitive": true
+          },
+          "scopes": {
+            "type": "string",
+            "description": "The scope to use for Oauth2 authentication. Provide a comma-separated list of scopes.",
+            "x-workforce-sensitive": true
+          },
+          "oauth2_audience": {
+            "type": "string",
+            "description": "The audience to use for Oauth2 authentication.",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [],
+        "description": "The sensitive variables for the api-resource resource"
+      },
+      "github_pull_request_resource_credential": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "The username of the authenticated user.",
+            "x-workforce-sensitive": true
+          },
+          "access_token": {
+            "type": "string",
+            "description": "The token to use for authentication.",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [],
+        "description": "The sensitive variables for the github-pull-request-resource resource"
+      },
+      "github_repo_resource_credential": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "The token to use for authentication.",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [],
+        "description": "The sensitive variables for the github-repo-resource resource"
+      },
+      "raw_text_resource_credential": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "description": "The sensitive variables for the raw-text-resource resource"
+      },
+      "simple_task_credential": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "description": "The sensitive variables for the simple-task task"
+      },
+      "structured_task_credential": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "description": "The sensitive variables for the structured-task task"
+      },
+      "coding_tool_credential": {
+        "type": "object",
+        "properties": {
+          "index_repo_username": {
+            "type": "string",
+            "description": "The username to use when cloning the mono repository.",
+            "x-workforce-sensitive": true
+          },
+          "index_repo_password": {
+            "type": "string",
+            "description": "The password to use when cloning the mono repository.",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [
+          "index_repo_username",
+          "index_repo_password"
+        ],
+        "description": "The sensitive variables for the coding-tool tool"
+      },
+      "excalidraw_tool_credential": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "description": "The sensitive variables for the excalidraw-tool tool"
+      },
+      "github_board_ticket_tool_credential": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "The Github access token",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [
+          "access_token"
+        ],
+        "description": "The sensitive variables for the github-board-ticket-tool tool"
+      },
+      "google_drive_tool_credential": {
+        "type": "object",
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "description": "The client ID for the Google Drive API.",
+            "x-workforce-sensitive": true
+          },
+          "client_secret": {
+            "type": "string",
+            "description": "The client secret for the Google Drive API.",
+            "x-workforce-sensitive": true
+          },
+          "oauth2_audience": {
+            "type": "string",
+            "description": "The audience for the OAuth2 token.",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [
+          "client_id",
+          "client_secret"
+        ],
+        "description": "The sensitive variables for the google-drive-tool tool"
+      },
+      "google_slides_tool_credential": {
+        "type": "object",
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "description": "The client ID for the Google Slides API.",
+            "x-workforce-sensitive": true
+          },
+          "client_secret": {
+            "type": "string",
+            "description": "The client secret for the Google Slides API.",
+            "x-workforce-sensitive": true
+          },
+          "oauth2_audience": {
+            "type": "string",
+            "description": "The audience for the OAuth2 token.",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [],
+        "description": "The sensitive variables for the google-slides-tool tool"
+      },
+      "message_channel_tool_credential": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "description": "The sensitive variables for the message-channel-tool tool"
+      },
+      "openapi_channel_tool_credential": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "description": "The sensitive variables for the openapi-channel-tool tool"
+      },
+      "openapi_tool_credential": {
+        "type": "object",
+        "properties": {
+          "custom_headers": {
+            "type": "string",
+            "description": "Custom headers to include in the request. Provide a JSON object.",
+            "x-workforce-multiline": true,
+            "x-workforce-sensitive": true
+          },
+          "username": {
+            "type": "string",
+            "description": "The username to use for basic authentication.",
+            "x-workforce-sensitive": true
+          },
+          "password": {
+            "type": "string",
+            "description": "The password to use for basic authentication.",
+            "x-workforce-sensitive": true
+          },
+          "bearer_token": {
+            "type": "string",
+            "description": "The bearer token to use for bearer token authentication.",
+            "x-workforce-sensitive": true
+          },
+          "api_key": {
+            "type": "string",
+            "description": "The API key to use for API key authentication.",
+            "x-workforce-sensitive": true
+          },
+          "mtls_cert": {
+            "type": "string",
+            "description": "The certificate to use for mTLS authentication.",
+            "x-workforce-multiline": true,
+            "x-workforce-sensitive": true
+          },
+          "mtls_key": {
+            "type": "string",
+            "description": "The key to use for mTLS authentication.",
+            "x-workforce-multiline": true,
+            "x-workforce-sensitive": true
+          },
+          "mtls_ca": {
+            "type": "string",
+            "description": "The CA to use for mTLS authentication.",
+            "x-workforce-multiline": true,
+            "x-workforce-sensitive": true
+          },
+          "client_id": {
+            "type": "string",
+            "description": "The client ID to use for Oauth2 authentication.",
+            "x-workforce-sensitive": true
+          },
+          "client_secret": {
+            "type": "string",
+            "description": "The client secret to use for Oauth2 authentication.",
+            "x-workforce-sensitive": true
+          },
+          "scopes": {
+            "type": "string",
+            "description": "The scope to use for Oauth2 authentication. Provide a comma-separated list of scopes.",
+            "x-workforce-sensitive": true
+          },
+          "oauth2_audience": {
+            "type": "string",
+            "description": "The audience to use for Oauth2 authentication.",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [],
+        "description": "The sensitive variables for the openapi-tool tool"
+      },
+      "template_tool_credential": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "description": "The sensitive variables for the template-tool tool"
+      },
+      "trello_ticket_tool_credential": {
+        "type": "object",
+        "properties": {
+          "api_key": {
+            "type": "string",
+            "description": "The Trello API key.",
+            "x-workforce-sensitive": true
+          },
+          "api_token": {
+            "type": "string",
+            "description": "The Trello API token.",
+            "x-workforce-sensitive": true
+          },
+          "app_secret": {
+            "type": "string",
+            "description": "The Trello app secret.",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [
+          "api_key",
+          "api_token",
+          "app_secret"
+        ],
+        "description": "The sensitive variables for the trello-ticket-tool tool"
+      },
+      "web_service_tool_credential": {
+        "type": "object",
+        "properties": {
+          "password": {
+            "type": "string",
+            "description": "The password to use for basic authentication.",
+            "x-workforce-sensitive": true
+          },
+          "bearer_token": {
+            "type": "string",
+            "description": "Bearer token to use for Oauth2 authentication.",
+            "x-workforce-sensitive": true
+          },
+          "client_id": {
+            "type": "string",
+            "description": "The client ID to use for Oauth2 Client Credentials authentication.",
+            "x-workforce-sensitive": true
+          },
+          "client_secret": {
+            "type": "string",
+            "description": "The client secret to use for Oauth2 Client Credentials authentication.",
+            "x-workforce-sensitive": true
+          },
+          "scope": {
+            "type": "string",
+            "description": "The scope to use for Oauth2 Client Credentials authentication.",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [],
+        "description": "The sensitive variables for the web-service-tool tool"
+      },
+      "github_board_tracker_credential": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "The Github access token",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [
+          "access_token"
+        ],
+        "description": "The sensitive variables for the github-board-tracker tracker"
+      },
+      "trello_tracker_credential": {
+        "type": "object",
+        "properties": {
+          "api_key": {
+            "type": "string",
+            "description": "The Trello API key",
+            "x-workforce-sensitive": true
+          },
+          "api_token": {
+            "type": "string",
+            "description": "The Trello API token",
+            "x-workforce-sensitive": true
+          },
+          "app_secret": {
+            "type": "string",
+            "description": "The secret used to verify the webhook",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [
+          "api_key",
+          "api_token",
+          "app_secret"
+        ],
+        "description": "The sensitive variables for the trello-tracker tracker"
+      },
+      "ai_worker_credential": {
+        "type": "object",
+        "properties": {
+          "api_token": {
+            "type": "string",
+            "description": "The API token",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [
+          "api_token"
+        ],
+        "description": "The sensitive variables for the ai-worker worker"
+      },
+      "human_worker_credential": {
+        "type": "object",
+        "properties": {},
+        "required": [],
+        "description": "The sensitive variables for the human-worker worker"
+      }
+    }
+  }
+}

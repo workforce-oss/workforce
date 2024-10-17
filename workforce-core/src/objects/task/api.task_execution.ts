@@ -169,6 +169,6 @@ export function TaskExecutionHandlers(): Record<string, RequestHandler[]> {
     };
 }
 
-export const TaskExecutionRoutes = Router({ mergeParams: true });
+export const TaskExecutionRoutes: Router = Router({ mergeParams: true });
 TaskExecutionRoutes.get("/", TaskExecutionHandlers().list);
 TaskExecutionRoutes.delete("/:id", TaskExecutionHandlers().delete);

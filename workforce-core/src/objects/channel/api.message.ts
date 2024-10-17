@@ -48,6 +48,6 @@ export function ChannelMessageHandlers(): Record<string, RequestHandler[]> {
 	};
 }
 
-export const ChannelMessageRoutes = Router({mergeParams: true});
+export const ChannelMessageRoutes: Router = Router({mergeParams: true});
 ChannelMessageRoutes.get("/", ChannelMessageHandlers().list);
 

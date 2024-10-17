@@ -1,13 +1,13 @@
 {
   "private": true,
   "scripts": {
-    "docker": "_build/build.sh && _deploy/docker/local/deploy.sh",
-    "docker:build": "_build/build.sh all",
-    "docker:build:backend": "_build/build.sh backend",
-    "docker:build:frontend": "_build/build.sh frontend",
-    "docker:build:extension": "_build/build.sh extension",
+    "docker": "_build/build.sh all build && _deploy/docker/local/deploy.sh",
+    "docker:build": "_build/build.sh all build",
+    "docker:build:backend": "_build/build.sh backend build",
+    "docker:build:frontend": "_build/build.sh frontend build",
+    "docker:build:extension": "_build/build.sh extension build",
     "docker:local": "_deploy/docker/local/deploy.sh",
-    "docker:push": "_build/build.sh && _build/push.sh"
+    "docker:push": "_build/build.sh all push"
   },
   "workspaces": [
     "excelsior",

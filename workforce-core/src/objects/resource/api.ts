@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { ModelHandlers } from "../base/api.js";
 
-export const ResourceRoutes = Router({ mergeParams: true });
+export const ResourceRoutes: Router = Router({ mergeParams: true });
 export const ResourceHandlers = ModelHandlers('resource');
 ResourceRoutes.post("/", ...ResourceHandlers.create);
 ResourceRoutes.get("/:id", ...ResourceHandlers.read);

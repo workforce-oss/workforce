@@ -1,4 +1,4 @@
-import express, { RequestHandler } from "express";
+import express, { RequestHandler, Router } from "express";
 import { Logger } from "../../logging/logger.js";
 import { ToolDb } from "./db.js";
 import { ToolRequestDb } from "./db.tool_request.js";
@@ -45,5 +45,5 @@ export function ToolRequestHandlers(): Record<string, RequestHandler[]> {
 	};
 }
 
-export const ToolRequestRoutes = express.Router({ mergeParams: true });
+export const ToolRequestRoutes: Router = express.Router({ mergeParams: true });
 ToolRequestRoutes.get("/", ToolRequestHandlers().list);
