@@ -39,8 +39,8 @@ services:
       - storage-api
       - nlm-ingestor
     volumes:
-      - ./encryption/private.pem:/data/private.pem
-      - ./encryption/public.pem:/data/public.pem
+      - ./encryption/private.insecure:/data/private.insecure
+      - ./encryption/public.insecure:/data/public.insecure
     env_file:
       - workforce-server.env
     networks:
@@ -62,8 +62,8 @@ services:
       - weaviate
       - redis
     volumes:
-      - ./encryption/private.pem:/data/private.pem
-      - ./encryption/public.pem:/data/public.pem
+      - ./encryption/private.insecure:/data/private.insecure
+      - ./encryption/public.insecure:/data/public.insecure
       - storage-api-data:/tmp
     networks:
       - backend
