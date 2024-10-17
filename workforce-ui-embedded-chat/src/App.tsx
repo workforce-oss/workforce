@@ -36,12 +36,6 @@ const modes = ['default', 'webview'];
 class mockWorkforce {
     public getAttribute(key: string) {
         switch (key) {
-            case modeKey:
-                return 'webview';
-            case orgIdKey:
-                return 'fa71d0aa-8376-4e15-859f-a2d10eb64ccc';
-            case channelIdKey:
-                return '651bf306-843f-40e0-b8ac-14f32f63549a';
             case draggableKey:
                 return 'true';
             case anonymousKey:
