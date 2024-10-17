@@ -261,7 +261,8 @@ function parseData(path: string): {
     documentRepositories: DocumentRepositoryConfig[],
     flows: FlowConfig[], 
      }  {
-	const filePath = `${process.cwd()}/${path}`;
+        const absolute = path.startsWith("/") || path.startsWith("~");
+	const filePath =  absolute ? path : `${process.cwd()}/${path}`;
 	const file = fs.readFileSync(filePath).toString();
     const sections = file.split("---");
     const data = {

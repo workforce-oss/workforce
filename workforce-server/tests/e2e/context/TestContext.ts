@@ -1,7 +1,6 @@
 import { OAuth2Server } from "workforce-core";
 import { RestApiComponent } from "../../../src/components/impl/rest_api.js";
 import { ServerContext } from "../../../src/context.js";
-import { ensureLocalClient } from "../identity/local_clients.js";
 
 export class TestContext extends ServerContext {
     oauth2Server?: OAuth2Server;
@@ -14,7 +13,6 @@ export class TestContext extends ServerContext {
 
     async init() {
         await super.init();
-        await ensureLocalClient();
         const restApiComponent = this.components.find((component) => component.componentName === "workforce-rest-api");
         this.oauth2Server = (restApiComponent as RestApiComponent).oauth2Server;
     }

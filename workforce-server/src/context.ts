@@ -6,10 +6,11 @@ import expressWs from "express-ws";
 import { Transaction } from "sequelize";
 import { ModelCtor, Sequelize } from "sequelize-typescript";
 import { fileURLToPath } from "url";
-import { Configuration, EncryptionService, Logger, MapFactory, MetricsHandlers, SubjectFactory, WorkforceClient, collectMetrics } from "workforce-core";
+import { BrokerManager, Configuration, EncryptionService, LocalIdentityDb, Logger, MapFactory, MetricsHandlers, SubjectFactory, WorkforceClient, collectMetrics } from "workforce-core";
 import { BaseComponent } from "./components/base.js";
 import { ComponentFactory } from "./components/factory.js";
 import { WorkforceComponent, workforceComponentTypes } from "./components/model.js";
+import bcrypt from "bcryptjs";
 
 export class ServerContext {
     __dirname: string;
@@ -102,6 +103,8 @@ export class ServerContext {
             await this.sequelize.sync({ });
         }
 
+        await this.ensureLocalClient();
+
         if (!this.publicKeys.has("secret-service")) {
             this.publicKeys.set("secret-service", Configuration.SecretServicePublicKey);
         }
@@ -156,6 +159,37 @@ export class ServerContext {
         });
 
         this.server = app;
+    }
+
+    async ensureLocalClient(): Promise<boolean> {
+        if (!Configuration.EnableLocalAuth) {
+            return true;
+        }
+    
+        const localOauth2ClientIdenity = await LocalIdentityDb.findOne({
+            where: {
+                username: Configuration.OAuth2ClientId
+            }
+        }).catch((err) => {
+            this.logger.error(`Error finding local identity: ${err}`);
+            return null;
+        });
+    
+        if (!localOauth2ClientIdenity) {
+            const passwordHash = await bcrypt.hash(Configuration.OAuth2ClientSecret, 12);
+            const result = await LocalIdentityDb.create({
+                username: Configuration.OAuth2ClientId,
+                passwordHash 
+            }).catch((err) => {
+                this.logger.error(`Error creating local identity: ${err}`);
+                return false;
+            });
+            if (!result) {
+                return false;
+            }
+        }
+    
+        return true;
     }
 
 }

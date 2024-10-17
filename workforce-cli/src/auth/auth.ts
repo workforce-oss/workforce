@@ -32,6 +32,8 @@ export class Auth {
       const authConfig = JSON.parse(fs.readFileSync(authConfigPath).toString());
       return authConfig;
     } else {
+      fs.mkdirSync(authConfigPath.split("/").slice(0, -1).join("/"), { recursive: true });
+      fs.writeFileSync(authConfigPath, JSON.stringify({}));
       return {}
     }
   }

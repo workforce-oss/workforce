@@ -18,6 +18,7 @@ export class NativeChannel extends Channel {
     webhookPath: string;
     subscription?: Subscription;
     voiceInterface?: NativeChannelVoiceInterface;
+    ensureRouteDaemon?: NodeJS.Timeout;
 
     constructor(config: ChannelConfig, onFailure: (objectId: string, error: string) => void) {
         super(config, onFailure);
@@ -46,6 +47,7 @@ export class NativeChannel extends Channel {
         }
         // do a short delay to ensure any existing destroy() calls have completed
         this.initWebsocket();
+        this.ensureRoute();
     }
 
     public static defaultConfig(orgId: string): ChannelConfig {
@@ -75,6 +77,21 @@ export class NativeChannel extends Channel {
             this.logger.error(`initWebsocket() error adding route `, error);
             this.onFailure?.(this.config.id!, error.message);
         });
+    }
+
+    private ensureRoute() {
+        if (this.ensureRouteDaemon) {
+            clearInterval(this.ensureRouteDaemon);
+        }
+        this.ensureRouteDaemon = setInterval(() => {
+            WebhookRouteManager.routeExists(this.webhookRoute.path).then((exists) => {
+                if (!exists) {
+                    this.initWebsocket();
+                }
+            }).catch((error: Error) => {
+                this.logger.error(`Error checking if route exists: ${error.message}`);
+            });
+        }, 1000 * 5);
     }
 
     private setupVoiceInterface() {
@@ -332,6 +349,9 @@ export class NativeChannel extends Channel {
 
     destroy(): Promise<void> {
         this.logger.info(`destroy() channel ${this.config.id}`);
+        if (this.ensureRouteDaemon) {
+            clearInterval(this.ensureRouteDaemon);
+        }
         if (this.subscription) {
             this.subscription.unsubscribe();
         }

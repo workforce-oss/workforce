@@ -118,6 +118,7 @@ export class TaskBroker extends BaseBroker<TaskConfig, Task, object> {
 				this.resourceSubscriptions.get(`${taskId}-${objectId}`)?.unsubscribe();
 				this.resourceSubscriptions.delete(`${taskId}-${objectId}`);
 			} else if (this.channelSubscriptions.has(`${taskId}-${objectId}`)) {
+				BrokerManager.channelBroker.unsubscribe(objectId, this.channelSubscriptions.get(`${taskId}-${objectId}`)!);
 				this.channelSubscriptions.get(`${taskId}-${objectId}`)?.unsubscribe();
 				this.channelSubscriptions.delete(`${taskId}-${objectId}`);
 			} else if (this.trackerSubscriptions.has(`${taskId}-${objectId}`)) {

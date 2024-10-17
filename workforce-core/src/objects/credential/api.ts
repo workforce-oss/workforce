@@ -43,7 +43,7 @@ export function CredentialHandlers(): CrudHandlers {
                 res.status(201).send(db.toModel(true));
             } catch (e) {
                 Logger.getInstance("credential-api").error(`${req.originalUrl} ${(e as Error).message}`, e)
-                res.send(500).send({message: "Unknown Error creating credential"});
+                res.status(500).send({message: "Unknown Error creating credential"});
             }
         }],
         read: [bodyParser.json({

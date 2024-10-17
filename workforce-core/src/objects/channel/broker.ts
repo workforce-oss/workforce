@@ -15,8 +15,9 @@ export class ChannelBroker extends BaseBroker<ChannelConfig, Channel, ChannelMes
 
 	private requestSubject = new Subject<MessageRequest>();
 	private messageSubject = new Subject<ChannelMessageEvent>();
-	private requestSubcriptions: Map<string, Subscription>;
 	private errorSubscriptions: Map<string, Subscription>;
+	private channelSubjects = new Map<string, Subject<ChannelMessageEvent>>();
+	private channelSubscribers = new Map<string, Set<Subscription>>();
 
 	constructor(
 		config: BrokerConfig,
@@ -25,7 +26,6 @@ export class ChannelBroker extends BaseBroker<ChannelConfig, Channel, ChannelMes
 	) {
 		super(config);
 		this.logger.debug(`constructor() config=${JSON.stringify(config)}`);
-		this.requestSubcriptions = new Map();
 		if (requestSubject) {
 			this.requestSubject = requestSubject;
 		}
@@ -58,6 +58,16 @@ export class ChannelBroker extends BaseBroker<ChannelConfig, Channel, ChannelMes
 	async register(channel: Channel): Promise<void> {
 		await channel.initializeDataCache();
 		await super.register(channel);
+
+		if (!this.channelSubjects.has(channel.config.id!)) {
+			const channelMessageSubject = new Subject<ChannelMessageEvent>();
+			this.channelSubjects.set(channel.config.id!, channelMessageSubject);
+		}
+
+		channel.subscribe((message: ChannelMessageEvent) => {
+			this.channelSubjects.get(channel.config.id!)?.next(message);
+		});
+
 		const errorSubscription = channel.errors.subscribe(this.handleError.bind(this));
 		this.errorSubscriptions.set(channel.config.id!, errorSubscription);
 	}
@@ -119,8 +129,12 @@ export class ChannelBroker extends BaseBroker<ChannelConfig, Channel, ChannelMes
 			.catch((error: Error) => {
 				this.logger.error(`remove() channelId=${channelId} error=${error.message}`);
 			});
-		this.requestSubcriptions.get(channelId)?.unsubscribe();
-		this.requestSubcriptions.delete(channelId);
+		const subscribers = this.channelSubscribers.get(channelId);
+		if (!subscribers || subscribers.size === 0) {
+			this.channelSubjects.get(channelId)?.unsubscribe();
+			this.channelSubjects.delete(channelId);
+		}
+	
 		this.errorSubscriptions.get(channelId)?.unsubscribe();
 		this.errorSubscriptions.delete(channelId);
 		this.objects.delete(channelId);
@@ -129,8 +143,8 @@ export class ChannelBroker extends BaseBroker<ChannelConfig, Channel, ChannelMes
 	async destroy(): Promise<void> {
 		this.logger.debug(`destroy()`);
 		await Promise.all(Array.from(this.objects.keys()).map((objectId) => this.remove(objectId)));
-		this.requestSubcriptions.forEach((subscription) => subscription.unsubscribe());
-		this.requestSubcriptions.clear();
+		this.channelSubjects.forEach((subscription) => subscription.unsubscribe());
+		this.channelSubjects.clear();
 		this.errorSubscriptions.forEach((subscription) => subscription.unsubscribe());
 		this.errorSubscriptions.clear();
 		this.requestSubject.complete();
@@ -263,7 +277,11 @@ export class ChannelBroker extends BaseBroker<ChannelConfig, Channel, ChannelMes
 		if (!channel) {
 			throw new Error(`subscribeToSession() channel ${channelId} not found`);
 		}
-		return channel.subscribe((message: ChannelMessageEvent) => {
+		const channelSubject = this.channelSubjects.get(channelId);
+		if (!channelSubject) {
+			throw new Error(`subscribeToSession() channel ${channelId} subject not found`);
+		}
+		return channelSubject.subscribe((message: ChannelMessageEvent) => {
 			this.logger.debug(
 				`subscribeToSession() message.sessionId=${message.taskExecutionId} sessionId=${sessionId}`
 			);
@@ -318,11 +336,15 @@ export class ChannelBroker extends BaseBroker<ChannelConfig, Channel, ChannelMes
 		channelId: string,
 		callback: (message: ChannelMessageEvent) => Promise<void>
 	): Promise<Subscription> {
-		const channel = this.objects.get(channelId);
-		if (!channel) {
-			throw new Error(`subscribe() channel ${channelId} not found`);
+		const channelSubject = this.channelSubjects.get(channelId);
+		if (!channelSubject) {
+			throw new Error(`subscribe() channel ${channelId} subject not found`);
 		}
-		return Promise.resolve(channel.subscribe((message: ChannelMessageEvent) => {
+		if (!this.channelSubscribers.has(channelId)) {
+			this.channelSubscribers.set(channelId, new Set());
+		}
+
+		const subcription = channelSubject.subscribe((message: ChannelMessageEvent) => {
 			if (message.taskExecutionId) {
 				// ignore messages that are part of a session
 				this.logger.debug(`subscribe() message.sessionId=${message.taskExecutionId}`);
@@ -334,6 +356,16 @@ export class ChannelBroker extends BaseBroker<ChannelConfig, Channel, ChannelMes
 					this.logger.error(`subscribe() channelId=${channelId} error=${error.message}`);
 				});
 			}
-		}));
+		});
+
+		this.channelSubscribers.get(channelId)?.add(subcription);
+		return Promise.resolve(subcription);
+	}
+
+	unsubscribe(channelId: string, subscription: Subscription): void {
+		const subscribers = this.channelSubscribers.get(channelId);
+		if (subscribers) {
+			subscribers.delete(subscription);
+		}
 	}
 }

@@ -81,7 +81,7 @@ export class BrokerManager {
         return this._toolBroker;
     }
 
-    public static async reset(options?: {mode?: BrokerMode}) {
+    public static async reset(options?: { mode?: BrokerMode }) {
         const mode = options?.mode ?? (Configuration.BrokerMode || "in-memory") as BrokerMode;
         if (this._channelBroker) {
             await this._channelBroker.destroy();
@@ -120,6 +120,12 @@ export class BrokerManager {
         this._taskBroker = await TaskBroker.create({ mode });
     }
 
+    public static initializeIdentityBroker(): void {
+        if (!this._identityBroker) {
+            this._identityBroker = IdentityBroker.create();
+        }
+    }
+
     public static async init(options?: { mode?: BrokerMode }): Promise<void> {
         Logger.getInstance("BrokerManager").debug(`init() called with options ${JSON.stringify(options)}`);
         const mode = options?.mode ?? (Configuration.BrokerMode || "in-memory") as BrokerMode;
@@ -147,8 +153,8 @@ export class BrokerManager {
             this._workerBroker = await WorkerBroker.create({ mode })
         }
         if (!this._taskBroker) {
-            this._taskBroker = await TaskBroker.create({ mode });    
-        }        
+            this._taskBroker = await TaskBroker.create({ mode });
+        }
     }
 }
 

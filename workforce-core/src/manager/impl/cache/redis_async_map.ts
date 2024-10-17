@@ -91,7 +91,6 @@ export class RedisAsyncMap<T> implements AsyncMap<T> {
     async destroy() {
         try {
             await this.client.del(`${this.tableName}:${this.objectId}:*`);
-            await this.client.quit();
         } catch (error) {
             this.logger.error(`Error destroying ${this.tableName}:${this.objectId}:`, error);
         }

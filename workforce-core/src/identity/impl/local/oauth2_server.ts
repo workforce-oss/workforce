@@ -355,6 +355,7 @@ export class OAuth2Server {
                     });
                 } else if (grant_type === "client_credentials") {
                     if (!client_id || !client_secret) {
+                        this.logger.debug(`Client ID or secret missing: ${client_id}`);
                         res.status(400).send({ error: 'invalid_request' });
                         return;
                     }
@@ -365,6 +366,7 @@ export class OAuth2Server {
                     });
 
                     if (!identity) {
+                        this.logger.debug(`Identity not found: ${client_id}`);
                         res.status(400).send({ error: 'invalid_request' });
                         return;
                     }
@@ -372,6 +374,7 @@ export class OAuth2Server {
                     const passwordValid = await this.bcryptCompare(client_secret, identity.passwordHash);
 
                     if (!passwordValid) {
+                        this.logger.debug(`Password invalid: ${client_id}`);
                         res.status(400).send({ error: 'invalid_request' });
                         return;
                     }
@@ -387,10 +390,11 @@ export class OAuth2Server {
                     });
 
                 } else {
+                    this.logger.debug(`grant_type ${grant_type} not supported`);
                     res.status(400).send({ error: 'invalid_request' });
                     return;
                 }
-                console.log(JSON.stringify(jwt));
+                this.logger.debug(`Returning JWT`);
                 res.status(200).send({
                     access_token: jwt,
                     id_token: jwt,

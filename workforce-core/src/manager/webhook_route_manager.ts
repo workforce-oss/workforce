@@ -187,6 +187,23 @@ export class WebhookRouteManager {
 		});
 	}
 
+	public static async routeExists(path: string): Promise<boolean> {
+		const route = await WebhookRouteDb.findOne({
+			where: {
+				path
+			}
+		}).catch((err: Error) => {
+			Logger.getInstance("WebhookRouteManager").error(`Error checking route exists for path=${path}: ${err}`);
+			return null;
+		});
+		if (route) {
+			return true;
+		}
+		return false;
+	}
+
+
+
 	public static async getInstance(authOptions?: AuthOptions): Promise<WebhookRouteManager> {
 		if (!WebhookRouteManager._instance) {
 			const manager = new WebhookRouteManager(authOptions);
@@ -515,7 +532,7 @@ export class WebhookRouteManager {
 				}
 			}
 			if (claims[key].contains) {
-				if (!decodedToken[key]?.includes(claims[key].contains!)) {
+				if (!decodedToken[key]?.includes(claims[key].contains)) {
 					this.logger.debug(`validateClaims() key=${key} contains=${claims[key].contains} decodedToken=${decodedToken[key]}`);
 					return false;
 				}
