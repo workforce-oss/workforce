@@ -9,8 +9,7 @@ export class StructuredTaskMetadata {
             orgId: orgId,
             name: "Structured Task",
             description: "A task with a pre-defined structure.",
-            type: "task",
-            subtype: "structured-task",
+            type: "structured-task",
             variables: {}
         }
     }

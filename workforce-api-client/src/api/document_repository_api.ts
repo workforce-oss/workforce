@@ -1,13 +1,15 @@
 import { DocumentData, DocumentRepositoryConfig, VariableSchemaValidationError, VariablesSchema } from "workforce-core/model";
-import { RestApi, RestApiInstanceOptions } from "./base/rest_api.js";
+import { RestApiInstanceOptions } from "./base/rest_api.js";
+import { OrgSubResourceAPI } from "./org_api.subresource.js";
 
-export class DocumentRepositoryAPI extends RestApi<DocumentRepositoryConfig, VariableSchemaValidationError> {
+export class DocumentRepositoryAPI extends OrgSubResourceAPI<DocumentRepositoryConfig, VariableSchemaValidationError> {
     static instance: DocumentRepositoryAPI | undefined;
     static getInstance(options?: RestApiInstanceOptions): DocumentRepositoryAPI {
         if (!DocumentRepositoryAPI.instance || options.accessToken !== DocumentRepositoryAPI.instance.accessToken) {
             DocumentRepositoryAPI.instance = new DocumentRepositoryAPI({
                 basePath: options.basePath ?? "/workforce-api",
                 resource: "document-repositories",
+                objectType: "document_repository",
                 baseUrl: options?.baseUrl,
                 accessToken: options?.accessToken,
                 unAuthorizedCallBack: options?.unAuthorizedCallBack,

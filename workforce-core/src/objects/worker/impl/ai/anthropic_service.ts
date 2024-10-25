@@ -55,7 +55,7 @@ export class AnthropicAIService implements AIService {
                     cache_control: { type: "ephemeral" }
                 }
             ] : undefined,
-            messages: messages.filter(m => m !== undefined) as Anthropic.Beta.PromptCaching.Messages.PromptCachingBetaMessageParam[],
+            messages: messages.filter(m => m !== undefined),
             tools: tools,
             temperature: this.config.variables!.temperature ? +this.config.variables!.temperature : 0,
             max_tokens: maxTokens,
@@ -435,7 +435,7 @@ export class AnthropicAIService implements AIService {
                         break;
                     }
                     if (userMessageCount === 2 || userMessageCount === 3) {
-                        const userMessage = messages[i]!;
+                        const userMessage = messages[i];
                         if (userMessage.content && userMessage.content.length >= 1) {
                             const last = userMessage.content[userMessage.content.length - 1] as Anthropic.Beta.PromptCaching.Messages.PromptCachingBetaTextBlockParam | Anthropic.Beta.PromptCaching.Messages.PromptCachingBetaImageBlockParam | Anthropic.Beta.PromptCaching.Messages.PromptCachingBetaToolUseBlockParam | Anthropic.Beta.PromptCaching.Messages.PromptCachingBetaToolResultBlockParam;
                             last.cache_control = { type: "ephemeral" };

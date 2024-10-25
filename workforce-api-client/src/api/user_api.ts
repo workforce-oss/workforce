@@ -8,6 +8,7 @@ export class UserAPI extends RestApi<WorkforceUser, VariableSchemaValidationErro
             UserAPI.instance = new UserAPI({
                 basePath: options?.basePath ?? "/workforce-api",
                 resource: "users",
+                objectType: "user",
                 baseUrl: options?.baseUrl,
                 accessToken: options?.accessToken,
                 unAuthorizedCallBack: options?.unAuthorizedCallBack,

@@ -6,7 +6,7 @@ import { Op } from "sequelize";
 
 export async function mapDocumentationNamesToIds(configs: DocumentationConfig[], orgId: string): Promise<void> {
     for (const config of configs) {
-        await CredentialHelper.instance.replaceCredentialNameWithId(config);
+        await CredentialHelper.instance.replaceCredentialNameWithId(config, orgId);
         if (config.repository) {
             const foundRepository = await DocumentRepositoryDb.findOne({
                 where: {

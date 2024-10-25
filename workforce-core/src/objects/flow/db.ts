@@ -22,6 +22,7 @@ import { mapToolIdsToNames, mapToolNamesToIds } from "./db.tool.js";
 import { ToolConfig } from "../tool/model.js";
 import { OrgDb } from "../../identity/db.org.js";
 import { SpaceDb } from "../../identity/db.space.js";
+import { ObjectType } from "../../model.js";
 
 export interface BaseModelAttributes {
 	id: string;
@@ -148,12 +149,12 @@ export class FlowDb extends Model<BaseModelAttributes, BaseModelCreationAttribut
 		}
 
 		if (args?.replaceIdsWithNames) {
-			await this.mapIdsToNames(model.channels);
-			await this.mapIdsToNames(model.documentation);
-			await this.mapIdsToNames(model.resources);
-			await this.mapIdsToNames(model.tools);
-			await this.mapIdsToNames(model.trackers);
-			await this.mapIdsToNames(model.tasks);
+			await this.mapIdsToNames(model.channels, "channel");
+			await this.mapIdsToNames(model.documentation, "documentation");
+			await this.mapIdsToNames(model.resources, "resource");
+			await this.mapIdsToNames(model.tools, "tool");
+			await this.mapIdsToNames(model.trackers, "tracker");
+			await this.mapIdsToNames(model.tasks, "task");
 		}
 		return model;
 	}
@@ -165,12 +166,12 @@ export class FlowDb extends Model<BaseModelAttributes, BaseModelCreationAttribut
 		this.status = model.status;
 		model = _.cloneDeep(model);
 
-		this.channels = await this.sync(model.channels ?? [], (flowId: string) => ChannelDb.findAll({ where: { flowId: flowId } }), this.id, ChannelDb);
-		this.documentation = await this.sync(model.documentation ?? [], (flowId: string) => DocumentationDb.findAll({ where: { flowId: flowId }, include: { all: true} }), this.id, DocumentationDb);
-		this.resources = await this.sync(model.resources ?? [], (flowId: string) => ResourceDb.findAll({ where: { flowId: flowId } }), this.id, ResourceDb);
-		this.tools = await this.sync(model.tools ?? [], (flowId: string) => ToolDb.findAll({ where: { flowId: flowId } }), this.id, ToolDb);
-		this.trackers = await this.sync(model.trackers ?? [], (flowId: string) => TrackerDb.findAll({ where: { flowId: flowId } }), this.id, TrackerDb);
-		this.tasks = await this.sync(model.tasks ?? [], (flowId: string) => TaskDb.findAll({ where: { flowId: flowId } }), this.id, TaskDb);
+		this.channels = await this.sync(model.channels ?? [], (flowId: string) => ChannelDb.findAll({ where: { flowId: flowId } }), this.id, ChannelDb, "channel");
+		this.documentation = await this.sync(model.documentation ?? [], (flowId: string) => DocumentationDb.findAll({ where: { flowId: flowId }, include: { all: true} }), this.id, DocumentationDb, "documentation");
+		this.resources = await this.sync(model.resources ?? [], (flowId: string) => ResourceDb.findAll({ where: { flowId: flowId } }), this.id, ResourceDb, "resource");
+		this.tools = await this.sync(model.tools ?? [], (flowId: string) => ToolDb.findAll({ where: { flowId: flowId } }), this.id, ToolDb, "tool");
+		this.trackers = await this.sync(model.trackers ?? [], (flowId: string) => TrackerDb.findAll({ where: { flowId: flowId } }), this.id, TrackerDb, "tracker");
+		this.tasks = await this.sync(model.tasks ?? [], (flowId: string) => TaskDb.findAll({ where: { flowId: flowId } }), this.id, TaskDb, "task");
 		return this;
 	}
 
@@ -232,9 +233,10 @@ export class FlowDb extends Model<BaseModelAttributes, BaseModelCreationAttribut
 		objects: TConfig[],
 		findAll: (flowId: string) => Promise<TModel[]>,
 		flowId: string,
-		Model: new () => TModel
+		Model: new () => TModel,
+		objectType: ObjectType
 	): Promise<TModel[]> {
-		await this.mapNamesToIds(objects);
+		await this.mapNamesToIds(objects, objectType);
 		const foundObjects = await findAll(flowId);
 		const synced = await this.syncModels(objects, foundObjects, Model);
 		if (synced) {
@@ -274,14 +276,15 @@ export class FlowDb extends Model<BaseModelAttributes, BaseModelCreationAttribut
 		}
 	}
 
-	private async mapNamesToIds<T extends BaseConfig>(configs: T[]): Promise<void> {
+	private async mapNamesToIds<T extends BaseConfig>(configs: T[], objectType: ObjectType): Promise<void> {
 		// check if type is TaskConfig[]
 		if (!configs || configs.length === 0) {
 			return;
 		}
-		if (configs[0].type === "task") {
+		if (objectType === "task") {
 			await mapTaskNamesToIds({
 				configs: configs as TaskConfig[],
+				orgId: this.orgId,
 				channels: this.channels,
 				resources: this.resources,
 				trackers: this.trackers,
@@ -292,26 +295,27 @@ export class FlowDb extends Model<BaseModelAttributes, BaseModelCreationAttribut
 				configs: configs as TaskConfig[],
 				taskDbs: this.tasks ?? []
 			})
-		} else if (configs[0].type === "documentation") {
+		} else if (objectType === "documentation") {
 			await mapDocumentationNamesToIds(configs as DocumentationConfig[], this.orgId);
-		} else if (configs[0].type === "tool") {
+		} else if (objectType === "tool") {
 			await mapToolNamesToIds({
 				configs: configs as ToolConfig[],
 				channels: this.channels,
+				orgId: this.orgId
 			});
 		} else {
 			for (const config of configs) {
-				await CredentialHelper.instance.replaceCredentialNameWithId(config);
+				await CredentialHelper.instance.replaceCredentialNameWithId(config, this.orgId);
 			}
 		}
 	}
 
-	private async mapIdsToNames<T extends BaseConfig>(configs?: T[]): Promise<void> {
+	private async mapIdsToNames<T extends BaseConfig>(configs?: T[], objectType?: ObjectType): Promise<void> {
 		// check if type is TaskConfig[]
 		if (!configs || configs.length === 0) {
 			return;
 		}
-		if (configs[0].type === "task") {
+		if (objectType === "task") {
 			await mapTaskIdsToNames({
 				configs: configs as TaskConfig[],
 				channels: this.channels,
@@ -321,9 +325,9 @@ export class FlowDb extends Model<BaseModelAttributes, BaseModelCreationAttribut
 				flowDocumentation: this.documentation,
 
 			});
-		} else if (configs[0].type === "documentation") {
+		} else if (objectType === "documentation") {
 			await mapDocumentationIdsToNames(configs as DocumentationConfig[], this.orgId);
-		} else if (configs[0].type === "tool") {
+		} else if (objectType === "tool") {
 			await mapToolIdsToNames({
 				configs: configs as ToolConfig[],
 				channels: this.channels

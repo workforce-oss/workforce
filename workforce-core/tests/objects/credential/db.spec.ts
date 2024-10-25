@@ -26,8 +26,7 @@ describe("Credential DB", () => {
             const credentialConfig: CredentialConfig = {
                 name: "test",
                 description: "test",
-                type: "credential",
-                subtype: "trello-tracker",
+                type: "trello-tracker",
                 orgId: orgId,
                 secretId: randomUUID(),
             }
@@ -49,8 +48,7 @@ describe("Credential DB", () => {
             const credentialConfig: CredentialConfig = {
                 name: "test",
                 description: "test",
-                type: "credential",
-                subtype: "mock",
+                type: "mock-channel",
                 orgId: orgId,
                 secretId: randomUUID(),
                 variables: {

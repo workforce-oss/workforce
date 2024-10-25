@@ -10,15 +10,16 @@ import { TrackerDb } from "../tracker/db.js";
 
 export async function mapTaskNamesToIds(args: {
     configs: TaskConfig[],
+    orgId: string,
     channels?: ChannelDb[] | undefined,
     resources?: ResourceDb[] | undefined,
     trackers?: TrackerDb[] | undefined,
     flowTools?: ToolDb[] | undefined,
     flowDocumentation?: DocumentationDb[] | undefined
 }): Promise<void> {
-    const { configs, channels, resources, trackers, flowTools, flowDocumentation } = args;
+    const { configs, channels, resources, trackers, flowTools, flowDocumentation, orgId } = args;
     for (const config of configs) {
-        await CredentialHelper.instance.replaceCredentialNameWithId(config);
+        await CredentialHelper.instance.replaceCredentialNameWithId(config, orgId);
 
         if (config.defaultChannel) {
             const foundChannel = channels?.find((c) => c.name === config.defaultChannel);
@@ -83,7 +84,7 @@ export async function mapTaskNamesToIds(args: {
 
                     if (foundResource) {
                         if (Array.isArray((config.inputs)[input])) {
-                            (config.inputs)[input] = ((config.inputs)[input] as string[]).map((v) => v == foundResource.name ? foundResource.id : v);
+                            (config.inputs)[input] = ((config.inputs)[input]).map((v) => v == foundResource.name ? foundResource.id : v);
                         } else {
                             (config.inputs)[input] = foundResource.id;
                         }
@@ -95,7 +96,7 @@ export async function mapTaskNamesToIds(args: {
                     );
                     if (foundChannel) {
                         if (Array.isArray((config.inputs)[input])) {
-                            (config.inputs)[input] = ((config.inputs)[input] as string[]).map((v) => v == foundChannel.name ? foundChannel.id : v);
+                            (config.inputs)[input] = ((config.inputs)[input]).map((v) => v == foundChannel.name ? foundChannel.id : v);
                         } else {
                             (config.inputs)[input] = foundChannel.id;
                         }
@@ -177,7 +178,7 @@ export function mapSubtaskNamesToIds(args: {
         if (config.inputs) {
             for (const input in config.inputs) {
                 if (Array.isArray(config.inputs[input])) {
-                    const inputVals = config.inputs[input] as string[];
+                    const inputVals = config.inputs[input];
                     for (let i = 0; i < inputVals.length; i++) {
                         const foundSubTask = taskDbs.find((t) => t.name === inputVals[i]);
                         if (foundSubTask) {
@@ -221,7 +222,6 @@ export async function mapTaskIdsToNames(args: {
         const config: TaskConfig = {
             inputs: {} as Record<string, string | string[]>,
             id: existing.id,
-            subtype: existing.subtype,
             type: existing.type,
             name: existing.name,
             description: existing.description,
@@ -265,7 +265,7 @@ export async function mapTaskIdsToNames(args: {
                     );
                     if (foundResource) {
                         if (Array.isArray(config.inputs[input])) {
-                            config.inputs[input] = (config.inputs[input] as string[]).map((v) => v == foundResource.id ? foundResource.name : v);
+                            config.inputs[input] = (config.inputs[input]).map((v) => v == foundResource.id ? foundResource.name : v);
                         } else {
                             config.inputs[input] = foundResource.name;
                         }
@@ -275,7 +275,7 @@ export async function mapTaskIdsToNames(args: {
                     );
                     if (foundChannel) {
                         if (Array.isArray(config.inputs[input])) {
-                            config.inputs[input] = (config.inputs[input] as string[]).map((v) => v == foundChannel.id ? foundChannel.name : v);
+                            config.inputs[input] = (config.inputs[input]).map((v) => v == foundChannel.id ? foundChannel.name : v);
                         } else {
                             config.inputs[input] = foundChannel.name;
                         }
@@ -284,7 +284,7 @@ export async function mapTaskIdsToNames(args: {
                     const foundSubTask = configs.find((c) => c.id === val);
                     if (foundSubTask) {
                         if (Array.isArray(config.inputs[input])) {
-                            (config.inputs)[input] = (config.inputs[input] as string[]).map((v) => v == foundSubTask.id ? foundSubTask.name : v);
+                            (config.inputs)[input] = (config.inputs[input]).map((v) => v == foundSubTask.id ? foundSubTask.name : v);
                         } else {
                             (config.inputs)[input] = foundSubTask.name;
                         }
@@ -372,15 +372,21 @@ export async function mapTaskIdsToNames(args: {
             config.triggers = updated;
         }
 
+        // map on the rest of the existing options
         if (existing.variables) {
             config.variables = existing.variables;
         }
         if (existing.requiredSkills) {
             config.requiredSkills = existing.requiredSkills;
         }
+        if (existing.costLimit) {
+            config.costLimit = existing.costLimit;
+        }
+
         if (outputs.length > 0) {
             config.outputs = outputs;
         }
+
         if (config.credential) {
             existing.credential = config.credential;
         }
@@ -392,6 +398,9 @@ export async function mapTaskIdsToNames(args: {
         }
         if (config.tracker) {
             existing.tracker = config.tracker;
+        }
+        if (config.costLimit) {
+            existing.costLimit = config.costLimit;
         }
         if (config.inputs) {
             existing.inputs = config.inputs;

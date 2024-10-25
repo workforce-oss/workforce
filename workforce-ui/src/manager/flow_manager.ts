@@ -14,8 +14,6 @@ export class FlowManager {
 		if (data.flow.channels) {
 			for (const channel of data.flow.channels) {
 				channel.id = channel.id ?? uuidv4();
-				channel.subtype = channel.subtype ?? (channel.type as any);
-				channel.type = "channel";
 				nodes.push({
 					id: channel.id,
 					type: "channel",
@@ -27,8 +25,6 @@ export class FlowManager {
 		if (data.flow.documentation) {
 			for (const doc of data.flow.documentation) {
 				doc.id = doc.id ?? uuidv4();
-				doc.subtype = doc.subtype ?? (doc.type as any);
-				doc.type = "documentation";
 				nodes.push({
 					id: doc.id,
 					type: "documentation",
@@ -40,8 +36,6 @@ export class FlowManager {
 		if (data.flow.resources) {
 			for (const resource of data.flow.resources) {
 				resource.id = resource.id ?? uuidv4();
-				resource.subtype = resource.subtype ?? (resource.type as any);
-				resource.type = "resource";
 				nodes.push({
 					id: resource.id,
 					type: "resource",
@@ -53,8 +47,6 @@ export class FlowManager {
 		if (data.flow.tools) {
 			for (const tool of data.flow.tools) {
 				tool.id = tool.id ?? uuidv4();
-				tool.subtype = tool.subtype ?? (tool.type as any);
-				tool.type = "tool";
 				nodes.push({
 					id: tool.id,
 					type: "tool",
@@ -66,8 +58,6 @@ export class FlowManager {
 		if (data.flow.trackers) {
 			for (const tracker of data.flow.trackers) {
 				tracker.id = tracker.id ?? uuidv4();
-				tracker.subtype = tracker.subtype ?? (tracker.type as any);
-				tracker.type = "tracker";
 				nodes.push({
 					id: tracker.id,
 					type: "tracker",
@@ -80,8 +70,6 @@ export class FlowManager {
 		if (data.flow.tasks) {
 			for (const task of data.flow.tasks) {
 				task.id = task.id ?? uuidv4();
-				task.subtype = task.subtype ?? (task.type as any);
-				task.type = "task";
 				nodes.push({
 					id: task.id,
 					type: "task",
@@ -283,8 +271,6 @@ export class FlowManager {
 			task.flowId = undefined;
 			task.orgId = undefined;
 			task.id = undefined;
-			task.type = task.subtype as any;
-			task.subtype = undefined;
 			for (const tool of task.tools ?? []) {
 				tool.id = undefined;
 			}
@@ -296,36 +282,26 @@ export class FlowManager {
 			channel.flowId = undefined;
 			channel.orgId = undefined;
 			channel.id = undefined;
-			channel.type = channel.subtype as any;
-			channel.subtype = undefined;
 		}
 		for (const documentation of flowCopy.documentation ?? []) {
 			documentation.flowId = undefined;
 			documentation.orgId = undefined;
 			documentation.id = undefined;
-			documentation.type = documentation.subtype as any;
-			documentation.subtype = undefined;
 		}
 		for (const resource of flowCopy.resources ?? []) {
 			resource.flowId = undefined;
 			resource.orgId = undefined;
 			resource.id = undefined;
-			resource.type = resource.subtype as any;
-			resource.subtype = undefined;
 		}
 		for (const tool of flowCopy.tools ?? []) {
 			tool.flowId = undefined;
 			tool.orgId = undefined;
 			tool.id = undefined;
-			tool.type = tool.subtype as any;
-			tool.subtype = undefined;
 		}
 		for (const tracker of flowCopy.trackers ?? []) {
 			tracker.flowId = undefined;
 			tracker.orgId = undefined;
 			tracker.id = undefined;
-			tracker.type = tracker.subtype as any;
-			tracker.subtype = undefined;
 		}
 
 		return YAML.stringify(flowCopy, {
@@ -399,8 +375,8 @@ export class FlowManager {
 	}
 
 
-	static addObject<T extends BaseConfig>(data: FlowData, obj: T) {
-		if (obj.type === "channel") {
+	static addObject<T extends BaseConfig>(data: FlowData, obj: T, objectType: ObjectType) {
+		if (objectType === "channel") {
 			if (!data.flow.channels) {
 				data.flow.channels = [];
 			}
@@ -408,7 +384,7 @@ export class FlowManager {
 				obj.name = incrementString(obj.name);
 			}
 			data.flow.channels.push(obj as ChannelConfig);
-		} else if (obj.type === "documentation") {
+		} else if (objectType === "documentation") {
 			if (!data.flow.documentation) {
 				data.flow.documentation = [];
 			}
@@ -416,7 +392,7 @@ export class FlowManager {
 				obj.name = incrementString(obj.name);
 			}
 			data.flow.documentation.push(obj as DocumentationConfig);
-		} else if (obj.type === "resource") {
+		} else if (objectType === "resource") {
 			if (!data.flow.resources) {
 				data.flow.resources = [];
 			}
@@ -424,7 +400,7 @@ export class FlowManager {
 				obj.name = incrementString(obj.name);
 			}
 			data.flow.resources.push(obj as ResourceConfig);
-		} else if (obj.type === "task") {
+		} else if (objectType === "task") {
 			if (!data.flow.tasks) {
 				data.flow.tasks = [];
 			}
@@ -432,7 +408,7 @@ export class FlowManager {
 				obj.name = incrementString(obj.name);
 			}
 			data.flow.tasks.push(obj as TaskConfig);
-		} else if (obj.type === "tool") {
+		} else if (objectType === "tool") {
 			if (!data.flow.tools) {
 				data.flow.tools = [];
 			}
@@ -440,7 +416,7 @@ export class FlowManager {
 				obj.name = incrementString(obj.name);
 			}
 			data.flow.tools.push(obj as ToolConfig);
-		} else if (obj.type === "tracker") {
+		} else if (objectType === "tracker") {
 			if (!data.flow.trackers) {
 				data.flow.trackers = [];
 			}
@@ -456,64 +432,66 @@ export class FlowManager {
 
 
 
-	static removeObject(data: FlowData, name: string) {
-		if (data.flow.channels && data.flow.channels.find((c) => c.name === name || c.id === name)) {
-			data.flow.channels = data.flow.channels.filter((c) => c.name !== name && c.id !== name);
-			this.removeTaskRefs(data, "channel", name);
-			this.removeToolRefs(data, name);
-		} else if (data.flow.documentation && data.flow.documentation.find((d) => d.name === name || d.id === name)) {
-			data.flow.documentation = data.flow.documentation.filter((d) => d.name !== name && d.id !== name);
-			this.removeTaskRefs(data, "documentation", name);
-		} else if (data.flow.resources && data.flow.resources.find((r) => r.name === name || r.id === name)) {
-			data.flow.resources = data.flow.resources.filter((r) => r.name !== name && r.id !== name);
-			this.removeTaskRefs(data, "resource", name);
-		} else if (data.flow.tasks && data.flow.tasks.find((t) => t.name === name || t.id === name)) {
-			data.flow.tasks = data.flow.tasks.filter((t) => t.name !== name && t.id !== name);
-			this.removeTaskRefs(data, "task", name);
-		} else if (data.flow.tools && data.flow.tools.find((t) => t.name === name || t.id === name)) {
-			data.flow.tools = data.flow.tools.filter((t) => t.name !== name && t.id !== name);
-			this.removeTaskRefs(data, "tool", name);
-		} else if (data.flow.trackers && data.flow.trackers.find((t) => t.name === name || t.id === name)) {
-			data.flow.trackers = data.flow.trackers.filter((t) => t.name !== name && t.id !== name);
-			this.removeTaskRefs(data, "tracker", name);
-		} else {
-			console.error(`removeObject() could not find object ${name}`);
+	static removeObject(data: FlowData, name: string, objectType: ObjectType) {
+		switch (objectType) {
+			case "channel":
+				data.flow.channels = data.flow.channels?.filter((c) => c.name !== name && c.id !== name);
+				this.removeTaskRefs(data, "channel", name);
+				this.removeToolRefs(data, name);
+				break;
+			case "documentation":
+				data.flow.documentation = data.flow.documentation?.filter((d) => d.name !== name && d.id !== name);
+				this.removeTaskRefs(data, "documentation", name);
+				break;
+			case "resource":
+				data.flow.resources = data.flow.resources?.filter((r) => r.name !== name && r.id !== name);
+				this.removeTaskRefs(data, "resource", name);
+				break;
+			case "task":
+				data.flow.tasks = data.flow.tasks?.filter((t) => t.name !== name && t.id !== name);
+				this.removeTaskRefs(data, "task", name);
+				break;
+			case "tool":
+				data.flow.tools = data.flow.tools?.filter((t) => t.name !== name && t.id !== name);
+				this.removeTaskRefs(data, "tool", name);
+				break;
+			case "tracker":
+				data.flow.trackers = data.flow.trackers?.filter((t) => t.name !== name && t.id !== name);
+				this.removeTaskRefs(data, "tracker", name);
+				break;
+			default:
+				console.error(`removeObject() unknown object type ${objectType}`);
+				break;
 		}
 	}
 
-	static updateObject(data: FlowData, obj: BaseConfig) {
-		if (obj.type === "channel") {
-			const channel = data.flow.channels?.find((c) => c.name === obj.name || c.id === obj.id);
-			if (channel) {
-				Object.assign(channel, obj);
-			}
-		} else if (obj.type === "documentation") {
-			const documentation = data.flow.documentation?.find((d) => d.name === obj.name || d.id === obj.id);
-			if (documentation) {
-				Object.assign(documentation, obj);
-			}
-		} else if (obj.type === "resource") {
-			const resource = data.flow.resources?.find((r) => r.name === obj.name || r.id === obj.id);
-			if (resource) {
-				Object.assign(resource, obj);
-			}
-		} else if (obj.type === "task") {
-			const task = data.flow.tasks?.find((t) => t.name === obj.name || t.id === obj.id);
-			if (task) {
-				Object.assign(task, obj);
-			}
-		} else if (obj.type === "tool") {
-			const tool = data.flow.tools?.find((t) => t.name === obj.name || t.id === obj.id);
-			if (tool) {
-				Object.assign(tool, obj);
-			}
-		} else if (obj.type === "tracker") {
-			const tracker = data.flow.trackers?.find((t) => t.name === obj.name || t.id === obj.id);
-			if (tracker) {
-				Object.assign(tracker, obj);
-			}
-		} else {
-			console.error(`updateObject() unknown object type ${obj.type}`);
+	static updateObject(data: FlowData, obj: BaseConfig, objectType: ObjectType) {
+		let found: BaseConfig | undefined = undefined;
+		switch (objectType) {
+			case "channel":
+				found = data.flow.channels?.find((c) => c.name === obj.name || c.id === obj.id);
+				break;
+			case "documentation":
+				found = data.flow.documentation?.find((d) => d.name === obj.name || d.id === obj.id);
+				break;
+			case "resource":
+				found = data.flow.resources?.find((r) => r.name === obj.name || r.id === obj.id);
+				break;
+			case "task":
+				found = data.flow.tasks?.find((t) => t.name === obj.name || t.id === obj.id);
+				break;
+			case "tool":
+				found = data.flow.tools?.find((t) => t.name === obj.name || t.id === obj.id);
+				break;
+			case "tracker":
+				found = data.flow.trackers?.find((t) => t.name === obj.name || t.id === obj.id);
+				break;
+			default:
+				console.error(`updateObject() unknown object type ${obj.type}`);
+				break;
+		}
+		if (found) {
+			Object.assign(found, obj);
 		}
 	}
 

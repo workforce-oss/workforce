@@ -30,7 +30,6 @@ import { DocumentationDb } from "../../src/objects/documentation/db.js";
 import { DocumentRepositoryDb } from "../../src/objects/document_repository/db.js";
 import { DocumentDb } from "../../src/objects/document_repository/db.document.js";
 import { DocumentationConfig } from "../../src/objects/documentation/model.js";
-import { DocumentRepositoryConfig } from "../../src/model.js";
 import { DocumentRelationDb } from "../../src/objects/documentation/db.document_relation.js";
 import { UserDb } from "../../src/identity/db.user.js";
 import { OrgDb } from "../../src/identity/db.org.js";
@@ -38,6 +37,8 @@ import { SpaceDb } from "../../src/identity/db.space.js";
 import { TaskExecutionUserDb } from "../../src/objects/task/db.task_execution_users.js";
 import { OrgUserRelationDb } from "../../src/identity/db.org_user.js";
 import { SpaceUserRelationDb } from "../../src/identity/db.space_user.js";
+import { SecretDb } from "../../src/secrets/db.js";
+import { DocumentRepositoryConfig } from "../../src/objects/document_repository/model.js";
 
 // export const dockerConnectionString = "postgres://testuser:password@localhost:5492/app";
 export const dockerConnectionString = "sqlite::memory:";
@@ -47,6 +48,7 @@ export function newDb(): Sequelize {
         models: [
             Outbox,
             CredentialDb,
+            SecretDb,
             FlowDb,
             ChannelDb,
             ChannelSessionDb,
@@ -129,8 +131,7 @@ export async function createBasicCredential(orgId: string): Promise<CredentialDb
     const credentialDb = await CredentialDb.create({
         name: `test-credential-${orgId}`,
         description: "test",
-        type: "credential",
-        subtype: "mock",
+        type: "mock-channel",
         orgId: orgId,
     });
     return credentialDb;
@@ -149,8 +150,7 @@ export function createBasicChannelConfig(orgId: string, flowId: string, variable
     return {
         name: "test-channel",
         description: "test",
-        type: "channel",
-        subtype: "mock",
+        type: "mock-channel",
         orgId: orgId,
         flowId: flowId,
         variables: variables ?? {
@@ -163,8 +163,7 @@ export async function createBasicDocumentationConfig(orgId: string, name: string
     const documentRepositoryConfig: DocumentRepositoryConfig = {
         name: "test-document-repository",
         description: "test",
-        type: "document_repository",
-        subtype: "internal-document-repository",
+        type: "internal-document-repository",
         orgId: orgId,
         variables: {}
     };
@@ -183,8 +182,7 @@ export async function createBasicDocumentationConfig(orgId: string, name: string
         name: name,
         repository: "test-document-repository",
         description: "test",
-        type: "documentation",
-        subtype: "default-documentation",
+        type: "default-documentation",
         orgId: orgId,
         documents: [documentDb.name],
     };
@@ -221,8 +219,7 @@ export function createBasicTaskConfig(orgId: string, flowId: string, variables?:
     return {
         name: name ?? "test-task",
         description: "test",
-        type: "task",
-        subtype: "mock",
+        type: "mock-task",
         orgId: orgId,
         flowId: flowId,
         documentation: [],
@@ -272,8 +269,7 @@ export function createBasicResourceConfig(orgId: string, flowId: string, variabl
     return {
         name: "test-resource",
         description: "test",
-        type: "resource",
-        subtype: "mock",
+        type: "mock-resource",
         orgId: orgId,
         flowId: flowId,
         variables: variables ?? {
@@ -297,8 +293,7 @@ export function createBasicToolConfig(orgId: string, flowId: string, variables?:
     return {
         name: "test-tool",
         description: "test",
-        type: "tool",
-        subtype: "mock",
+        type: "mock-tool",
         orgId: orgId,
         flowId: flowId,
         variables: variables ?? {
@@ -319,8 +314,7 @@ export function createBasicTrackerConfig(orgId: string, flowId: string, variable
     return {
         name: "test-tracker",
         description: "test",
-        type: "tracker",
-        subtype: "mock",
+        type: "mock-tracker",
         orgId: orgId,
         flowId: flowId,
         variables: variables ?? {
@@ -341,8 +335,7 @@ export function createBasicWorkerConfig(orgId: string, variables?: Record<string
     return {
         name: "test-worker",
         description: "test",
-        type: "worker",
-        subtype: "mock",
+        type: "mock-worker",
         orgId: orgId,
         wipLimit: 10,
         skills: [],

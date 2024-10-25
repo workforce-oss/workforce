@@ -12,8 +12,10 @@ import { ToolState } from "../base/model.js";
 import { ToolStateDb } from "./db.state.js";
 import { AsyncMap } from "../../manager/impl/cache/async_map.js";
 import { MapFactory } from "../../manager/impl/map_factory.js";
+import { ObjectType } from "../base/factory/types.js";
 
 export class ToolBroker extends BaseBroker<ToolConfig, Tool<ToolConfig>, object> {
+	objectType: ObjectType = "tool";
 	logger = Logger.getInstance("ToolBroker");
 
 	private requestSubject = new Subject<ToolRequest>();
@@ -284,11 +286,11 @@ export class ToolBroker extends BaseBroker<ToolConfig, Tool<ToolConfig>, object>
 					await ToolStateDb.findOrCreate({
 						where: {
 							taskExecutionId: taskExecutionId,
-							toolId: currentState!.toolId,
+							toolId: currentState.toolId,
 						},
 						defaults: {
 							taskExecutionId: taskExecutionId,
-							toolId: currentState!.toolId,
+							toolId: currentState.toolId,
 							machineState: jsonStringify(state.machineState),
 							humanState: jsonStringify(state.humanState),
 							machineImage: state.machineImage,							

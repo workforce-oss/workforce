@@ -68,4 +68,4 @@ while ! curl -s http://localhost:5002/v1/meta; do
 done
 
 export NODE_ENV=e2e
-mocha --exit tests/e2e/**/*.spec.ts
+mocha --exit tests/e2e/**/*.spec.ts --timeout 10000 2>&1

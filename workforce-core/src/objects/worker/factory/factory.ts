@@ -6,15 +6,15 @@ import { HumanWorker } from "../impl/human/human_worker.js";
 
 export class WorkerFactory {
 	static create(config: WorkerConfig,): Worker {
-		switch (config.subtype) {
-			case "mock":
+		switch (config.type) {
+			case "mock-worker":
 				return new MockWorker(config);
 			case "ai-worker":
 				return new AIWorker(config);
 			case "human-worker":
 				return new HumanWorker(config);
 			default:
-				throw new Error(`WorkerFactory.create() unknown worker type ${config.subtype as string}`);
+				throw new Error(`WorkerFactory.create() unknown worker type ${config.type as string}`);
 		}
 	}
 }

@@ -31,8 +31,7 @@ describe("Flow DB", () => {
                 tasks: [{
                     name: "test-input-task",
                     description: "test",
-                    type: "task",
-                    subtype: "mock",
+                    type: "mock-task",
                     orgId: orgId,
                     defaultChannel: "test-channel",
                     tracker: "test-input-tracker",
@@ -49,8 +48,7 @@ describe("Flow DB", () => {
                 {
                     name: "test-input-task2",
                     description: "test",
-                    type: "task",
-                    subtype: "mock",
+                    type: "mock-task",
                     orgId: orgId,
                     inputs: {
                         message: "test-input-task"
@@ -64,43 +62,37 @@ describe("Flow DB", () => {
                 name: "test-input-tracker",
                 description: "test",
                 orgId: orgId,
-                subtype: "mock",
-                type: "tracker",
+                type: "mock-tracker",
             }
             const outputTrackerConfig: TrackerConfig = {
                 name: "test-output-tracker",
                 description: "test",
                 orgId: orgId,
-                subtype: "mock",
-                type: "tracker",
+                type: "mock-tracker",
             }
             const inputResourceConfig: ResourceConfig = {
                 name: "test-input-resource",
                 description: "test",
                 orgId: orgId,
-                subtype: "mock",
-                type: "resource",
+                type: "mock-resource",
             }
             const outputResourceConfig: ResourceConfig = {
                 name: "test-output-resource",
                 description: "test",
                 orgId: orgId,
-                subtype: "mock",
-                type: "resource",
+                type: "mock-resource",
             }
             const testChannelConfig: ChannelConfig = {
                 name: "test-channel",
                 description: "test",
                 orgId: orgId,
-                subtype: "mock",
-                type: "channel",
+                type: "mock-channel",
             }
             const testToolConfig: ToolConfig = {
                 name: "test-tool",
                 description: "test",
                 orgId: orgId,
-                subtype: "mock",
-                type: "tool",
+                type: "mock-tool",
             }
 
             const documentationConfig = await createBasicDocumentationConfig(orgId, "test-documentation");
@@ -182,8 +174,7 @@ describe("Flow DB", () => {
                 flowId: flowDb.id,
                 name: flowDb.tasks![0].name,
                 description: flowDb.tasks![0].description,
-                type: 'task',
-                subtype: 'mock',
+                type: 'mock-task',
                 documentation: [flowDb.documentation![0].id],
                 tracker: flowDb.trackers![0].id,
                 outputs: [flowDb.resources![1].id, flowDb.trackers![1].id],
@@ -207,8 +198,7 @@ describe("Flow DB", () => {
                 flowId: flowDb.id,
                 name: flowDb.tasks![1].name,
                 description: flowDb.tasks![1].description,
-                type: 'task',
-                subtype: 'mock',
+                type: 'mock-task',
                 inputs: {
                     message: flowDb.tasks![0].id,
                 },

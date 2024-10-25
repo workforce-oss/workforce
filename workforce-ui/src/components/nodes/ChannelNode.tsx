@@ -20,8 +20,8 @@ export const ChannelNode = ({ data, selected }: { data: CustomNodeData<ChannelCo
 
 
     return (
-        <GenericNode data={data} selected={selected} children={
-            data.config.subtype === "native-channel" &&
+        <GenericNode data={data} objectType="channel" selected={selected} children={
+            data.config.type === "native-channel" &&
             <div className="w-full">
                 <div
                     className="w-full dark:text-white flex items-center justify-between p-4 gap-8 bg-gray-10 dark:bg-gray-800 border dark:border-b-gray-700 "

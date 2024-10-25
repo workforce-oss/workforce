@@ -4,7 +4,7 @@ export const documentationTypes = ["default-documentation"] as const;
 export type DocumentationType = typeof documentationTypes[number];
 
 export interface DocumentationConfig extends BaseConfig {
-    subtype: DocumentationType;
+    type: DocumentationType;
 
     /**
      * The document repository to use for the documentation.

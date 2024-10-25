@@ -9,8 +9,7 @@ export class SimpleTaskMetadata {
             orgId: orgId,
             name: "Simple Task",
             description: "A simple task.",
-            type: "task",
-            subtype: "simple-task",
+            type: "simple-task",
             costLimit: 2.00,
             variables: {
                 purpose: "A simple task.",

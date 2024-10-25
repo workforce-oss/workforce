@@ -8,8 +8,7 @@ export class WebServiceToolMetadata {
             id: crypto.randomUUID(),
             name: "Web Service Tool",
             description: "A tool that calls a web service.",
-            type: "tool",
-            subtype: "web-service-tool",
+            type: "web-service-tool",
             orgId: orgId,
             variables: {
                 url: "",

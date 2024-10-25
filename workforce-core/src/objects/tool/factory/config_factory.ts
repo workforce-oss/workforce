@@ -11,12 +11,12 @@ import { OpenAPIChannelToolMetadata } from "../impl/openapi_channel/openapi_chan
 import { TemplateToolMetadata } from "../impl/template/template_tool_metadata.js";
 import { TrelloTicketToolMetadata } from "../impl/trello_ticket/trello_ticket_tool_metadata.js";
 import { WebServiceToolMetadata } from "../impl/webservice/web_service_tool_metadata.js";
-import { ToolConfig } from "../model.js";
+import { ToolConfig, ToolType } from "../model.js";
 
 export class ToolConfigFactory {
     static variablesSchemaFor(config: ToolConfig): VariablesSchema {
-        switch (config.subtype) {
-            case "mock":
+        switch (config.type) {
+            case "mock-tool":
                 return MockToolMetadata.variablesSchema();
             case "web-service-tool":
                 return WebServiceToolMetadata.variablesSchema();
@@ -41,13 +41,13 @@ export class ToolConfigFactory {
             case "message-channel-tool":
                 return MessageChannelToolMetadata.variablesSchema();
             default:
-                throw new Error(`ToolFactory.variablesSchemaFor() unknown tool type ${config.subtype as string}`);
+                throw new Error(`ToolFactory.variablesSchemaFor() unknown tool type ${config.type as string}`);
         }
     }
 
-    static defaultConfigFor(orgId: string, subtype: string): ToolConfig {
+    static defaultConfigFor(orgId: string, subtype: ToolType): ToolConfig {
         switch (subtype) {
-            case "mock":
+            case "mock-tool":
                 return MockToolMetadata.defaultConfig(orgId);
             case "web-service-tool":
                 return WebServiceToolMetadata.defaultConfig(orgId);
@@ -72,7 +72,7 @@ export class ToolConfigFactory {
             case "message-channel-tool":
                 return MessageChannelToolMetadata.defaultConfig(orgId);
             default:
-                throw new Error(`ToolFactory.defaultConfigFor() unknown tool type ${subtype}`);
+                throw new Error(`ToolFactory.defaultConfigFor() unknown tool type ${subtype as string}`);
         }
     }
 }

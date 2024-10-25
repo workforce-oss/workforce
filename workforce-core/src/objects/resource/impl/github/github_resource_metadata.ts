@@ -9,8 +9,7 @@ export class GithubResourceMetadata {
             orgId: orgId,
             name: "Github Resource",
             description: "A Github resource.",
-            type: "resource",
-            subtype: "github-repo-resource",
+            type: "github-repo-resource",
             variables: {
                 branch: "main",
                 path_template: "{{filename}}",

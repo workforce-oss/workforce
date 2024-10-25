@@ -34,7 +34,7 @@
     "workforce-ui-core": "0.1.0",
     "yaml": "^2.5.1",
     "zundo": "^2.2.0",
-    "zustand": "^4.3.8"
+    "zustand": "4.5.2"
   },
   "scripts": {
     "start": "PUBLIC_URL=workforce-ui react-scripts start --port=3000",

@@ -9,8 +9,10 @@ import { Channel } from "./base.js";
 import { ChannelMessageDb } from "./db.message.js";
 import { ChannelSessionDb } from "./db.session.js";
 import { ChannelConfig, ChannelMessageEvent, ChannelSessionStatus, MessageRequest } from "./model.js";
+import { ObjectType } from "../base/factory/types.js";
 
 export class ChannelBroker extends BaseBroker<ChannelConfig, Channel, ChannelMessageEvent> {
+	objectType: ObjectType = "channel";
 	logger = Logger.getInstance("ChannelBroker");
 
 	private requestSubject = new Subject<MessageRequest>();

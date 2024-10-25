@@ -7,8 +7,7 @@ export class MockResourceMetadata {
             id: crypto.randomUUID(),
             name: "Mock Resource",
             description: "Mock Resource",
-            type: "resource",
-            subtype: "mock",
+            type: "mock-resource",
             orgId: orgId,
         };
     }

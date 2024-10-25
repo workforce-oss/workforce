@@ -1,5 +1,8 @@
+import { OrgSubResourceCallOptions } from "workforce-api-client/dist/api/org_api.subresource.js";
 import { Auth } from "../auth/auth.js";
 import { initApi } from "./base.js";
+import { FlowAPI } from "workforce-api-client/dist/api/flow_api.js";
+import { ChannelAPI } from "workforce-api-client/dist/api/channel_api.js";
 
 export async function excelsiorLinks(options: {
     flow?: string,
@@ -17,7 +20,7 @@ export async function excelsiorLinks(options: {
         return;
     }
 
-    const api = initApi("channels", options.api);
+    const api = initApi("channels", options.api) as ChannelAPI;
     if (!api) {
         return;
     }
@@ -25,15 +28,15 @@ export async function excelsiorLinks(options: {
     const flowData = [];
 
     if (!options.flow) {
-        const flowApi = initApi("flows", options.api);
+        const flowApi = initApi("flows", options.api) as FlowAPI;
         if (!flowApi) {
             return;
         }
         const response = await flowApi.list({ orgId });
         for (const item of response) {
             flowData.push({
-                id: item.id,
-                name: item.name
+                id: (item as any).id,
+                name: (item as any).name
         });
         }
     } else {
@@ -49,7 +52,6 @@ export async function excelsiorLinks(options: {
     }
 
     for (const flow of flowData) {
-
         const response = await api.list({ orgId, flowId: flow.id });
 
         for (const item of response) {

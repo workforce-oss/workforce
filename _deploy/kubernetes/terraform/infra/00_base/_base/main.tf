@@ -10,17 +10,18 @@ module "base_cluster_config" {
   install_nvidia_toolkit       = var.install_nvidia_toolkit
   enable_nvidia_timeslicing    = var.enable_nvidia_timeslicing
   create_istio_lb_health_check = var.create_istio_lb_health_check
+  scale_istio_to_zero          = var.scale_istio_to_zero
 
   enable_gke_security_policy   = var.enable_gke_security_policy
   enable_ip_source_restriction = var.enable_ip_source_restriction
   allowed_ips                  = var.allowed_ips
-  
+
 }
 
 module "ngrok" {
-  count = var.enable_ngrok ? 1 : 0
+  count  = var.enable_ngrok ? 1 : 0
   source = "../../_modules/k8s/ngrok_controller"
 
-  ngrok_api_key = var.ngrok_api_key
+  ngrok_api_key    = var.ngrok_api_key
   ngrok_auth_token = var.ngrok_auth_token
 }

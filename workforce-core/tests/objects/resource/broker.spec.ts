@@ -20,9 +20,9 @@ describe("Resource Broker", () => {
         });
         const resourceConfig = resourceDb.toModel();
         
-        const resource = new MockResource(resourceConfig);
+        const resource = new MockResource(resourceConfig, () => {});
 
-        const broker = new ResourceBroker({});
+        const broker = new ResourceBroker({mode: "in-memory"});
         await broker.register(resource);
 
         let resourceVersionReceived = false;

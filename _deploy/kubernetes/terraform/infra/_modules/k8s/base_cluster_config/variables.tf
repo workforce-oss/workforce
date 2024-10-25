@@ -33,6 +33,12 @@ variable "istio_gateway_service_type" {
   default     = "LoadBalancer"
 }
 
+variable "scale_istio_to_zero" {
+  type        = bool
+  description = "Whether to scale Istio to 0."
+  default     = false
+}
+
 variable "install_nvidia_operator" {
   type        = bool
   description = "Whether to install the Nvidia operator."

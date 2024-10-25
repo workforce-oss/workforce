@@ -6,8 +6,10 @@ import { DocumentData, DocumentRepositoryConfig, SearchRequest, SearchResponse }
 import { SubjectFactory } from "../../manager/impl/subject_factory.js";
 import { DocumentDb } from "./db.document.js";
 import { DocumentRepositoryDb } from "./db.js";
+import { ObjectType } from "../base/factory/types.js";
 
 export class DocumentRepositoryBroker extends BaseBroker<DocumentRepositoryConfig, DocumentRepository, object> {
+    objectType: ObjectType = "document_repository";
     logger = Logger.getInstance("DocumentRepositoryBroker");
 
     private searchResponseSubjects = new Map<string, Subject<SearchResponse>>();

@@ -9,8 +9,7 @@ export class GithubBoardTicketMetadata {
             orgId: orgId,
             name: "Github Board Ticket Tool",
             description: "A Github Board Ticket Tool.",
-            type: "tool",
-            subtype: "github-board-ticket-tool",
+            type: "github-board-ticket-tool",
             variables: {
                 purpose: "Create a ticket in a Github Board",
                 org_name: "",

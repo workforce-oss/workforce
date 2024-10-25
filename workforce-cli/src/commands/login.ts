@@ -3,6 +3,8 @@ import { Auth, AuthConfig, oauth2_login } from "../auth/auth.js";
 import { initApi } from "./base.js";
 import { OrgAPI } from "workforce-api-client/dist/api/org_api.js";
 import { OrgUserAPI } from "workforce-api-client/dist/api/org_user_api.js";
+import { UserAPI } from "workforce-api-client/dist/api/user_api.js";
+import { WorkforceUser } from "workforce-core/model";
 
 export async function login(options: {
   oauth2IssuerUri?: string,
@@ -40,12 +42,17 @@ export async function login(options: {
   Auth.setOauth2IssuerUri(output.oauth2IssuerUri!);
   Auth.setOauth2ClientId(output.oauth2ClientId!);
 
-  const api: OrgUserAPI | undefined = initApi("org-users", options.api);
+  console.log("Logged in");
+  console.log("API URL: " + options.api);
+  const tokenParts = token.access_token!.split(".");
+  const payload = JSON.parse(Buffer.from(tokenParts[1], "base64").toString());
+  const userId = payload.sub;
+  const api: UserAPI | undefined = initApi("users", options.api) as UserAPI | undefined;
   if (api) {
     Auth.setApiUrl(options.api!);
-    const response = await api.list();
-    if (response && response.length > 0) {
-      Auth.setOrgId(response[0].orgId);
+    const response = await api.get(userId) as WorkforceUser;
+    if (response.relations && response.relations.length > 0) {
+      Auth.setOrgId(response.relations?.[0].orgId!);
     } 
   }
     

@@ -42,7 +42,7 @@ export type DocumentRepositoryType = typeof documentRepositoryTypes[number];
 export const documentChunkStrategyTypes = ["none", "sentence", "paragraph", "section"] as const;
 
 export interface DocumentRepositoryConfig extends BaseConfig {
-    subtype: DocumentRepositoryType;
+    type: DocumentRepositoryType;
     
     documentChunkStrategy?: typeof documentChunkStrategyTypes[number];
     externalId?: string;

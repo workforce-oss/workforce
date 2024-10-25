@@ -216,7 +216,7 @@ const App = () => {
         if (!authSession?.userId || !taskExecutionApi) {
             return;
         }
-        taskExecutionApi.list({ userId: authSession.userId }).then((response) => {
+        taskExecutionApi.list({ orgId, queryParams: {userId: authSession.userId }}).then((response) => {
             addTaskExecutions(response);
         }).catch((error) => {
             console.error(error);

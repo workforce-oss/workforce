@@ -28,9 +28,9 @@ describe("Channel Broker", () => {
         });
         const taskExecution = await createTaskExecution(orgId, taskDb.id);
 
-        const channel = new MockChannel(channelDb.toModel());
+        const channel = new MockChannel(channelDb.toModel(), () => {});
 
-        const broker = new ChannelBroker({});
+        const broker = new ChannelBroker({mode: "in-memory"});
         await broker.register(channel);
         await broker.establishSession(channelDb.id!, taskExecution.id);
 

@@ -70,7 +70,7 @@ export const DocumentationNode = ({ data, selected }: { data: CustomNodeData<Doc
 
 
     return (
-        <GenericNode data={data} selected={selected} children={""} headerColor={CustomColors.documentRepository}
+        <GenericNode data={data} objectType="documentation" selected={selected} children={""} headerColor={CustomColors.documentRepository}
             additionalConfiguration={
                 (<div style={{
                     padding: 20

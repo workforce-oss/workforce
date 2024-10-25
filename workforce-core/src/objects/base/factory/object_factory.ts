@@ -16,10 +16,11 @@ import { WorkerFactory } from "../../worker/factory/factory.js";
 import { WorkerConfig } from "../../worker/model.js";
 import { BaseObject } from "../base.js";
 import { BaseConfig } from "../model.js";
+import { ObjectType } from "./types.js";
 
 export class ObjectFactory {
-    static create<TConfig extends BaseConfig, T extends BaseObject<TConfig>>(config: TConfig, onFailure: (objectId: string, error: string) => void): T {
-        switch (config.type) {
+    static create<TConfig extends BaseConfig, T extends BaseObject<TConfig>>(config: TConfig, objectType: ObjectType, onFailure: (objectId: string, error: string) => void): T {
+        switch (objectType) {
             case "channel":
                 return ChannelFactory.create(config as ChannelConfig, onFailure) as unknown as T;
             case "documentation":
@@ -37,7 +38,7 @@ export class ObjectFactory {
             case "worker":
                 return WorkerFactory.create(config as WorkerConfig) as unknown as T;
             default:
-                throw new Error(`ObjectFactory.create() unknown object type ${config.type}`);
+                throw new Error(`ObjectFactory.create() unknown object type ${objectType as string}`);
         }
     }
 

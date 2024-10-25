@@ -11,8 +11,7 @@ export class AIWorkerMetadata {
 			orgId: orgId,
 			name: "AI Worker",
 			description: "AI Worker",
-			type: "worker",
-			subtype: "ai-worker",
+			type: "ai-worker",
 			variables: {},
 		};
 		for (const [key, value] of this.variablesSchema()) {

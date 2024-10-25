@@ -9,5 +9,5 @@ export const channelUserCredentialTypes = [
 export type ChannelUserCredentialType = typeof channelUserCredentialTypes[number];
 
 export interface ChannelUserCredential extends BaseConfig {
-    subtype: ChannelUserCredentialType;
+    type: ChannelUserCredentialType;
 }

@@ -6,7 +6,7 @@ import expressWs from "express-ws";
 import { setupServer } from "msw/node";
 import { Sequelize } from "sequelize-typescript";
 import request from "supertest";
-import { TrackerRoutes } from "../../../src/objects/tracker/api.js";
+import { TrackerRouter } from "../../../src/objects/tracker/api.js";
 import { TrackerDb } from "../../../src/objects/tracker/db.js";
 import { TrackerConfig } from "../../../src/objects/tracker/model.js";
 import { createBasicFlow, createBasicTracker, createBasicTrackerConfig, createOrg, createUser, newDb } from "../../helpers/db.js";
@@ -32,7 +32,7 @@ describe("Tracker API", () => {
 		orgId = randomUUID();
 		jwt = await createJwt({ payload: { orgId } });
 
-		app.use("/trackers", TrackerRoutes);
+		app.use("/orgs/:orgId/flows/:flowId/trackers", TrackerRouter);
 	});
     beforeEach(async () => {
         await sequelize.sync({ force: true });
@@ -53,7 +53,7 @@ describe("Tracker API", () => {
 			const trackerConfig = createBasicTrackerConfig(orgId, flow.id);
 
 			const response = await request(app)
-				.post("/trackers")
+				.post(`/orgs/${orgId}/flows/${flow.id}/trackers`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
 				.send(trackerConfig)
@@ -73,7 +73,7 @@ describe("Tracker API", () => {
 			const flow = await createBasicFlow(otherOrgId);
 			const trackerConfig = createBasicTrackerConfig(otherOrgId, flow.id);
 			await request(app)
-				.post("/trackers")
+				.post(`/orgs/${otherOrgId}/flows/${flow.id}/trackers`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
 				.send(trackerConfig)
@@ -85,7 +85,7 @@ describe("Tracker API", () => {
 			trackerConfig.variables = {};
 
 			await request(app)
-				.post("/trackers")
+				.post(`/orgs/${orgId}/flows/${flow.id}/trackers`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
 				.send(trackerConfig)
@@ -98,10 +98,9 @@ describe("Tracker API", () => {
 			const trackerDb = await createBasicTracker(orgId, flow.id);
 
 			const response = await request(app)
-				.get(`/trackers/${trackerDb.id}`)
+				.get(`/orgs/${orgId}/flows/${flow.id}/trackers/${trackerDb.id}`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
-				.query({ orgId: orgId })
 				.expect(200);
 
 			expect(response.body).to.deep.equal(trackerDb.toModel());
@@ -114,10 +113,9 @@ describe("Tracker API", () => {
 			const trackerDb = await createBasicTracker(otherOrgId, flow.id);
 
 			await request(app)
-				.get(`/trackers/${trackerDb.id}`)
+				.get(`/orgs/${otherOrgId}/flows/${flow.id}/trackers/${trackerDb.id}`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
-				.query({ orgId: otherOrgId })
 				.expect(404);
 		});
 	});
@@ -127,22 +125,10 @@ describe("Tracker API", () => {
 			const trackerDb = await createBasicTracker(orgId, flow.id);
 
 			const response = await request(app)
-				.get(`/trackers`)
-				.query({ flowId: flow.id, orgId })
+				.get(`/orgs/${orgId}/flows/${flow.id}/trackers`)
 				.set("Authorization", `Bearer ${jwt}`);
 
 			expect(response.body).to.deep.equal([trackerDb.toModel()]);
-		});
-
-		it("should not retrieve trackers when flowId is missing", async () => {
-			const flow = await createBasicFlow(orgId);
-			const trackerDb = await createBasicTracker(orgId, flow.id);
-
-			await request(app)
-			.get(`/trackers`)
-			.query({ orgId })
-			.set("Authorization", `Bearer ${jwt}`)
-			.expect(400);
 		});
 
 		it("should not retrieve trackers for a different org", async () => {
@@ -153,8 +139,7 @@ describe("Tracker API", () => {
 			const trackerDb = await createBasicTracker(otherOrgId, flow.id);
 
 			const response = await request(app)
-				.get(`/trackers`)
-				.query({ flowId: flow.id, orgId: orgId })
+				.get(`/orgs/${orgId}/flows/${flow.id}/trackers`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
 				.expect(200);
@@ -171,7 +156,7 @@ describe("Tracker API", () => {
 			updatedTrackerConfig.name = "updated name";
 
 			await request(app)
-				.put(`/trackers/${trackerDb.id}`)
+				.put(`/orgs/${orgId}/flows/${flow.id}/trackers/${trackerDb.id}`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
 				.send(updatedTrackerConfig)
@@ -192,7 +177,7 @@ describe("Tracker API", () => {
 
 			const updatedTrackerConfig: TrackerConfig = trackerDb.toModel();
 			await request(app)
-				.put(`/trackers/${trackerDb.id}`)
+				.put(`/orgs/${orgId}/flows/${flow.id}/trackers/${trackerDb.id}`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
 				.send(updatedTrackerConfig)
@@ -206,7 +191,7 @@ describe("Tracker API", () => {
 			updatedTrackerConfig.variables = {};
 
 			await request(app)
-				.put(`/trackers/${trackerDb.id}`)
+				.put(`/orgs/${orgId}/flows/${flow.id}/trackers/${trackerDb.id}`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
 				.send(updatedTrackerConfig)
@@ -219,10 +204,9 @@ describe("Tracker API", () => {
 			const trackerDb = await createBasicTracker(orgId, flow.id);
 
 			await request(app)
-				.delete(`/trackers/${trackerDb.id}`)
+				.delete(`/orgs/${orgId}/flows/${flow.id}/trackers/${trackerDb.id}`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
-				.query({ orgId: orgId })
 				.expect(200);
 
 			const retrievedTrackerDb = await TrackerDb.findByPk(trackerDb.id);
@@ -236,10 +220,9 @@ describe("Tracker API", () => {
 			const trackerDb = await createBasicTracker(otherOrgId, flow.id);
 
 			await request(app)
-				.delete(`/trackers/${trackerDb.id}`)
+				.delete(`/orgs/${otherOrgId}/flows/${flow.id}/trackers/${trackerDb.id}`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
-				.query({ orgId })
 				.expect(404);
 		});
 	});

@@ -1,7 +1,7 @@
 import { expect } from "chai";
 import { OpenAPIAuthHelper } from "../../../../src/objects/tool/impl/openapi/openapi_auth_helper.js";
 import { ToolType } from "../../../../src/objects/tool/model.js";
-import { ObjectType } from "../../../../src/model.js";
+import { ObjectType } from "../../../../src/objects/base/factory/types.js";
 
 describe("OpenAPI Auth Helper", () => {
     it("should select the correct auth type for basic auth", () => {

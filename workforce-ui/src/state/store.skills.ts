@@ -1,7 +1,7 @@
 import { WorkforceAPIClient } from "workforce-api-client";
 import { Skill } from "workforce-core/model";
 import { temporal } from "zundo";
-import { create } from "zustand";
+import { create, StateCreator } from "zustand";
 
 export type SkillState = {
     message: string | undefined;
@@ -20,7 +20,7 @@ export const skillStore = create<SkillState>()(
         skills: [],
         addSkill: (skill: Skill) => {
             WorkforceAPIClient.SkillAPI
-                .create(skill)
+                .create(skill, { orgId: skill.orgId })
                 .then((response: Skill | string[]) => {
                     if (Array.isArray(response)) {
                         set({
@@ -41,7 +41,7 @@ export const skillStore = create<SkillState>()(
         },
         removeSkill: (skill: Skill) => {
             WorkforceAPIClient.SkillAPI
-                .delete(skill.id)
+                .delete(skill.id, { orgId: skill.orgId })
                 .then(() => {
                     console.log(`deleteSkill() deleted skill ${skill.name}`);
                     set({
@@ -57,7 +57,7 @@ export const skillStore = create<SkillState>()(
         },
         updateSkill: (skill: Skill) => {
             WorkforceAPIClient.SkillAPI
-                .update(skill, skill.id)
+                .update(skill, skill.id, { orgId: skill.orgId })
                 .then((response: Skill | string[]) => {
                     if (Array.isArray(response)) {
                         set({
@@ -93,5 +93,5 @@ export const skillStore = create<SkillState>()(
                     });
                 });
         },
-    }))
+    })) as StateCreator<SkillState, [], [never, unknown][]>
 )

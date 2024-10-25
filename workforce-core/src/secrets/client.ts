@@ -1,11 +1,13 @@
 import { Configuration } from "../config/configuration.js";
+import { Logger } from "../logging/logger.js";
 import { ApiClient } from "../objects/base/api_client.js";
 
 export class SecretServiceClient extends ApiClient {
   private _apiUrl: string;
+  logger = Logger.getInstance("SecretServiceClient");
 
   constructor() {
-    super("SecretServiceClient");
+    super();
     this._apiUrl = Configuration.SecretServiceUri;
 
   }

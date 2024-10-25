@@ -8,7 +8,7 @@ interface SkillAttributes {
     id: string;
     orgId: string;
     name: string;
-    description: string;
+    description?: string;
 }
 
 type SkillCreationAttributes = Optional<SkillAttributes, "id">

@@ -5,13 +5,13 @@ import { DocumentRepositoryConfig } from "../model.js";
 
 export class DocumentRepositoryFactory {
     static create(config: DocumentRepositoryConfig, onFailure: (objectId: string, error: string) => void): DocumentRepository {
-        switch (config.subtype) {
+        switch (config.type) {
             case "internal-document-repository":
                 return new InternalDocumentRepository(config, onFailure);
             case "git-document-repository":
                 return new GitDocumentRepository(config, onFailure);
             default:
-                throw new Error(`DocumentRepositoryFactory.create() unknown document repository type ${config.subtype as string}`);
+                throw new Error(`DocumentRepositoryFactory.create() unknown document repository type ${config.type as string}`);
         }
     }
 }

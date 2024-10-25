@@ -8,8 +8,10 @@ import { TicketRequestDb } from "./db.ticket_request.js";
 import { randomUUID } from "crypto";
 import { jsonStringify } from "../../util/json.js";
 import { TicketDb } from "./db.ticket.js";
+import { ObjectType } from "../base/factory/types.js";
 
 export class TrackerBroker extends BaseBroker<TrackerConfig, Tracker<TrackerConfig>, object> {
+    objectType: ObjectType = "tracker";
     logger = Logger.getInstance("TrackerBroker")
 
     private createSubject = new Subject<TicketCreateRequest>();

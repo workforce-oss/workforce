@@ -38,7 +38,7 @@ export class DocumentRepositoryDb extends BaseModel {
         const base = super.toModel();
         const model: DocumentRepositoryConfig = {
             ...base,
-            subtype: this.subtype as DocumentRepositoryType
+            type: this.type as DocumentRepositoryType
         };
         if (this.credentialId) {
             model.credential = this.credentialId;

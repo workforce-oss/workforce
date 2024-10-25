@@ -15,8 +15,10 @@ import { TaskSubscriptionManager } from "./broker.subscriptions.js";
 import { TaskExecutionDb } from "./db.task_execution.js";
 import { TaskConfig, TaskExecution, TaskExecutionRequest, TaskExecutionResponse } from "./model.js";
 import { TaskExecutionUserDb } from "./db.task_execution_users.js";
+import { ObjectType } from "../base/factory/types.js";
 
 export class TaskBroker extends BaseBroker<TaskConfig, Task, object> {
+	objectType: ObjectType = "task";
 	logger = Logger.getInstance("TaskBroker");
 
 	private taskExecutionRequestSubject = new Subject<TaskExecutionRequest>();
@@ -268,7 +270,7 @@ export class TaskBroker extends BaseBroker<TaskConfig, Task, object> {
 					costLimit: task.config.costLimit,
 				},
 				BrokerManager.workerBroker,
-				BrokerManager.channelBroker.getObject(channelId ?? task.config.defaultChannel ?? "")?.config.subtype,
+				BrokerManager.channelBroker.getObject(channelId ?? task.config.defaultChannel ?? "")?.config.type,
 				(error: Error) => {
 					this.logger.error(`executeTask() Error executing task ${task.config.name}`, error);
 					TaskExecutionDb.findOne({

@@ -2,6 +2,7 @@ import { EncryptionService } from "../../crypto/encryption_service.js";
 import { Logger } from "../../logging/logger.js";
 import { SecretServiceClient } from "../../secrets/client.js";
 import { jsonParse } from "../../util/json.js";
+import { ObjectType } from "../base/factory/types.js";
 import { BaseConfig } from "../base/model.js";
 import { CredentialDb } from "./db.js";
 import { CredentialConfig } from "./model.js";
@@ -24,15 +25,15 @@ export class CredentialHelper {
     return CredentialHelper._instance;
   }
 
-  public async mergeCredential<T extends BaseConfig>(model: T): Promise<T> {
-    if (!model.credential && model.type !== "credential") {
+  public async mergeCredential<T extends BaseConfig>(model: T, objectType: ObjectType): Promise<T> {
+    if (!model.credential && objectType !== "credential") {
       return model;
     }
     let credentialId = model.credential;
     if (!credentialId || credentialId === "") {
       credentialId = model.id;
     }
-    
+
     const credential = await CredentialDb.findByPk(credentialId);
     if (!credential) {
       this.logger.debug(
@@ -66,7 +67,7 @@ export class CredentialHelper {
     try {
       const parsed = jsonParse<Record<string, unknown>>(decrypted);
 
-      if (model.type === "credential") {
+      if (objectType === "credential") {
         // We are using a trick to avoid the secretId in the credential object
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { secretId, ...rest } = model as CredentialConfig;
@@ -106,16 +107,16 @@ export class CredentialHelper {
     return credential.id;
   }
 
-  public async replaceCredentialNameWithId(model: BaseConfig): Promise<void> {
+  public async replaceCredentialNameWithId(model: BaseConfig, orgId: string): Promise<void> {
     if (!model.credential) {
       this.logger.debug(
-        `replaceCredentialNameWithId() no credential found for ${model.type}/${model.name}.`
+        `replaceCredentialNameWithId() no credential in spec for ${model.type}/${model.name}.`
       );
       return;
     }
     const credential = await CredentialDb.findOne({
       where: {
-        orgId: model.orgId,
+        orgId,
         name: model.credential,
       },
     });
@@ -154,11 +155,9 @@ export class CredentialHelper {
     const credential = await CredentialDb.findByPk(credentialId);
     if (!credential) {
       this.logger.debug(`getSecret() Credential for ${credentialId} not found.`);
-      const allcredentials = await CredentialDb.findAll();
-      this.logger.debug(`getSecret() All credentials: ${JSON.stringify(allcredentials, null, 2)}`);
       return undefined;
     }
-    if (credential.subtype === "mock") {
+    if (credential.type.startsWith("mock")) {
       return jsonParse(credential.variables ?? "{}");
     }
     const secret = await this._client.getSecret(credential.secretId);

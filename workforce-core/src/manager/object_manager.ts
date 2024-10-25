@@ -16,6 +16,7 @@ import { WorkerDb } from "../objects/worker/db.js";
 import { WorkerConfig } from "../objects/worker/model.js";
 import { BrokerManager } from "./broker_manager.js";
 import { OutboxManager } from "./outbox_manager.js";
+import { DocumentationDb } from "../objects/documentation/db.js";
 
 export class ObjectManager {
 	private flows: Map<string, FlowConfig> = new Map<string, FlowConfig>();
@@ -88,7 +89,14 @@ export class ObjectManager {
 		if (event.eventType === "update") {
 			switch (event.type) {
 				case "flow": {
-					const flow = await FlowDb.findByPk(event.objectId, { include: [{ all: true, separate: true }] });
+					const flow = await FlowDb.findByPk(event.objectId, { include: [
+						{model: ChannelDb, separate: true},
+						{model: ToolDb, separate: true},
+						{model: ResourceDb, separate: true},
+						{model: TaskDb, separate: true},
+						{model: TrackerDb, separate: true},
+						{model: DocumentationDb, include: [DocumentRepositoryDb], separate: true},				
+					] });
 					if (!flow) {
 						return;
 					}
@@ -341,7 +349,9 @@ export class ObjectManager {
 
 		const syncPromises = [];
 		for (const config of newObjects) {
-			syncPromises.push(broker.syncObject(config));
+			syncPromises.push(broker.syncObject(config).catch((e) => {
+				this.logger.error("Error syncing object", e);
+			}));
 		}
 
 		return Promise.allSettled(syncPromises);
@@ -351,7 +361,9 @@ export class ObjectManager {
 		if (!broker) {
 			throw new Error("Broker not initialized");
 		}
-		return broker.syncObject(config);
+		return broker.syncObject(config).catch((e) => {
+			this.logger.error("Error syncing object", e);
+		});
 	}
 
 	private async syncChannels(flow: FlowConfig): Promise<void> {

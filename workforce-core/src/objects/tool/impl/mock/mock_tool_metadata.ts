@@ -8,8 +8,7 @@ export class MockToolMetadata {
             orgId: orgId,
             name: "Mock Tool",
             description: "Mock Tool",
-            type: "tool",
-            subtype: "mock",
+            type: "mock-tool",
         };
     }
 

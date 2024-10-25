@@ -20,7 +20,7 @@ export class MessageChannelTool extends Tool<ToolConfig> {
             throw new Error("Channel not configured.");
         }
 
-        const channelSubType = BrokerManager.channelBroker.getObject(this.config.channel)?.config.subtype;
+        const channelSubType = BrokerManager.channelBroker.getObject(this.config.channel)?.config.type;
         if (!channelSubType) {
             throw new Error("Channel subtype not configured.");
         }

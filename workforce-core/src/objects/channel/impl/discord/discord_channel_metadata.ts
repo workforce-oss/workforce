@@ -8,8 +8,7 @@ export class DiscordChannelMetadata {
             id: crypto.randomUUID(),
             name: "Discord Channel",
             description: "Discord Channel",
-            type: "channel",
-            subtype: "discord-channel",
+            type: "discord-channel",
             orgId: orgId,
             variables: {
                 channel_id: "",

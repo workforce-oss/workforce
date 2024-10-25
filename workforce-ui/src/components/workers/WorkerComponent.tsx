@@ -57,7 +57,7 @@ export const WorkerComponent = (props: { config: WorkerConfig }) => {
 			return;
 		}
 		WorkforceAPIClient.WorkerAPI
-			.get(config.id)
+			.get(config.id, { orgId: currentOrg.id })
 			.then((config) => {
 				setDetails(config);
 			});
@@ -69,7 +69,7 @@ export const WorkerComponent = (props: { config: WorkerConfig }) => {
 	}, [currentOrg]);
 
 	useEffect(() => {
-		setCredentialList(credentials.filter((credential) => workerTypes.includes(credential.subtype as WorkerType)));
+		setCredentialList(credentials.filter((credential) => workerTypes.includes(credential.type as WorkerType)));
 	}, [credentials]);
 
 	return (
@@ -81,7 +81,7 @@ export const WorkerComponent = (props: { config: WorkerConfig }) => {
 					</Grid>
 
 					<Grid item xs={4}>
-						<Typography color="text.secondary">{config.subtype}</Typography>
+						<Typography color="text.secondary">{config.type}</Typography>
 					</Grid>
 					<Grid item xs={2}>
 						{expanded && (
@@ -153,6 +153,7 @@ export const WorkerComponent = (props: { config: WorkerConfig }) => {
 					<Grid item xs={12}>
 						<SchemaVariableListComponent
 							config={details}
+							objectType="worker"
 							onPropertyChange={(name, newValue) => {
 								setDetails({
 									...details,
@@ -170,7 +171,7 @@ export const WorkerComponent = (props: { config: WorkerConfig }) => {
 						<b>Channel Tokens</b>
 					</Grid>
 					{channelTypes
-						.filter((channelType) => channelType !== "mock")
+						.filter((channelType) => !channelType.startsWith("mock"))
 						.map((channelType) => (
 							<Grid item xs={12} key={channelType}>
 								<TextField
@@ -193,7 +194,7 @@ export const WorkerComponent = (props: { config: WorkerConfig }) => {
 									{credentials
 										.filter((credential) =>
 											channelUserCredentialTypes.includes(
-												credential.subtype as ChannelUserCredentialType
+												credential.type as ChannelUserCredentialType
 											)
 										)
 

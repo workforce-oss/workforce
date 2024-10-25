@@ -4,12 +4,12 @@ import { GithubResourceMetadata } from "../impl/github/github_resource_metadata.
 import { GithubPullRequestResourceMetadata } from "../impl/github_pull_request/github_pull_request_metadata.js";
 import { MockResourceMetadata } from "../impl/mock/mock_resource_metadata.js";
 import { RawTextResourceMetadata } from "../impl/raw_text/raw_test_resource_metadata.js";
-import { ResourceConfig } from "../model.js";
+import { ResourceConfig, ResourceType } from "../model.js";
 
 export class ResourceConfigFactory {
     static variablesSchemaFor(config: ResourceConfig): VariablesSchema {
-        switch (config.subtype) {
-            case "mock":
+        switch (config.type) {
+            case "mock-resource":
                 return MockResourceMetadata.variablesSchema();
             case "api-resource":
                 return ApiResourceMetadata.variablesSchema();
@@ -20,13 +20,13 @@ export class ResourceConfigFactory {
             case "github-pull-request-resource":
                 return GithubPullRequestResourceMetadata.variablesSchema();
             default:
-                throw new Error(`ResourceFactory.variablesSchemaFor() unknown resource type ${config.subtype as string}`);
+                throw new Error(`ResourceFactory.variablesSchemaFor() unknown resource type ${config.type as string}`);
         }
     }
 
-    static defaultConfigFor(orgId: string, subtype: string): ResourceConfig {
+    static defaultConfigFor(orgId: string, subtype: ResourceType): ResourceConfig {
         switch (subtype) {
-            case "mock":
+            case "mock-resource":
                 return MockResourceMetadata.defaultConfig(orgId);
             case "api-resource":
                 return ApiResourceMetadata.defaultConfig(orgId);
@@ -37,7 +37,7 @@ export class ResourceConfigFactory {
             case "github-pull-request-resource":
                 return GithubPullRequestResourceMetadata.defaultConfig(orgId);
             default:
-                throw new Error(`ResourceFactory.defaultConfigFor() unknown resource type ${subtype}`);
+                throw new Error(`ResourceFactory.defaultConfigFor() unknown resource type ${subtype as string}`);
         }
     }
 }

@@ -8,8 +8,7 @@ export class TrelloTrackerMetadata {
             id: crypto.randomUUID(),
             name: "Trello Tracker",
             description: "Trello Tracker",
-            type: "tracker",
-            subtype: "trello-tracker",
+            type: "trello-tracker",
             orgId: orgId,
             variables: {
                 api_key: "",

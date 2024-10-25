@@ -8,8 +8,7 @@ export class GoogleSlidesToolMetadata {
             id: crypto.randomUUID(),
             name: "Google Slides Tool",
             description: "A tool that interacts with Google Slides.",
-            type: "tool",
-            subtype: "google-slides-tool",
+            type: "google-slides-tool",
             orgId: orgId,
             variables: {},
         }

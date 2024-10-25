@@ -1,8 +1,11 @@
 import { randomUUID } from "crypto";
+import { BrokerManager } from "../../src/manager/broker_manager.js";
 import { ObjectFactory } from "../../src/objects/base/factory/object_factory.js";
+import { BaseConfig, TASK_COMPLETE_FUNCTION_NAME, ToolCall } from "../../src/objects/base/model.js";
 import { Channel } from "../../src/objects/channel/base.js";
 import { ChannelBroker } from "../../src/objects/channel/broker.js";
 import { ChannelConfig, ChannelType } from "../../src/objects/channel/model.js";
+import { DocumentRepository } from "../../src/objects/document_repository/base.js";
 import { Resource } from "../../src/objects/resource/base.js";
 import { ResourceBroker } from "../../src/objects/resource/broker.js";
 import { ResourceConfig } from "../../src/objects/resource/model.js";
@@ -18,23 +21,49 @@ import { TrackerConfig } from "../../src/objects/tracker/model.js";
 import { Worker } from "../../src/objects/worker/base.js";
 import { WorkerBroker } from "../../src/objects/worker/broker.js";
 import { WorkerConfig } from "../../src/objects/worker/model.js";
-import { CredentialConfig } from "../../src/model.js";
-import { DocumentRepositoryBroker } from "../../src/objects/document_repository/broker.js";
-import { DocumentRepository } from "../../src/objects/document_repository/base.js";
-import { TASK_COMPLETE_FUNCTION_NAME } from "../../src/objects/base/model.js";
-import { BrokerManager } from "../../src/manager/broker_manager.js";
+import { CredentialConfig } from "../../src/objects/credential/model.js";
+import { ChannelUserCredential } from "../../src/objects/channel_user_credential/model.js";
+import { ConfigFactory } from "../../src/objects/base/factory/config_factory.js";
 
-export function mockChannelUserCredential(args: {name: string, orgId: string, token: string}): CredentialConfig {
+
+export function mockCredentialConfig(args: { name: string; orgId: string; }): CredentialConfig {
+	const { name, orgId } = args;
+	return {
+		id: randomUUID(),
+		name: name,
+		description: `${name} description`,
+		type: "mock-channel",
+		orgId: orgId,
+		variables: {
+			secret_key: 1,
+		},
+	};
+}
+
+export function mockCredentialToolConfig(args: { name: string; orgId: string; }): ToolConfig {
+	const { name, orgId } = args;
+	return {
+		id: randomUUID(),
+		name: name,
+		description: `${name} description`,
+		type: "mock-tool",
+		orgId: orgId,
+		variables: {
+			output: `${name} output`,		
+		}
+	};
+}
+
+export function mockChannelUserCredential(args: {name: string, orgId: string, token: string}): ChannelUserCredential {
 	const { name, orgId, token } = args;
 	return {
 		id: randomUUID(),
 		name: name,
 		description: `${name} description`,
-		type: "credential",
-		subtype: "mock",
+		type: "worker-native-token",
 		orgId: orgId,
 		variables: {
-			token: token,
+			token: "secret_value",
 		},
 	};
 }
@@ -45,8 +74,7 @@ export function mockResourceConfig(args: { name: string; orgId: string;}): Resou
 		id: randomUUID(),
 		name: name,
 		description: `${name} description`,
-		type: "resource",
-		subtype: "mock",
+		type: "mock-resource",
 		orgId: orgId,
 		example: "",
 		variables: {
@@ -70,8 +98,7 @@ export function mockChannelConfig(args: {
 		id: randomUUID(),
 		name: name,
 		description: `${name} description`,
-		type: "channel",
-		subtype: "mock",
+		type: "mock-channel",
 		orgId: orgId,
 		variables: {
 			output: {
@@ -84,7 +111,7 @@ export function mockChannelConfig(args: {
 	};
 
 	for (const arg of outputArgs) {
-		channel.variables!.output.arguments[arg.name] = arg.value;
+		(channel.variables!.output as ToolCall).arguments[arg.name] = arg.value;
 	}
 
 	return channel;
@@ -96,8 +123,7 @@ export function mockWorkerConfig(args: { name: string; orgId: string; skills?: s
 		id: randomUUID(),
 		name: name,
 		description: `${name} description`,
-		type: "worker",
-		subtype: "mock",
+		type: "mock-worker",
 		orgId: orgId,
 		skills: skills,
 		channelUserConfig: channelConfig,
@@ -114,8 +140,7 @@ export function mockTrackerConfig(args: { name: string; orgId: string; }): Track
 		id: randomUUID(),
 		name: name,
 		description: `${name} description`,
-		type: "tracker",
-		subtype: "mock",
+		type: "mock-tracker",
 		orgId: orgId,
 		variables: {
 			output: `${name} output`,
@@ -130,8 +155,7 @@ export function mockToolConfig(args: { name: string; orgId: string; }): ToolConf
 		id: randomUUID(),
 		name: name,
 		description: `${name} description`,
-		type: "tool",
-		subtype: "mock",
+		type: "mock-tool",
 		orgId: orgId,
 		variables: {
 			output: `${name} output`,
@@ -159,8 +183,7 @@ export function mockTaskConfig(args: {
 		id: randomUUID(),
 		name: name,
 		description: `${name} description`,
-		type: "task",
-		subtype: "mock",
+		type: "mock-task",
 		orgId: orgId,
 		flowId: flowId,
 	};
@@ -192,41 +215,38 @@ export function mockTaskConfig(args: {
 }
 
 export class MockObjectFactory {
-	static async createAndRegisterConfigs(configs: any[]): Promise<void> {
+	static async createAndRegisterConfigs(configs: BaseConfig[]): Promise<void> {
 		const tasks: Task[] = [];
 		const resources: Resource[] = [];
 		const channels: Channel[] = [];
 		const documentRepositories: DocumentRepository[] = [];
-		const tools: Tool[] = [];
+		const tools: Tool<any>[] = [];
 		const workers: Worker[] = [];
-		const trackers: Tracker[] = [];
+		const trackers: Tracker<any>[] = [];
 		
 		await BrokerManager.reset();
 
-
 		configs.forEach((config) => {
-			switch (config.type) {
+			const objectType = ConfigFactory.getTypeForSubtype(config.type);
+			const obj = ObjectFactory.create(config, objectType, () => {});
+			switch (objectType) {
 				case "resource":
-					resources.push(ObjectFactory.create(config, {}));
+					resources.push(obj as Resource);
 					break;
 				case "channel":
-					channels.push(ObjectFactory.create(config, {}));
+					channels.push(obj as Channel);
 					break;
 				case "task":
-					tasks.push(ObjectFactory.create(config, {}));
+					tasks.push(obj as Task); 
 					break;
 				case "tool":
-					tools.push(ObjectFactory.create(config, {}));
+					tools.push(obj as Tool<any>);
 					break;
 				case "tracker":
-					trackers.push(ObjectFactory.create(config, {}));
+					trackers.push(obj as Tracker<any>);
 					break;
 				case "worker":
-					workers.push(ObjectFactory.create(config, {
-						toolBroker: BrokerManager.toolBroker,
-						channelBroker: BrokerManager.channelBroker,
-						workerBroker: BrokerManager.workerBroker,
-					}));
+					workers.push(obj as Worker);
 					break;
 				case "credential":
 					break;
@@ -239,20 +259,13 @@ export class MockObjectFactory {
 			await BrokerManager.resourceBroker.register(resource);
 		}
 		for (const tool of tools) {
-			await BrokerManager.toolBroker.register(tool, {
-				channelBroker: BrokerManager.channelBroker,
-			});
+			await BrokerManager.toolBroker.register(tool);
 		}
 		for (const channel of channels) {
 			await BrokerManager.channelBroker.register(channel);
 		}
 		for (const worker of workers) {
-			await BrokerManager.workerBroker.register(worker, {
-				toolBroker: BrokerManager.toolBroker,
-				channelBroker: BrokerManager.channelBroker,
-				workerBroker: BrokerManager.workerBroker,
-				documentRepositoryBroker: BrokerManager.documentRepositoryBroker,
-			});
+			await BrokerManager.workerBroker.register(worker);
 		}
 		for (const tracker of trackers) {
 			await BrokerManager.trackerBroker.register(tracker);

@@ -26,29 +26,27 @@ export const CredentialAddComponent = () => {
 	const [name, setName] = useState("");
 	const [selectedType, setSelectedType] = useState("channel");
 
-	const subTypes = ConfigFactory.getSubtypesForType(selectedType as ObjectType).filter(s => s !== "mock") as string[];
+	const subTypes = ConfigFactory.getSubtypesForType(selectedType as ObjectType).filter(s => !s.startsWith("mock")) as string[];
 
 	const { currentOrg } = contextStore(contextSelector, shallow);
 	const [subtype, setSubtype] = useState("slack-channel" as string);
 	const [details, setDetails] = useState<CredentialConfig>({
 		name: "",
 		orgId: currentOrg.id,
-		subtype: subtype as ObjectSubtype,
+		type: subtype as ObjectSubtype,
 		description: "",
-		type: "credential",
 		variables: {},
 	});
 
 	const reset = () => {
 		setName("");
 		setSelectedType(objectTypes[0] as string);
-		setSubtype(ConfigFactory.getSubtypesForType(objectTypes[0]).filter(s => s !== "mock")[0]);
+		setSubtype(ConfigFactory.getSubtypesForType(objectTypes[0]).filter(s => !s.startsWith("mock"))[0]);
 		setDetails({
 			name: "",
 			orgId: currentOrg.id,
-			subtype: subtype as ObjectSubtype,
+			type: subtype as ObjectSubtype,
 			description: "",
-			type: "credential",
 			variables: {},
 		});
 		setEditting(false);
@@ -89,9 +87,7 @@ export const CredentialAddComponent = () => {
 								onClick={() => {
 									addCredential({
 										name,
-										subtype,
-										description: "",
-										type: "credential",
+										type: subtype,										description: "",
 										variables: details.variables,
 									} as CredentialConfig);
 
@@ -118,7 +114,7 @@ export const CredentialAddComponent = () => {
 									setSelectedType(e.target.value);
 									setDetails({
 										...details,
-										subtype: ConfigFactory.getSubtypesForType(e.target.value as ObjectType).filter(s => s !== "mock")[0],
+										type: ConfigFactory.getSubtypesForType(e.target.value as ObjectType).filter(s => !s.startsWith("mock"))[0],
 									});
 								}}
 							>
@@ -140,7 +136,7 @@ export const CredentialAddComponent = () => {
 								onChange={(e) => {
 									setDetails({
 										...details,
-										subtype: e.target.value as ObjectSubtype,
+										type: e.target.value as ObjectSubtype,
 									});
 									setSubtype(e.target.value as ObjectSubtype);
 								}}
@@ -154,6 +150,7 @@ export const CredentialAddComponent = () => {
 					<Grid item xs={12}>
 						<SchemaVariableListComponent
 							config={details}
+							objectType="credential"
 							onPropertyChange={(name, newValue) => {
 								setDetails({
 									...details,
@@ -190,9 +187,8 @@ export const CredentialAddComponent = () => {
 					setDetails({
 						name: "",
 						orgId: currentOrg.id,
-						subtype: "mock",
+						type: "mock-channel",
 						description: "",
-						type: "credential",
 						variables: {},
 					});
 					setEditting(true);

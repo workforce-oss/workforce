@@ -7,8 +7,7 @@ export class MockTrackerMetadata {
             id: crypto.randomUUID(),
             name: "Mock Tracker",
             description: "Mock Tracker",
-            type: "tracker",
-            subtype: "mock",
+            type: "mock-tracker",
             orgId: orgId,
         };
     }

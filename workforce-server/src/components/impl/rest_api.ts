@@ -3,7 +3,7 @@ import { AuthOptions, auth } from "express-oauth2-jwt-bearer";
 import { ParamsDictionary } from "express-serve-static-core";
 import expressWs from "express-ws";
 import QueryString from "qs";
-import { BrokerManager, ChannelDb, ChannelMessageDb, ChannelMessageRoutes, ChannelRoutes, ChannelSessionDb, ChannelSessionRoutes, Configuration, CredentialDb, CredentialRoutes, DocumentDb, DocumentRelationDb, DocumentRepositoryDb, DocumentRepositoryRoutes, DocumentationDb, DocumentationRoutes, FlowDb, FlowRoutes, LocalIdentityDb, MapFactory, OAuth2Server, OAuthKeysDb, OrgDb, OrgRoutes, OrgUserRelationDb, OrgUserRoutes, Outbox, ResourceDb, ResourceRoutes, ResourceVersionDb, ResourceVersionRoutes, ResourceWriteDb, ResourceWriteRoutes, SkillDb, SkillRoutes, SpaceDb, SpaceUserRelationDb, SubjectFactory, TaskDb, TaskExecutionDb, TaskExecutionRequest, TaskExecutionResponse, TaskExecutionRoutes, TaskExecutionUserDb, TaskRoutes, TicketRequestDb, TicketRequestRoutes, ToolDb, ToolImageRoutes, ToolRequestDb, ToolRequestRoutes, ToolStateDb, TrackerDb, UserDb, UserRoutes, WebhookRouteDb, WebhookSocketAuthMessage, WorkRequestDb, WorkRequestRoutes, WorkerChatMessageDb, WorkerChatSessionDb, WorkerChatSessionRoutes, WorkerDb, WorkerRoutes, WorkforceClient } from "workforce-core";
+import { BrokerManager, ChannelDb, ChannelMessageDb, ChannelRouter, ChannelSessionDb, Configuration, CredentialDb, CredentialRouter, DocumentationDb, DocumentationRouter, DocumentDb, DocumentRelationDb, DocumentRepositoryDb, DocumentRepositoryRouter, FlowDb, FlowRouter, LocalIdentityDb, MapFactory, OAuth2Server, OAuthKeysDb, OrgDb, OrgRouter, OrgUserRelationDb, Outbox, ResourceDb, ResourceRouter, ResourceVersionDb, ResourceWriteDb, SkillDb, SkillRouter, SpaceDb, SpaceUserRelationDb, SubjectFactory, TaskDb, TaskExecutionDb, TaskExecutionRequest, TaskExecutionResponse, TaskExecutionRouter, TaskExecutionUserDb, TaskRouter, TicketRequestDb, ToolDb, ToolImageRouter, ToolRequestDb, ToolRouter, ToolStateDb, TrackerDb, TrackerRouter, UserDb, UserRouter, WebhookRouteDb, WebhookSocketAuthMessage, WorkerChatMessageDb, WorkerChatSessionDb, WorkerDb, WorkerRouter, WorkforceClient, WorkRequestDb, } from "workforce-core";
 import WebSocket from "ws";
 import { BaseComponent } from "../base.js";
 import { WorkforceComponent } from "../model.js";
@@ -95,115 +95,80 @@ export class RestApiComponent extends BaseComponent {
 
     httpRoutes(auth: RequestHandler, cors: RequestHandler): Record<string, RequestHandler[]> {
         const routes = {
-            "/flows": [
+            "/orgs/:orgId/flows": [
                 cors,
                 auth,
-                FlowRoutes
+                FlowRouter               
             ],
-            "/channels": [
+            "/orgs/:orgId/flows/:flowId/channels": [
                 cors,
                 auth,
-                ChannelRoutes
+                ChannelRouter
             ],
-            "/documentation": [
+            "/orgs/:orgId/flows/:flowId/documentation": [
                 cors,
                 auth,
-                DocumentationRoutes
+                DocumentationRouter
             ],
-            "/resources": [
+            "/orgs/:orgId/flows/:flowId/resources": [
                 cors,
                 auth,
-                ResourceRoutes
+                ResourceRouter
             ],
-            "/tasks": [
+            "/orgs/:orgId/flows/:flowId/tasks": [
                 cors,
                 auth,
-                TaskRoutes
+                TaskRouter
             ],
-            "/document-repositories": [
+            "/orgs/:orgId/flows/:flowId/tools": [
                 cors,
                 auth,
-                DocumentRepositoryRoutes
+                ToolRouter
             ],
-            "/workers": [
+            "/orgs/:orgId/flows/:flowId/trackers": [
                 cors,
                 auth,
-                WorkerRoutes
+                TrackerRouter
             ],
-            "/credentials": [
+            "/orgs/:orgId/document-repositories": [
                 cors,
                 auth,
-                CredentialRoutes
+                DocumentRepositoryRouter
             ],
-            "/channel-messages": [
+            "/orgs/:orgId/skills": [
                 cors,
                 auth,
-                ChannelMessageRoutes
+                SkillRouter
             ],
-            "/channel-sessions": [
+            "/orgs/:orgId/workers": [
                 cors,
                 auth,
-                ChannelSessionRoutes
+                WorkerRouter
             ],
-            "/resource-writes": [
+            "/orgs/:orgId/credentials": [
                 cors,
                 auth,
-                ResourceWriteRoutes
+                CredentialRouter
             ],
-            "/resource-versions": [
+            "/orgs/:orgId/task-executions": [
                 cors,
                 auth,
-                ResourceVersionRoutes
-            ],
-            "/task-executions": [
-                cors,
-                auth,
-                TaskExecutionRoutes
-            ],
-            "/tool-requests": [
-                cors,
-                auth,
-                ToolRequestRoutes
+                TaskExecutionRouter
             ],
             "/state-images": [
                 cors,
                 auth,
-                ToolImageRoutes
+                ToolImageRouter
             ],
             "/orgs": [
                 cors,
                 auth,
-                OrgRoutes
+                OrgRouter
             ],
             "/users": [
                 cors,
                 auth,
-                UserRoutes
-            ],
-            "/org-users": [
-                cors,
-                auth,
-                OrgUserRoutes
-            ],
-            "/ticket-requests": [
-                cors,
-                auth,
-                TicketRequestRoutes
-            ],
-            "/work-requests": [
-                cors,
-                auth,
-                WorkRequestRoutes
-            ],
-            "/worker-chat-sessions": [
-                cors,
-                auth,
-                WorkerChatSessionRoutes
-            ],
-            "/skills": [
-                cors,
-                auth,
-                SkillRoutes
+                UserRouter
             ],
         };
 

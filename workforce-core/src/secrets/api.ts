@@ -1,5 +1,5 @@
 import bodyParser from "body-parser";
-import express, { Router } from "express";
+import { Router, Request, Response, NextFunction } from "express";
 import { EncryptionService } from "../crypto/encryption_service.js";
 import { WorkforceClient } from "../identity/model.js";
 import { Logger } from "../logging/logger.js";
@@ -12,7 +12,7 @@ export function SecretHandlers(): CrudHandlers {
     return {
         create: [bodyParser.json({
             reviver: reviver,
-        }), async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        }), async (req: Request, res: Response, next: NextFunction) => {
             try {
                 const model = req.body as SecretData;
 
@@ -32,7 +32,7 @@ export function SecretHandlers(): CrudHandlers {
         }],
         read: [bodyParser.json({
             reviver: reviver,
-        }), async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        }), async (req: Request, res: Response, next: NextFunction) => {
             try {
                 const clientName = req.auth!.payload.client_id as WorkforceClient;
                 const found = await SecretDb.findByPk(req.params.id);
@@ -52,7 +52,7 @@ export function SecretHandlers(): CrudHandlers {
         }],
         list: [bodyParser.json({
             reviver: reviver,
-        }), async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        }), async (req: Request, res: Response, next: NextFunction) => {
             try {
                 const clientName = req.auth!.payload.client_id as WorkforceClient;
                 const found = await SecretDb.findAll({
@@ -74,7 +74,7 @@ export function SecretHandlers(): CrudHandlers {
         }],
         update: [bodyParser.json({
             reviver: reviver,
-        }), async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        }), async (req: Request, res: Response, next: NextFunction) => {
             try {
                 const model = req.body as SecretData;
                 const db = await SecretDb.findByPk(req.params.id)
@@ -100,7 +100,7 @@ export function SecretHandlers(): CrudHandlers {
         }],
         delete: [bodyParser.json({
             reviver: reviver,
-        }), async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+        }), async (req: Request, res: Response, next: NextFunction) => {
             try {
                 const found = await SecretDb.findByPk(req.params.id);
                 if (!found) {
@@ -117,7 +117,7 @@ export function SecretHandlers(): CrudHandlers {
     }
 }
 
-export const SecretRoutes: Router = express.Router({ mergeParams: true });
+export const SecretRoutes: Router = Router({ mergeParams: true });
 const Handlers = SecretHandlers();
 SecretRoutes.post("/", ...Handlers.create);
 SecretRoutes.get("/:id", ...Handlers.read);

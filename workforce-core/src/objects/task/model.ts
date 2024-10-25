@@ -44,7 +44,7 @@ export type TaskType = (typeof taskTypes)[number];
 
 export type TaskExecutionStatus = "started" | "complete" | "error";
 
-export const taskTypes = ["mock", "simple-task", "structured-task"] as const;
+export const taskTypes = ["mock-task", "simple-task", "structured-task"] as const;
 
 export interface ToolReference {
 	name: string;
@@ -79,7 +79,7 @@ export interface Subtask {
 // }
 
 export interface TaskConfig extends BaseConfig {
-	subtype: TaskType;
+	type: TaskType;
 
 	/**
 	 * The list of skills needed for this task.

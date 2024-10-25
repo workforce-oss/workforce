@@ -21,7 +21,7 @@ export interface ToolRequest {
     taskExecutionId: string;
     timestamp: number;
     workerId: string;
-    workerChannelUserConfig?: Record<"mock" | "slack-channel" | "native-channel" | "discord-channel", string> | undefined
+    workerChannelUserConfig?: Record<"mock-channel" | "slack-channel" | "native-channel" | "discord-channel", string> | undefined
     channelThreadId?: string;
     channelId?: string;
     machine_state?: Record<string, unknown>;
@@ -45,7 +45,7 @@ export type ToolRequestStatus = "awaiting-response" | "response-received" | "err
 export type ToolType = typeof toolTypes[number];
 
 export const toolTypes = [
-    "mock",
+    "mock-tool",
     "web-service-tool",
     "template-tool",
     "openapi-tool",
@@ -60,7 +60,7 @@ export const toolTypes = [
 ] as const;
 
 export interface ToolConfig extends BaseConfig {
-    subtype: ToolType;
+    type: ToolType;
 
     /*
      * This the channel the tool may use for communication

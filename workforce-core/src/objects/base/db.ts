@@ -5,10 +5,11 @@ import { OutboxManager } from "../../manager/outbox_manager.js";
 import { jsonParse, jsonStringify } from "../../util/json.js";
 import { BaseConfig } from "./model.js";
 import { Outbox } from "./outbox.js";
-import { objectTypes, ObjectType, objectSubtypes, ObjectSubtype } from "./factory/types.js";
+import { objectSubtypes, ObjectSubtype } from "./factory/types.js";
 import { Logger } from "../../logging/logger.js";
 import { OrgDb } from "../../identity/db.org.js";
 import { SpaceDb } from "../../identity/db.space.js";
+import { ConfigFactory } from "./factory/config_factory.js";
 
 
 export interface BaseModelAttributes {
@@ -18,7 +19,6 @@ export interface BaseModelAttributes {
     name: string;
     description: string;
     type: string;
-    subtype: string;
     status?: string | null;
 }
 
@@ -76,18 +76,6 @@ export class BaseModel extends Model<BaseModelAttributes, BaseModelCreationAttri
     })
     declare description: string;
 
-    @Is("type", (value: string) => {
-        const type = objectTypes.find((type: ObjectType) => type === value);
-        if (!type) {
-            throw new Error("Invalid type");
-        }
-    })
-    @Column({
-        type: TEXT,
-        allowNull: false
-    })
-    declare type: string;
-
     @Is("subtype", (value: string) => {
         const subtype = objectSubtypes.find((subtype: ObjectSubtype) => subtype === value);
         if (!subtype) {
@@ -98,7 +86,7 @@ export class BaseModel extends Model<BaseModelAttributes, BaseModelCreationAttri
         type: TEXT,
         allowNull: false
     })
-    declare subtype: string;
+    declare type: string;
 
     @Column({
         type: JSON,
@@ -118,8 +106,7 @@ export class BaseModel extends Model<BaseModelAttributes, BaseModelCreationAttri
             orgId: this.orgId,
             name: this.name,
             description: this.description,
-            type: this.type as ObjectType,
-            subtype: this.subtype as ObjectSubtype,
+            type: this.type as ObjectSubtype,
         }
 
         const variables = jsonParse<Record<string, unknown>>(this.variables);
@@ -138,8 +125,8 @@ export class BaseModel extends Model<BaseModelAttributes, BaseModelCreationAttri
         this.name = model.name;
         this.description = model.description;
         this.type = model.type;
-        this.subtype = model.subtype;
         if (model.variables) {
+            console.log(`variables: ${jsonStringify(model.variables)}`);
             this.variables = jsonStringify(model.variables);
         } else {
             this.variables = undefined
@@ -151,8 +138,9 @@ export class BaseModel extends Model<BaseModelAttributes, BaseModelCreationAttri
         const t = await this.sequelize?.transaction(async (t) => {
             Logger.getInstance(`baseModel`).info(`Saving object: ${jsonStringify(this)}`);
             const original = await super.save({ transaction: t, ...options });
+            const type = ConfigFactory.getTypeForSubtype(this.type as ObjectSubtype);
             const outbox = await Outbox.create({
-                type: this.type,
+                type,
                 objectId: this.id,
                 eventType: "update"
             }, { transaction: t });
@@ -160,7 +148,7 @@ export class BaseModel extends Model<BaseModelAttributes, BaseModelCreationAttri
             const outboxManager = await OutboxManager.instance();
             outboxManager.next({
                 eventId: outbox.id,
-                type: this.type,
+                type,
                 objectId: this.id,
                 eventType: "update"
             });
@@ -173,15 +161,16 @@ export class BaseModel extends Model<BaseModelAttributes, BaseModelCreationAttri
     public async destroy(options?: InstanceDestroyOptions): Promise<void> {
         await this.sequelize?.transaction(async (t) => {
             await super.destroy({ transaction: t, ...options });
+            const type = ConfigFactory.getTypeForSubtype(this.type as ObjectSubtype);
             const outbox = await Outbox.create({
-                type: this.type,
+                type,
                 objectId: this.id,
                 eventType: "delete",
             }, { transaction: t });
             const outboxManager = await OutboxManager.instance();
             outboxManager.next({
                 eventId: outbox.id,
-                type: this.type,
+                type,
                 objectId: this.id,
                 eventType: "delete"
             });

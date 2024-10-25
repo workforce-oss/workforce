@@ -1,9 +1,9 @@
 import bodyParser from 'body-parser';
 import { Buffer } from 'buffer';
 import { createSecretKey } from 'crypto';
-import express, { RequestHandler} from 'express';
+import express, { RequestHandler } from 'express';
 import { SignJWT, generateKeyPair, exportJWK, KeyLike } from 'jose';
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import nock from 'nock';
 import sinon from 'sinon';
 
@@ -38,7 +38,9 @@ const getKeys = async () => {
 };
 
 export const createJwt = async ({
-    payload = {},
+    payload = {
+        client_id: 'workforce-api',
+    },
     issuer = 'https://localhost:3100/',
     subject = 'me',
     audience = 'https://api/',
@@ -71,7 +73,7 @@ export const createJwt = async ({
 
     const secretKey = secret && createSecretKey(Buffer.from(secret));
 
-    return new SignJWT(payload)
+    const token = await new SignJWT(payload)
         .setProtectedHeader({
             alg: secretKey ? 'HS256' : 'RS256',
             typ: 'JWT',
@@ -83,23 +85,26 @@ export const createJwt = async ({
         .setIssuedAt(iat)
         .setExpirationTime(exp)
         .sign(secretKey || privateKey);
+
+    return token;
 };
 
 export const issuerHandlers = [
-    rest.get(`https://localhost:3100/.well-known/jwks.json`, async (req, res, ctx) => {
+    http.get(`https://localhost:3100/.well-known/jwks.json`, async () => {
         const { publicKey, privateKey } = await getKeys();
         const publicJwk = await exportJWK(publicKey);
-        return res(ctx.status(200) ,ctx.json({ keys: [{ kid: 'kid', ...publicJwk }] }));
+        return HttpResponse.json({ keys: [{ kid: 'kid', ...publicJwk }] });
     }),
-    rest.get(`https://localhost:3100/.well-known/openid-configuration`, (req, res, ctx) => {
-        return res(ctx.json({
+    http.get(`https://localhost:3100/.well-known/openid-configuration`, () => {
+        return HttpResponse.json({
             issuer: 'https://localhost:3100/',
             jwks_uri: `https://localhost:3100/.well-known/jwks.json`,
             id_token_signing_alg_values_supported: ['RS256'],
-        }));
+            token_endpoint: 'https://localhost:3100/token',
+        });
     }),
-    rest.post(`https://localhost:3100/token`, (req, res, ctx) => {
-        return res(ctx.json(createJwt()));
+    http.post(`https://localhost:3100/token`, async (req) => {
+        return HttpResponse.json({ access_token: await createJwt() });
     }),
 ]
 
@@ -108,7 +113,7 @@ export const expressIssueHandlers: Record<string, RequestHandler[]> = {
         bodyParser.json(),
         async (req: express.Request, res: express.Response, next: express.NextFunction) => {
             const { publicKey, privateKey } = await getKeys();
-            const publicJwk = await exportJWK(publicKey);            
+            const publicJwk = await exportJWK(publicKey);
             res.status(200).send({ keys: [{ kid: 'kid', ...publicJwk }] });
         }
     ],
@@ -116,17 +121,17 @@ export const expressIssueHandlers: Record<string, RequestHandler[]> = {
         bodyParser.json(),
         async (req: express.Request, res: express.Response, next: express.NextFunction) => {
             res.status(200).send({
-                issuer: 'http://localhost:3000',
-                jwks_uri: `http://localhost:3000/.well-known/jwks.json`,
+                issuer: 'https://localhost:3100',
+                jwks_uri: `https://localhost:3100/.well-known/jwks.json`,
                 id_token_signing_alg_values_supported: ['RS256'],
-                token_endpoint: 'http://localhost:3000/token',
+                token_endpoint: 'https://localhost:3100/token',
             });
         }
     ],
     token: [
         bodyParser.json(),
         async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-            const jwt = await createJwt({issuer: 'http://localhost:3000', payload: {client_id: 'workforce-engine'}});
+            const jwt = await createJwt({ issuer: 'http://localhost:3000', payload: { client_id: 'workforce-engine' } });
             res.status(200).send({
                 access_token: jwt,
                 token_type: 'Bearer',

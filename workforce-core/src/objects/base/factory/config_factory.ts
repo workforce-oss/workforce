@@ -24,25 +24,25 @@ export class ConfigFactory {
     static defaultConfigFor<TConfig extends BaseConfig>(orgId: string, type: ObjectType, subtype: ObjectSubtype): TConfig {
         switch (type) {
             case "channel":
-                return ChannelConfigFactory.defaultConfigFor(orgId, subtype) as unknown as TConfig;
+                return ChannelConfigFactory.defaultConfigFor(orgId, subtype as ChannelType) as unknown as TConfig;
             case "channel_user_credential":
-                return ChannelUserCredentialConfigFactory.defaultConfigFor(orgId, subtype) as unknown as TConfig;
+                return ChannelUserCredentialConfigFactory.defaultConfigFor(orgId, subtype as ChannelUserCredentialType) as unknown as TConfig;
             case "credential":
                 return CredentialConfigFactory.defaultConfigFor(orgId, subtype) as unknown as TConfig;
             case "documentation":
-                return DocumentationConfigFactory.defaultConfigFor(orgId, subtype) as unknown as TConfig;
+                return DocumentationConfigFactory.defaultConfigFor(orgId, subtype as DocumentationType) as unknown as TConfig;
             case "document_repository":
-                return DocumentRepositoryConfigFactory.defaultConfigFor(orgId, subtype) as unknown as TConfig;
+                return DocumentRepositoryConfigFactory.defaultConfigFor(orgId, subtype as DocumentRepositoryType) as unknown as TConfig;
             case "resource":
-                return ResourceConfigFactory.defaultConfigFor(orgId, subtype) as unknown as TConfig;
+                return ResourceConfigFactory.defaultConfigFor(orgId, subtype as ResourceType) as unknown as TConfig;
             case "task":
-                return TaskConfigFactory.defaultConfigFor(orgId, subtype) as unknown as TConfig;
+                return TaskConfigFactory.defaultConfigFor(orgId, subtype as TaskType) as unknown as TConfig;
             case "tool":
-                return ToolConfigFactory.defaultConfigFor(orgId, subtype) as unknown as TConfig;
+                return ToolConfigFactory.defaultConfigFor(orgId, subtype as ToolType) as unknown as TConfig;
             case "tracker":
-                return TrackerConfigFactory.defaultConfigFor(orgId, subtype) as unknown as TConfig;
+                return TrackerConfigFactory.defaultConfigFor(orgId, subtype as TrackerType) as unknown as TConfig;
             case "worker":
-                return WorkerConfigFactory.defaultConfigFor(orgId, subtype) as unknown as TConfig;
+                return WorkerConfigFactory.defaultConfigFor(orgId, subtype as WorkerType) as unknown as TConfig;
             default:
                 throw new Error(`ObjectFactory.defaultConfigFor() unknown object type ${type as string}`);
         }

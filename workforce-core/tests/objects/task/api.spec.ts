@@ -6,7 +6,7 @@ import expressWs from "express-ws";
 import { setupServer } from "msw/node";
 import { Sequelize } from "sequelize-typescript";
 import request from "supertest";
-import { TaskRoutes } from "../../../src/objects/task/api.js";
+import { TaskRouter } from "../../../src/objects/task/api.js";
 import { TaskDb } from "../../../src/objects/task/db.js";
 import { TaskConfig } from "../../../src/objects/task/model.js";
 import { createBasicFlow, createBasicTask, createBasicTaskConfig, createOrg, createUser, newDb } from "../../helpers/db.js";
@@ -28,7 +28,7 @@ describe("Task API", () => {
         }));
         orgId = randomUUID();
 
-        app.use("/tasks", TaskRoutes)
+        app.use("/orgs/:orgId/flows/:flowId/tasks", TaskRouter)
     });
     beforeEach(async () => {
         await sequelize.sync({ force: true });
@@ -48,7 +48,7 @@ describe("Task API", () => {
 
             const taskConfig: TaskConfig = createBasicTaskConfig(orgId, flow.id);
             const response = await request(app)
-                .post("/tasks")
+                .post(`/orgs/${orgId}/flows/${flow.id}/tasks`)
                 .set("Authorization", `Bearer ${jwt}`)
                 .set("Content-Type", "application/json")
                 .send(taskConfig)
@@ -69,8 +69,8 @@ describe("Task API", () => {
             
             const taskConfig: TaskConfig = createBasicTaskConfig(otherOrgId, flow.id);
             await request(app)
-                .post("/tasks")
-                .set("Authorization", `Bearer ${jwt}`)
+            .post(`/orgs/${otherOrgId}/flows/${flow.id}/tasks`)
+            .set("Authorization", `Bearer ${jwt}`)
                 .set("Content-Type", "application/json")
                 .send(taskConfig)
                 .expect(404)
@@ -81,8 +81,8 @@ describe("Task API", () => {
             const taskConfig: TaskConfig = createBasicTaskConfig(orgId, flow.id);
             taskConfig.variables = {};
             await request(app)
-                .post("/tasks")
-                .set("Authorization", `Bearer ${jwt}`)
+            .post(`/orgs/${orgId}/flows/${flow.id}/tasks`)
+            .set("Authorization", `Bearer ${jwt}`)
                 .set("Content-Type", "application/json")
                 .send(taskConfig)
                 .expect(400)
@@ -94,10 +94,9 @@ describe("Task API", () => {
             const taskDb = await createBasicTask(orgId, flow.id);
 
             const response = await request(app)
-                .get(`/tasks/${taskDb.id}`)
+                .get(`/orgs/${orgId}/flows/${flow.id}/tasks/${taskDb.id}`)
                 .set("Authorization", `Bearer ${jwt}`)
                 .set("Content-Type", "application/json")
-                .query({ orgId: orgId })
                 .expect(200)
 
             expect(response.body).to.deep.equal(taskDb.toModel());
@@ -110,10 +109,9 @@ describe("Task API", () => {
             const taskDb = await createBasicTask(otherOrgId, flow.id);
 
             await request(app)
-                .get(`/tasks/${taskDb.id}`)
+                .get(`/orgs/${otherOrgId}/tasks/${taskDb.id}`)
                 .set("Authorization", `Bearer ${jwt}`)
                 .set("Content-Type", "application/json")
-                .query({ orgId: otherOrgId })
                 .expect(404)
         });
     });
@@ -124,23 +122,12 @@ describe("Task API", () => {
             const taskDb = await createBasicTask(orgId, flow.id, undefined, undefined, true);
 
             const response = await request(app)
-                .get(`/tasks`)
+                .get(`/orgs/${orgId}/flows/${flow.id}/tasks`)
                 .set("Authorization", `Bearer ${jwt}`)
-                .query({ flowId: flow.id, orgId })
                 .expect(200)
             expect(response.body).to.deep.equal([taskDb.toModel()]);
         });
-        it("should not retrieve tasks when flowId is missing", async () => {
-            const flow = await createBasicFlow(orgId);
-
-            const taskDb = await createBasicTask(orgId, flow.id);
-
-            await request(app)
-                .get(`/tasks`)
-                .set("Authorization", `Bearer ${jwt}`)
-                .query({ orgId })
-                .expect(400)
-        });
+        
         it("should not retrieve tasks for a different org", async () => {
             const otherOrgId = randomUUID();
             await createOrg(otherOrgId);
@@ -150,13 +137,12 @@ describe("Task API", () => {
             const taskDb = await createBasicTask(otherOrgId, flow.id);
 
             const response = await request(app)
-                .get(`/tasks`)
+                .get(`/orgs/${otherOrgId}/flows/${flow.id}/tasks`)
                 .set("Authorization", `Bearer ${jwt}`)
                 .set("Content-Type", "application/json")
-                .query({ flowId: flow.id, orgId: orgId })
-                .expect(200)
+                .expect(404)
 
-            expect(response.body).to.deep.equal([]);
+            expect(response.body).to.be.empty;
         });
     });
     describe("PUT /tasks/:id", () => {
@@ -169,7 +155,7 @@ describe("Task API", () => {
             updatedTaskConfig.name = "updated name";
 
             await request(app)
-                .put(`/tasks/${taskDb.id}`)
+                .put(`/orgs/${orgId}/flows/${flow.id}/tasks/${taskDb.id}`)
                 .set("Authorization", `Bearer ${jwt}`)
                 .set("Content-Type", "application/json")
                 .send(updatedTaskConfig)
@@ -193,7 +179,7 @@ describe("Task API", () => {
             updatedTaskConfig.name = "updated name";
 
             await request(app)
-                .put(`/tasks/${taskDb.id}`)
+                .put(`/orgs/${otherOrgId}/flows{${flow.id}/tasks/${taskDb.id}`)
                 .set("Authorization", `Bearer ${jwt}`)
                 .set("Content-Type", "application/json")
                 .send(updatedTaskConfig)
@@ -207,7 +193,7 @@ describe("Task API", () => {
             updatedTaskConfig.variables = {};
 
             await request(app)
-                .put(`/tasks/${taskDb.id}`)
+                .put(`/orgs/${orgId}/flows/${flow.id}/tasks/${taskDb.id}`)
                 .set("Authorization", `Bearer ${jwt}`)
                 .set("Content-Type", "application/json")
                 .send(updatedTaskConfig)
@@ -221,10 +207,9 @@ describe("Task API", () => {
             const taskDb = await createBasicTask(orgId, flow.id);
 
             await request(app)
-                .delete(`/tasks/${taskDb.id}`)
+                .delete(`/orgs/${orgId}/flows/${flow.id}/tasks/${taskDb.id}`)
                 .set("Authorization", `Bearer ${jwt}`)
                 .set("Content-Type", "application/json")
-                .query({ orgId })
                 .expect(200)
 
             const retrievedTaskDb = await TaskDb.findByPk(taskDb.id);
@@ -239,17 +224,9 @@ describe("Task API", () => {
             const taskDb = await createBasicTask(otherOrgId, flow.id);
 
             await request(app)
-                .delete(`/tasks/${taskDb.id}`)
+                .delete(`/orgs/${otherOrgId}/flows/${flow.id}/tasks/${taskDb.id}`)
                 .set("Authorization", `Bearer ${jwt}`)
                 .set("Content-Type", "application/json")
-                .query({ orgId })
-                .expect(404)
-
-            await request(app)
-                .delete(`/tasks/${taskDb.id}`)
-                .set("Authorization", `Bearer ${jwt}`)
-                .set("Content-Type", "application/json")
-                .query({ orgId: otherOrgId })
                 .expect(404)
         });
     });

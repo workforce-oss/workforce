@@ -1,12 +1,14 @@
 import { Configuration } from "../../../../../config/configuration.js";
+import { Logger } from "../../../../../logging/logger.js";
 import { ApiClient } from "../../../../base/api_client.js";
 
 
 export class StorageApiClient extends ApiClient {
     private _apiUrl: string;
+    logger = Logger.getInstance("StorageApiClient");
 
     constructor() {
-        super("StorageApiClient");
+        super();
         this._apiUrl = Configuration.StorageApiUri;
     }
 

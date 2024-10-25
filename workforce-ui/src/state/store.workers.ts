@@ -1,6 +1,7 @@
 import { WorkforceAPIClient } from "workforce-api-client";
 import { VariableSchemaValidationError, WorkerConfig } from "workforce-core/model";
 import { temporal } from "zundo";
+import { StateCreator } from "zustand";
 import { create } from "zustand";
 
 export type WorkerState = {
@@ -23,7 +24,7 @@ export const workerStore = create<WorkerState>()(
 				worker.id = worker.variables?.user_id as string;
 			}
 			WorkforceAPIClient.WorkerAPI
-				.create(worker)
+				.create(worker, { orgId: worker.orgId })
 				.then((response: WorkerConfig | VariableSchemaValidationError[]) => {
 					if (Array.isArray(response)) {
 						const error = response.map((e) => e.message).join("\n");
@@ -46,7 +47,7 @@ export const workerStore = create<WorkerState>()(
 		},
 		removeWorker: (worker: WorkerConfig) => {
 			WorkforceAPIClient.WorkerAPI
-				.delete(worker.id)
+				.delete(worker.id, { orgId: worker.orgId })
 				.then(() => {
 					console.log(`deleteWorker() deleted worker ${worker.name}`);
 					set({
@@ -62,7 +63,7 @@ export const workerStore = create<WorkerState>()(
 		},
 		updateWorker: (worker: WorkerConfig) => {
 			WorkforceAPIClient.WorkerAPI
-				.update(worker, worker.id)
+				.update(worker, worker.id, { orgId: worker.orgId })
 				.then((response: WorkerConfig | VariableSchemaValidationError[]) => {
 					if (Array.isArray(response)) {
 						const error = response.map((e) => e.message).join("\n");
@@ -106,5 +107,5 @@ export const workerStore = create<WorkerState>()(
 					});
 				});
 		},
-	}))
+	})) as StateCreator<WorkerState, [], [never, unknown][]>
 );

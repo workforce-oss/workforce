@@ -9,8 +9,7 @@ export class HumanWorkerMetadata {
             orgId: orgId,
             name: "Human Worker",
             description: "Human Worker",
-            type: "worker",
-            subtype: "human-worker",
+            type: "human-worker",
             variables: {},
         };
         for (const [key, value] of this.variablesSchema()) {

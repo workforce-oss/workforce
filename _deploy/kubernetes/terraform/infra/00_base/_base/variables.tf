@@ -28,6 +28,12 @@ variable "install_istio_gateway" {
     default     = false
 }
 
+variable "scale_istio_to_zero" {
+    type        = bool
+    description = "Whether to scale Istio to 0."
+    default     = false
+}
+
 variable "create_istio_lb_health_check" {
     type        = bool
     description = "Whether to create a load balancer health check."

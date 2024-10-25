@@ -8,8 +8,10 @@ import { ResourceWriteDb } from "./db.resource_write.js";
 import { jsonStringify } from "../../util/json.js";
 import { randomUUID } from "crypto";
 import { ResourceVersionDb } from "./db.resource_version.js";
+import { ObjectType } from "../base/factory/types.js";
 
 export class ResourceBroker extends BaseBroker<ResourceConfig, Resource, object> {
+	objectType: ObjectType = "resource";
 	logger = Logger.getInstance("ResourceBroker");
 
 	private writeSubject = new Subject<WriteRequest>();

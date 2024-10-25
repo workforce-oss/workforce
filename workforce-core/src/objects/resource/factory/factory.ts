@@ -7,8 +7,8 @@ import { ResourceConfig } from "../model.js";
 
 export class ResourceFactory {
     static create(config: ResourceConfig, onFailure: (objectId: string, error: string) => void): Resource {
-        switch (config.subtype) {
-            case "mock":
+        switch (config.type) {
+            case "mock-resource":
                 return new MockResource(config, onFailure);
             case "github-repo-resource":
                 return new GithubResource(config, onFailure);
@@ -17,7 +17,7 @@ export class ResourceFactory {
             case "github-pull-request-resource":
                 return new GithubPullRequestResource(config, onFailure);
             default:
-                throw new Error(`ResourceFactory.create() unknown resource type ${config.subtype}`);
+                throw new Error(`ResourceFactory.create() unknown resource type ${config.type as string}`);
         }
     }
 }

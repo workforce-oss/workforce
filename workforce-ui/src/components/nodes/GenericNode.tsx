@@ -3,7 +3,7 @@ import { Chip, Color, MenuItem, SvgIcon, TextField } from "@mui/material";
 import _ from "lodash";
 
 import { ReactNode, useEffect, useMemo, useRef, useState } from "react";
-import { BaseConfig, TaskConfig, VariablesSchemaFactory, CredentialConfig } from "workforce-core/model";
+import { BaseConfig, TaskConfig, VariablesSchemaFactory, CredentialConfig, ObjectType } from "workforce-core/model";
 
 import { shallow } from "zustand/shallow";
 import { CustomNodeData } from "../../nodes/nodeData";
@@ -60,6 +60,7 @@ export const GenericNode = <T extends BaseConfig>({
 	headerColor,
 	children,
 	additionalConfiguration,
+	objectType,
 	configType,
 	readOnly,
 	hideVariables,
@@ -69,6 +70,7 @@ export const GenericNode = <T extends BaseConfig>({
 	headerColor: Color;
 	children: ReactNode;
 	additionalConfiguration?: ReactNode;
+	objectType: ObjectType;
 	configType?: string;
 	readOnly?: boolean;
 	hideVariables?: boolean;
@@ -97,7 +99,7 @@ export const GenericNode = <T extends BaseConfig>({
 	const [node, setNode] = useState<Node<CustomNodeData<T>>>(nodes.find((n: Node<CustomNodeData<T>>) => n.id === data.config.id));
 
 	const hasAdvanced = useMemo(() => {
-		const schema = VariablesSchemaFactory.for(data.config);
+		const schema = VariablesSchemaFactory.for(data.config, objectType);
 		let adv = false;
 		for (const key in schema) {
 			if (schema[key].advanced) {
@@ -145,14 +147,14 @@ export const GenericNode = <T extends BaseConfig>({
 	};
 
 	useMemo(() => {
-		if (data.config.type !== "task" && data.config.type !== "documentation") {
+		if (objectType !== "task" && objectType !== "documentation") {
 			hydrateCredentials(currentOrg?.id);
 		}
 	}, [currentOrg]);
 
 	useEffect(() => {
-		if (data.config.type !== "task" && data.config.type !== "documentation" && credentials && credentials.length > 0) {
-			setCredentialList(credentials.filter((credential) => credential.subtype === data.config.subtype));
+		if (objectType !== "task" && objectType !== "documentation" && credentials && credentials.length > 0) {
+			setCredentialList(credentials.filter((credential) => credential.type === data.config.type));
 		}
 	}, [credentials]);
 
@@ -166,7 +168,7 @@ export const GenericNode = <T extends BaseConfig>({
 		return <></>;
 	}
 
-	const customIcon = CustomIcons.icons.get((data.config as BaseConfig).subtype);
+	const customIcon = CustomIcons.icons.get((data.config as BaseConfig).type);
 	
 	return (
 		<div
@@ -207,7 +209,7 @@ export const GenericNode = <T extends BaseConfig>({
 					) : (
 						<div className="ml-2 truncate text-lg font-bold">{node.data.config.name}</div>
 					)}
-					{node.data.config.type !== "credential" && !readOnly ? (
+					{objectType !== "credential" && !readOnly ? (
 						<button
 							onClick={() => {
 								setUpdatingName(true);
@@ -264,7 +266,7 @@ export const GenericNode = <T extends BaseConfig>({
 				)}
 				{configExpanded && !hideVariables ? (
 					<div className="h-auto w-auto">
-						{node.data.config.type !== "task" && node.data.config.type !== "documentation" && credentialList && credentialList.length > 0?
+						{objectType !== "task" && objectType !== "documentation" && credentialList && credentialList.length > 0?
 							<div className="h-auto w-auto py-4">
 								<div className="w-full">
 									<div className={"flex flex-row flex-start items-center ml-8"}>
@@ -291,6 +293,7 @@ export const GenericNode = <T extends BaseConfig>({
 						{additionalConfiguration}
 						<SchemaVariableListComponent
 							readOnly={readOnly}
+							objectType={objectType}
 							config={node.data.config}
 							onPropertyChange={onPropertyChange}
 							onResize={onResize}
@@ -317,6 +320,7 @@ export const GenericNode = <T extends BaseConfig>({
 					<div className="h-auto w-auto">
 						<SchemaVariableListComponent
 							readOnly={readOnly}
+							objectType={objectType}
 							config={node.data.config}
 							onPropertyChange={onPropertyChange}
 							onResize={onResize}
@@ -324,7 +328,7 @@ export const GenericNode = <T extends BaseConfig>({
 						/>
 					</div>
 				) : null}
-				{node.data.config.type === "task" ? (
+				{objectType === "task" ? (
 					<div
 						className="w-full dark:text-white flex items-center justify-between p-4 gap-8 bg-gray-10 dark:bg-gray-800 border dark:border-b-gray-700 "
 						onClick={(e) => {
@@ -343,7 +347,7 @@ export const GenericNode = <T extends BaseConfig>({
 						</div>
 					</div>
 				) : null}
-				{node.data.config.type === "task" && skillsExpanded ? (
+				{objectType === "task" && skillsExpanded ? (
 					<div className="h-auto w-auto py-4">
 						<div className="w-full">
 							<div className={"flex flex-row flex-start items-center ml-8"}>
@@ -435,7 +439,7 @@ export const GenericNode = <T extends BaseConfig>({
 					})}
 				</div>
 			</div>
-			{node.data.config.type === "task" ? (
+			{objectType === "task" ? (
 				<div className="w-full flex justify-center bg-gray-50 dark:bg-gray-800" ref={paramsRef}>
 					<div className="flex-1">
 						{Object.keys((node.data.config as TaskConfig).inputs ?? {}).map((input: string, index: number) => {

@@ -1,30 +1,26 @@
-import { ChannelAPI } from "./api/channel_api.js";
-import { ChannelMessageAPI } from "./api/channel_message_api.js";
-import { ChannelSessionAPI } from "./api/channel_session_api.js";
+import { Resource, TaskExecution } from "workforce-core";
+import { ChannelAPI, ChannelMessageAPI, ChannelSessionAPI, ChannelSubResourceCallOptions } from "./api/channel_api.js";
 import { CredentialAPI } from "./api/credential_api.js";
 import { DocumentRepositoryAPI } from "./api/document_repository_api.js";
 import { DocumentationAPI } from "./api/documentation_api.js";
 import { FlowAPI } from "./api/flow_api.js";
+import { FlowSubResourceCallOptions } from "./api/flow_api.subresource.js";
 import { HumanWorkerSocketAPI } from "./api/human_worker_socket_api.js";
 import { NativeChatSocketAPI } from "./api/native_chat_socket_api.js";
 import { OrgAPI } from "./api/org_api.js";
+import { OrgSubResourceCallOptions } from "./api/org_api.subresource.js";
 import { OrgUserAPI } from "./api/org_user_api.js";
 import { ProspectAdminAPI } from "./api/prospect_admin_api.js";
 import { ProspectAPI } from "./api/prospect_api.js";
-import { ResourceAPI } from "./api/resource_api.js";
-import { ResourceVersionAPI } from "./api/resource_version_api.js";
-import { ResourceWriteAPI } from "./api/resource_write_api.js";
+import { ResourceAPI, ResourceSubResourceCallOptions, ResourceVersionAPI, ResourceWriteAPI } from "./api/resource_api.js";
 import { SkillAPI } from "./api/skill_api.js";
 import { StorageAPI } from "./api/storage_api.js";
 import { TaskAPI } from "./api/task_api.js";
-import { TaskExecutionAPI } from "./api/task_execution_api.js";
+import { TaskExecutionAPI, TaskExecutionChannelMessageAPI, TaskExecutionSubResourceCallOptions, TaskExecutionToolRequestAPI, TaskExecutionWorkerChatSessionAPI, TaskExecutionWorkRequestAPI } from "./api/task_execution_api.js";
 import { TaskExecutionWatchAPI } from "./api/task_execution_watch_api.js";
-import { TicketRequestAPI } from "./api/ticket_request_api.js";
-import { ToolRequestAPI } from "./api/tool_request_api.js";
 import { UserAPI } from "./api/user_api.js";
-import { WorkRequestAPI } from "./api/work_request_api.js";
-import { WorkerAPI } from "./api/worker_api.js";
-import { WorkerChatSessionAPI } from "./api/worker_chat_session_api.js";
+import { WorkerAPI, WorkerSubResourceCallOptions, WorkerWorkRequestAPI } from "./api/worker_api.js";
+import { TrackerSubResourceCallOptions } from "./api/tracker_api.js";
 
 export { RestApi } from "./api/base/rest_api.js";
 
@@ -34,6 +30,72 @@ export { TaskExecutionWatchAPI } from "./api/task_execution_watch_api.js";
 
 export type { TaskExecutionAPI } from "./api/task_execution_api.js";
 
+interface WorkforceAPITypes {
+    "org": OrgAPI;
+    "orgs": OrgAPI;
+    "flow": FlowAPI;
+    "flows": FlowAPI;
+    "worker": WorkerAPI;
+    "workers": WorkerAPI;
+    "credential": CredentialAPI;
+    "credentials": CredentialAPI;
+    "user": UserAPI;
+    "users": UserAPI;
+    "org-user": OrgUserAPI;
+    "org-users": OrgUserAPI;
+    "document-repository": DocumentRepositoryAPI;
+    "document-repositories": DocumentRepositoryAPI;
+    "channel": ChannelAPI;
+    "channels": ChannelAPI;
+    "channel-session": ChannelSessionAPI;
+    "channel-sessions": ChannelSessionAPI;
+    "channel-message": ChannelMessageAPI;
+    "channel-messages": ChannelMessageAPI;
+    "task": TaskAPI;
+    "tasks": TaskAPI;
+    "task-execution": TaskExecutionAPI;
+    "task-executions": TaskExecutionAPI;
+    "resource": ResourceAPI;
+    "resources": ResourceAPI;
+    "resource-version": ResourceVersionAPI;
+    "resource-versions": ResourceVersionAPI;
+    "resource-write": ResourceWriteAPI;
+    "resource-writes": ResourceWriteAPI;
+    "documentation": DocumentationAPI;
+
+}
+
+export type WorkforceAPI =
+    ChannelAPI |
+    ChannelSessionAPI |
+    ChannelMessageAPI |
+    CredentialAPI |
+    DocumentRepositoryAPI |
+    DocumentationAPI |
+    FlowAPI |
+    OrgUserAPI |
+    ResourceAPI |
+    ResourceVersionAPI |
+    ResourceWriteAPI |
+    SkillAPI |
+    TaskAPI |
+    TaskExecutionAPI |
+    TaskExecutionChannelMessageAPI |
+    TaskExecutionToolRequestAPI |
+    TaskExecutionWorkRequestAPI |
+    TaskExecutionWorkerChatSessionAPI |
+    UserAPI |
+    WorkerAPI |
+    WorkerWorkRequestAPI;
+
+export type APICallOptions = 
+    ChannelSubResourceCallOptions &
+    FlowSubResourceCallOptions &
+    OrgSubResourceCallOptions &
+    ResourceSubResourceCallOptions &
+    TaskExecutionSubResourceCallOptions &
+    TrackerSubResourceCallOptions &
+    WorkerSubResourceCallOptions;
 
 
 export class WorkforceAPIClient {
@@ -59,24 +121,6 @@ export class WorkforceAPIClient {
 
     static get WorkerAPI(): WorkerAPI {
         return WorkerAPI.getInstance({
-            accessToken: WorkforceAPIClient.accessToken,
-            baseUrl: WorkforceAPIClient.baseUrl,
-            basePath: WorkforceAPIClient.basePath,
-            unAuthorizedCallBack: WorkforceAPIClient.unauthorizedCallBack
-        });
-    }
-
-    static get ChannelMessageAPI(): ChannelMessageAPI {
-        return ChannelMessageAPI.getInstance({
-            accessToken: WorkforceAPIClient.accessToken,
-            baseUrl: WorkforceAPIClient.baseUrl,
-            basePath: WorkforceAPIClient.basePath,
-            unAuthorizedCallBack: WorkforceAPIClient.unauthorizedCallBack
-        });
-    }
-
-    static get ChannelSessionAPI(): ChannelSessionAPI {
-        return ChannelSessionAPI.getInstance({
             accessToken: WorkforceAPIClient.accessToken,
             baseUrl: WorkforceAPIClient.baseUrl,
             basePath: WorkforceAPIClient.basePath,
@@ -208,24 +252,6 @@ export class WorkforceAPIClient {
         return ProspectAPI.getInstance(WorkforceAPIClient.basePath, WorkforceAPIClient.baseUrl);
     }
 
-    static get ResourceVersionAPI(): ResourceVersionAPI {
-        return ResourceVersionAPI.getInstance({
-            accessToken: WorkforceAPIClient.accessToken,
-            baseUrl: WorkforceAPIClient.baseUrl,
-            basePath: WorkforceAPIClient.basePath,
-            unAuthorizedCallBack: WorkforceAPIClient.unauthorizedCallBack
-        });
-    }
-
-    static get ResourceWriteAPI(): ResourceWriteAPI {
-        return ResourceWriteAPI.getInstance({
-            accessToken: WorkforceAPIClient.accessToken,
-            baseUrl: WorkforceAPIClient.baseUrl,
-            basePath: WorkforceAPIClient.basePath,
-            unAuthorizedCallBack: WorkforceAPIClient.unauthorizedCallBack
-        });
-    }
-
     static get SkillAPI(): SkillAPI {
         return SkillAPI.getInstance({
             accessToken: WorkforceAPIClient.accessToken,
@@ -258,42 +284,6 @@ export class WorkforceAPIClient {
             baseUrl: WorkforceAPIClient.baseSocketUrl,
             basePath: WorkforceAPIClient.basePath,
             path: path,
-            unAuthorizedCallBack: WorkforceAPIClient.unauthorizedCallBack
-        });
-    }
-
-    static get TicketRequestAPI(): TicketRequestAPI {
-        return TicketRequestAPI.getInstance({
-            accessToken: WorkforceAPIClient.accessToken,
-            baseUrl: WorkforceAPIClient.baseUrl,
-            basePath: WorkforceAPIClient.basePath,
-            unAuthorizedCallBack: WorkforceAPIClient.unauthorizedCallBack
-        });
-    }
-
-    static get ToolRequestAPI(): ToolRequestAPI {
-        return ToolRequestAPI.getInstance({
-            accessToken: WorkforceAPIClient.accessToken,
-            baseUrl: WorkforceAPIClient.baseUrl,
-            basePath: WorkforceAPIClient.basePath,
-            unAuthorizedCallBack: WorkforceAPIClient.unauthorizedCallBack
-        });
-    }
-
-    static get WorkRequestAPI(): WorkRequestAPI {
-        return WorkRequestAPI.getInstance({
-            accessToken: WorkforceAPIClient.accessToken,
-            baseUrl: WorkforceAPIClient.baseUrl,
-            basePath: WorkforceAPIClient.basePath,
-            unAuthorizedCallBack: WorkforceAPIClient.unauthorizedCallBack
-        });
-    }
-
-    static get WorkerChatSessionAPI(): WorkerChatSessionAPI {
-        return WorkerChatSessionAPI.getInstance({
-            accessToken: WorkforceAPIClient.accessToken,
-            baseUrl: WorkforceAPIClient.baseUrl,
-            basePath: WorkforceAPIClient.basePath,
             unAuthorizedCallBack: WorkforceAPIClient.unauthorizedCallBack
         });
     }

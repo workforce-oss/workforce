@@ -6,13 +6,13 @@ import expressWs from "express-ws";
 import { setupServer } from "msw/node";
 import { Sequelize } from "sequelize-typescript";
 import request from "supertest";
-import { CredentialConfig } from "../../../src/model.js";
 import { CredentialDb } from "../../../src/objects/credential/db.js";
-import { WorkerRoutes } from "../../../src/objects/worker/api.js";
+import { WorkerRouter } from "../../../src/objects/worker/api.js";
 import { WorkerDb } from "../../../src/objects/worker/db.js";
 import { WorkerConfig } from "../../../src/objects/worker/model.js";
 import { createBasicWorker, createBasicWorkerConfig, createOrg, createUser, newDb } from "../../helpers/db.js";
 import { createJwt, issuerHandlers } from "../../helpers/jwt.js";
+import { CredentialConfig } from "../../../src/objects/credential/model.js";
 
 describe("Worker API", () => {
     const { app, getWss, applyTo } = expressWs(express());
@@ -20,8 +20,7 @@ describe("Worker API", () => {
     const basicCredentialConfig = (customOrgId?: string): CredentialConfig => ({
         name: "test-credential",
         description: "test",
-        type: "credential",
-        subtype: "mock",
+        type: "mock-worker",
         orgId: customOrgId || orgId,
         variables: {
             output: "test"
@@ -43,7 +42,7 @@ describe("Worker API", () => {
         orgId = randomUUID();
         jwt = await createJwt({ payload: { orgId } });
 
-        app.use("/workers", WorkerRoutes)
+        app.use("/orgs/:orgId/workers", WorkerRouter)
     });
     beforeEach(async () => {
         await sequelize.sync({ force: true });
@@ -61,7 +60,7 @@ describe("Worker API", () => {
             workerConfig.credential = credentialConfig.name;
 
             const response = await request(app)
-                .post("/workers")
+                .post(`/orgs/${orgId}/workers`)
                 .set("Authorization", `Bearer ${jwt}`)
                 .set("Content-Type", "application/json")
                 .send(workerConfig)
@@ -82,7 +81,7 @@ describe("Worker API", () => {
 
             const workerConfig: WorkerConfig = createBasicWorkerConfig(otherOrgId);
             await request(app)
-                .post("/workers")
+                .post(`/orgs/${otherOrgId}/workers`)
                 .set("Authorization", `Bearer ${jwt}`)
                 .set("Content-Type", "application/json")
                 .send(workerConfig)
@@ -93,7 +92,7 @@ describe("Worker API", () => {
             workerConfig.variables = {};
 
             await request(app)
-                .post("/workers")
+                .post(`/orgs/${orgId}/workers`)
                 .set("Authorization", `Bearer ${jwt}`)
                 .set("Content-Type", "application/json")
                 .send(workerConfig)
@@ -110,10 +109,9 @@ describe("Worker API", () => {
             await workerDb.save();
 
             const response = await request(app)
-                .get(`/workers/${workerDb.id}`)
+                .get(`/orgs/${orgId}/workers/${workerDb.id}`)
                 .set("Authorization", `Bearer ${jwt}`)
                 .set("Content-Type", "application/json")
-                .query({ orgId: orgId })
                 .expect(200)
 
             const retrievedWorkerDb = await WorkerDb.findByPk(workerDb.id);
@@ -138,7 +136,7 @@ describe("Worker API", () => {
             await workerDb.save();
 
             await request(app)
-                .get(`/workers/${workerDb.id}`)
+                .get(`/orgs/${orgId}/workers/${workerDb.id}`)
                 .set("Authorization", `Bearer ${jwt}`)
                 .set("Content-Type", "application/json")
                 .expect(404)
@@ -157,9 +155,8 @@ describe("Worker API", () => {
             await workerDb.save();
 
             const response = await request(app)
-                .get(`/workers`)
+                .get(`/orgs/${orgId}/workers`)
                 .set("Authorization", `Bearer ${jwt}`)
-                .query({ orgId })
                 .expect(200)
 
             workerConfig.credential = credentialConfig.name;
@@ -182,10 +179,9 @@ describe("Worker API", () => {
             await workerDb.save();
 
             const response = await request(app)
-                .get(`/workers`)
+                .get(`/orgs/${otherOrgId}/workers`)
                 .set("Authorization", `Bearer ${jwt}`)
                 .set("Content-Type", "application/json")
-                .query({ orgId: otherOrgId })
                 .expect(404)
 
             expect(response.body).to.deep.equal({});
@@ -208,7 +204,7 @@ describe("Worker API", () => {
             updatedWorkerConfig.name = "updated name";
 
             await request(app)
-                .put(`/workers/${workerDb.id}`)
+                .put(`/orgs/${orgId}/workers/${workerDb.id}`)
                 .set("Authorization", `Bearer ${jwt}`)
                 .set("Content-Type", "application/json")
                 .send(updatedWorkerConfig)
@@ -239,7 +235,7 @@ describe("Worker API", () => {
             const updatedWorkerConfig: WorkerConfig = createBasicWorkerConfig(otherOrgId);
 
             await request(app)
-                .put(`/workers/${workerDb.id}`)
+                .put(`/orgs/${orgId}/workers/${workerDb.id}`)
                 .set("Authorization", `Bearer ${jwt}`)
                 .set("Content-Type", "application/json")
                 .send(updatedWorkerConfig)
@@ -260,7 +256,7 @@ describe("Worker API", () => {
             updatedWorkerConfig.variables = {};
 
             await request(app)
-                .put(`/workers/${workerDb.id}`)
+                .put(`/orgs/${orgId}/workers/${workerDb.id}`)
                 .set("Authorization", `Bearer ${jwt}`)
                 .set("Content-Type", "application/json")
                 .send(updatedWorkerConfig)
@@ -280,10 +276,9 @@ describe("Worker API", () => {
             await workerDb.save();
 
             await request(app)
-                .delete(`/workers/${workerDb.id}`)
+                .delete(`/orgs/${orgId}/workers/${workerDb.id}`)
                 .set("Authorization", `Bearer ${jwt}`)
                 .set("Content-Type", "application/json")
-                .query({ orgId })
                 .expect(200)
 
             const retrievedWorkerDb = await WorkerDb.findByPk(workerDb.id);
@@ -304,25 +299,9 @@ describe("Worker API", () => {
             await workerDb.save();
 
             await request(app)
-                .delete(`/workers/${workerDb.id}`)
+                .delete(`/orgs/${otherOrgId}/workers/${workerDb.id}`)
                 .set("Authorization", `Bearer ${jwt}`)
                 .set("Content-Type", "application/json")
-                .expect(404)
-
-
-            await request(app)
-                .delete(`/workers/${workerDb.id}`)
-                .set("Authorization", `Bearer ${jwt}`)
-                .set("Content-Type", "application/json")
-                .query({ orgId })
-                .expect(404)
-
-            
-            await request(app)
-                .delete(`/workers/${workerDb.id}`)
-                .set("Authorization", `Bearer ${jwt}`)
-                .set("Content-Type", "application/json")
-                .query({ orgId: otherOrgId })
                 .expect(404)
         });
     });

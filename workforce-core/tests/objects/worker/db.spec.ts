@@ -19,11 +19,10 @@ describe("Worker DB", () => {
             const workerConfig: WorkerConfig = {
                 name: "test",
                 description: "test",
-                type: "worker",
-                subtype: "ai-worker",
+                type: "ai-worker",
                 orgId: orgId,
                 channelUserConfig: {
-                    mock: "mock"
+                    "mock-channel": "mock"
                 } as Record<ChannelType, string>,
                 variables: {
                     test: "test"
@@ -47,11 +46,10 @@ describe("Worker DB", () => {
             const workerConfig: WorkerConfig = {
                 name: "test",
                 description: "test",
-                type: "worker",
-                subtype: "ai-worker",
+                type: "ai-worker",
                 orgId: orgId,
                 channelUserConfig: {
-                    mock: "mock"
+                    "mock-channel": "mock"
                 } as Record<ChannelType, string>,
                 variables: {
                     test: "test"

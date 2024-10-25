@@ -7,7 +7,8 @@
     "docker:build:frontend": "_build/build.sh frontend build",
     "docker:build:extension": "_build/build.sh extension build",
     "docker:local": "_deploy/docker/local/deploy.sh",
-    "docker:push": "_build/build.sh all push"
+    "docker:push": "_build/build.sh all push",
+    "generate:schema": "workforce-core/test.sh schema/generate_schema.ts"
   },
   "workspaces": [
     "excelsior",

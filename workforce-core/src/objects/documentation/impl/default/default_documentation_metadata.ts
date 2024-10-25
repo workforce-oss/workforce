@@ -8,8 +8,7 @@ export class DefaultDocumentationMetadata {
         return {
             id: crypto.randomUUID(),
             orgId,
-            type: "documentation",
-            subtype: "default-documentation",
+            type: "default-documentation",
             name: "Documentation",
             description: "Documentation",
             variables: {

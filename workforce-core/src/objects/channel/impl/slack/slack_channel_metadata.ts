@@ -8,8 +8,7 @@ export class SlackChannelMetadata {
             id: crypto.randomUUID(),
             name: "Slack Channel",
             description: "Slack Channel",
-            type: "channel",
-            subtype: "slack-channel",
+            type: "slack-channel",
             orgId: orgId,
             variables: {
                 channel_id: "",

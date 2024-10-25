@@ -59,12 +59,12 @@ export type ChannelSessionStatus = "started" | "complete" | "error";
 export type ChannelType = typeof channelTypes[number];
 
 export const channelTypes = [
-    "mock",
+    "mock-channel",
     "slack-channel",
     "native-channel",
     "discord-channel",
 ] as const;
 
 export interface ChannelConfig extends BaseConfig {
-    subtype: ChannelType;
+    type: ChannelType;
 }

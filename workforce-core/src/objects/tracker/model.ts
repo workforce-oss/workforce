@@ -66,13 +66,13 @@ export interface TicketCreateRequest {
 export type TrackerType = typeof trackerTypes[number];
 
 export const trackerTypes = [
-    "mock",
+    "mock-tracker",
     "github-board-tracker",
     "trello-tracker"
 ] as const
 
 export interface TrackerConfig extends BaseConfig {
-    subtype: TrackerType;
+    type: TrackerType;
     webhooksEnabled?: boolean;
     pollingInterval?: number;
 }

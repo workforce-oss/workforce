@@ -9,11 +9,13 @@ import { FlowDb } from "../flow/db.js";
 import { CustomMetrics } from "../../metrics/api.js";
 import { BrokerMode } from "../../manager/impl/subject_factory.js";
 import { FunctionDocuments, FunctionParameters } from "../../util/openapi.js";
+import { ObjectType } from "./factory/types.js";
 
 export abstract class BaseBroker<TConfig extends BaseConfig, T extends BaseObject<TConfig>, TObjectEvent> {
 	config: BrokerConfig;
 	objects = new Map<string, T>();
 	abstract logger: Logger;
+	abstract objectType: ObjectType;
 
 	public abstract remove(objectId: string): Promise<void>;
 	public abstract subscribe(objectId: string, callback: (e: TObjectEvent) => Promise<void>): Promise<Subscription>;
@@ -82,13 +84,12 @@ export abstract class BaseBroker<TConfig extends BaseConfig, T extends BaseObjec
 
 	public async syncObject(config: TConfig): Promise<void> {
 		// this.logger.info(`syncObject() Syncing ${config.type} ${config.name} with id ${config.id}`);
-		// this.logger.debug(`syncObject() Syncing ${JSON.stringify(config)}`);
 		if (!config.id) {
 			throw new Error("BaseBroker.syncObject() config.id is required");
 		}
-		const merged = await CredentialHelper.instance.mergeCredential(config);
+		const merged = await CredentialHelper.instance.mergeCredential(config, this.objectType);
 		const object = this.getObject(config.id);
-		if (config.type !== "worker" && config.type !== "document_repository") {
+		if (config.flowId) {
 			const flow = await FlowDb.findByPk(config.flowId);
 			if (!flow) {
 				throw new Error(`BaseBroker.syncObject() Flow ${config.flowId} not found`);
@@ -96,31 +97,31 @@ export abstract class BaseBroker<TConfig extends BaseConfig, T extends BaseObjec
 				if (object) {
 					this.remove(object.config.id!)
 						.then(() => {
-							this.logger.info(`syncObject() ${config.type} ${config.name} with id ${config.id} removed due to inactive flow`);
+							this.logger.info(`syncObject() ${this.objectType} ${config.name} with id ${config.id} removed due to inactive flow`);
 
-							CustomMetrics.getInstance().setMetricObjectCount(config.type, config.subtype, getSubtypeCount(this.objects, config.subtype));
+							CustomMetrics.getInstance().setMetricObjectCount(this.objectType, config.type, getSubtypeCount(this.objects, config.type));
 						})
 						.catch((e) => {
-							this.logger.error(`syncObject() Error removing ${config.type} ${config.name} with id ${config.id}`, e);
+							this.logger.error(`syncObject() Error removing ${this.objectType} ${config.name} with id ${config.id}`, e);
 						});
 				}
 				return;
 			}
 		}
 		if (!_.isEqual(object?.config, merged)) {
-			this.logger.info(`syncObject() ${config.type} ${config.name} with id ${config.id} changed. Updating.`);
-			if (object) {
-				await this.remove(object.config.id!).then(() => {
-					this.logger.debug(`syncObject() ${config.type} ${config.name} with id ${config.id} removed`);
+			this.logger.info(`syncObject() ${this.objectType} ${config.name} with id ${config.id} changed. Updating.`);
+			if (object?.config.id) {
+				await this.remove(object.config.id).then(() => {
+					this.logger.debug(`syncObject() ${this.objectType} ${config.name} with id ${config.id} removed`);
 				})
 					.catch((e) => {
 						this.logger.error(`syncObject() Error removing ${config.type} ${config.name} with id ${config.id}`, e);
 					});
 			}
 
-			const newObject = ObjectFactory.create<TConfig, T>(merged, this.onFailure.bind(this));
+			const newObject = ObjectFactory.create<TConfig, T>(merged, this.objectType, this.onFailure.bind(this));
 			await this.register(newObject);
-			CustomMetrics.getInstance().setMetricObjectCount(config.type, config.subtype, getSubtypeCount(this.objects, config.subtype));
+			CustomMetrics.getInstance().setMetricObjectCount(this.objectType, config.type, getSubtypeCount(this.objects, config.type));
 		}
 	}
 
@@ -130,7 +131,7 @@ export abstract class BaseBroker<TConfig extends BaseConfig, T extends BaseObjec
 function getSubtypeCount(objects: Map<string, BaseObject<BaseConfig>>, subtype: string): number {
 	let subtypeCount = 0;
 	objects.forEach((obj) => {
-		if (obj.config.subtype === subtype) {
+		if (obj.config.type === subtype) {
 			subtypeCount++;
 		}
 	});

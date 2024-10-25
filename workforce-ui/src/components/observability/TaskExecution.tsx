@@ -1,15 +1,15 @@
+import { Delete, ExpandMore, MemoryOutlined } from "@mui/icons-material";
+import { Accordion, AccordionDetails, AccordionSummary, Grid, IconButton } from "@mui/material";
 import { useState } from "react";
-import { ChannelMessage, ChatSession, TaskExecution, ToolRequestData, WorkRequestData } from "workforce-core/model";
-import { Delete, ExpandMore, MemoryOutlined, Work } from "@mui/icons-material";
+import { WorkforceAPIClient } from "workforce-api-client";
+import { ChatSession, TaskExecution, WorkRequestData } from "workforce-core/model";
+import { ContextState, contextStore } from "../../state/store.context";
 import { ChannelRequestComponent } from "./ChannelMessageRequest";
 import { ToolRequestComponent } from "./ToolRequest";
 import { ToolResponseComponent } from "./ToolResponse";
+import { WorkerChatSessionComponent } from "./WorkerChatSession";
 import { WorkRequestComponent } from "./WorkRequest";
 import { WorkResponseComponent } from "./WorkResponse";
-import { Accordion, AccordionDetails, AccordionSummary, Card, CardContent, Grid, IconButton, List, ListItem } from "@mui/material";
-import { WorkerChatSessionComponent } from "./WorkerChatSession";
-import { WorkforceAPIClient } from "workforce-api-client";
-import { ContextState, contextStore } from "../../state/store.context";
 
 type componentTypes =
 	| "ChannelMessageRequest"
@@ -51,7 +51,7 @@ export const TaskExecutionComponent = (props: { taskExecution: TaskExecution }) 
 		}
 		const newChildren = new Map<number, componentData>();
 
-		WorkforceAPIClient.WorkerChatSessionAPI
+		WorkforceAPIClient.TaskExecutionAPI.WorkRequests
 			.list({ taskExecutionId: taskExecution.id, orgId: currentOrg?.id })
 			.then((response: any) => {
 				response.forEach((chatSession: ChatSession) => {
@@ -66,7 +66,7 @@ export const TaskExecutionComponent = (props: { taskExecution: TaskExecution }) 
 			.catch((error: any) => {
 				console.error(error);
 			});
-		WorkforceAPIClient.WorkRequestAPI
+		WorkforceAPIClient.TaskExecutionAPI.WorkRequests
 			.list({ taskExecutionId: taskExecution.id, orgId: currentOrg?.id })
 			.then((response: WorkRequestData[]) => {
 				response.forEach((workRequestData: WorkRequestData) => {
@@ -91,7 +91,7 @@ export const TaskExecutionComponent = (props: { taskExecution: TaskExecution }) 
 
 	const deleteTaskExecution = (taskExecution: TaskExecution) => {
 		WorkforceAPIClient.TaskExecutionAPI
-			.delete(taskExecution.id)
+			.delete(taskExecution.id, { orgId: currentOrg.id })
 			.then(() => {
 				console.log("Task Execution Deleted");
 				setDeleted(true);

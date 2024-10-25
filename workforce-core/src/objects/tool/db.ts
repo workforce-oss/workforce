@@ -50,7 +50,7 @@ export class ToolDb extends BaseModel {
         const base = super.toModel();
         const model: ToolConfig = {
             ...base,
-            subtype: this.subtype as ToolType,
+            type: this.type as ToolType,
             flowId: this.flowId,
         };
         if (this.credentialId) {

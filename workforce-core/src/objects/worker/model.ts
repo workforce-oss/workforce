@@ -85,10 +85,10 @@ export type WorkerType = (typeof workerTypes)[number];
 
 export type WorkRequestStatus = "queued" | "in-progress" | "complete" | "error";
 
-export const workerTypes = ["mock", "ai-worker", "human-worker"] as const;
+export const workerTypes = ["mock-worker", "ai-worker", "human-worker"] as const;
 
 export interface WorkerConfig extends BaseConfig {
-	subtype: WorkerType;
+	type: WorkerType;
 
 	/**
 	 * Map of channel types to credentials.

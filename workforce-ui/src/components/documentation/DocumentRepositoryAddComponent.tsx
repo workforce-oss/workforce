@@ -33,8 +33,7 @@ export const DocumentRepositoryAddComponent = () => {
         name: "",
         orgId: currentOrg.id,
         description: "",
-        subtype: "internal-document-repository",
-        type: "document_repository",
+        type: "internal-document-repository",
         variables: {
             model: "text-embedding-3-small"
         },
@@ -45,7 +44,7 @@ export const DocumentRepositoryAddComponent = () => {
     }, [currentOrg]);
 
     useEffect(() => {
-        setCredentialList(credentials.filter((credential) => documentRepositoryTypes.includes(credential.subtype as DocumentRepositoryType)));
+        setCredentialList(credentials.filter((credential) => documentRepositoryTypes.includes(credential.type as DocumentRepositoryType)));
     }, [credentials]);
 
     return editting ? (
@@ -77,11 +76,11 @@ export const DocumentRepositoryAddComponent = () => {
                                 style={{
                                     minWidth: 235,
                                 }}
-                                value={details.subtype}
+                                value={details.type}
                                 onChange={(e) => {
                                     setDetails({
                                         ...details,
-                                        subtype: e.target.value as DocumentRepositoryType,
+                                        type: e.target.value as DocumentRepositoryType,
                                     });
                                 }}
                             >
@@ -141,6 +140,7 @@ export const DocumentRepositoryAddComponent = () => {
                     <Grid item xs={12}>
 						<SchemaVariableListComponent
 							config={details}
+                            objectType="document_repository"
 							onPropertyChange={(name, newValue) => {
 								setDetails({
 									...details,
@@ -175,9 +175,8 @@ export const DocumentRepositoryAddComponent = () => {
 					setDetails({
 						name: "",
 						orgId: currentOrg.id,
-						subtype: "internal-document-repository",
+						type: "internal-document-repository",
 						description: "",
-						type: "document_repository",
 						variables: {
                             model: "text-embedding-3-small"
                         },

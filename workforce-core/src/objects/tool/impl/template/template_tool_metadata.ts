@@ -8,8 +8,7 @@ export class TemplateToolMetadata {
             id: crypto.randomUUID(),
             name: "Template Tool",
             description: "A tool that renders a template.",
-            type: "tool",
-            subtype: "template-tool",
+            type: "template-tool",
             orgId: orgId,
             variables: {
                 template_location: "",

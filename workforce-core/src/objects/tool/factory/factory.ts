@@ -15,8 +15,8 @@ import { ToolConfig } from "../model.js";
 
 export class ToolFactory {
   static create(config: ToolConfig, onFailure: (objectId: string, error: string) => void): Tool<ToolConfig> {
-    switch (config.subtype) {
-      case "mock":
+    switch (config.type) {
+      case "mock-tool":
         return new MockTool(config, onFailure);
       case "web-service-tool":
         return new WebServiceTool(config, onFailure);
@@ -42,7 +42,7 @@ export class ToolFactory {
         return new MessageChannelTool(config, onFailure);
       default:
         throw new Error(
-          `ToolFactory.create() unknown tool type ${config.subtype as string}`
+          `ToolFactory.create() unknown tool type ${config.type as string}`
         );
     }
   }

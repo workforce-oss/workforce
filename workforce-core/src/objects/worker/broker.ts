@@ -12,8 +12,10 @@ import { WorkRequestDb } from "./db.work_request.js";
 import { WorkerChatSessionDb } from "./db.worker_chat_session.js";
 import { WorkRequest, WorkResponse, WorkerConfig } from "./model.js";
 import { QueueService } from "./service.queue.js";
+import { ObjectType } from "../base/factory/types.js";
 
 export class WorkerBroker extends BaseBroker<WorkerConfig, Worker, object> {
+	objectType: ObjectType = "worker";
 	logger = Logger.getInstance("WorkerBroker");
 
 	private orgWorkers = new Map<string, Worker[]>();
@@ -165,7 +167,7 @@ export class WorkerBroker extends BaseBroker<WorkerConfig, Worker, object> {
 
 			chatSession.channelId = channelId;
 
-			const channelType = BrokerManager.channelBroker.getObject(channelId)?.config.subtype;
+			const channelType = BrokerManager.channelBroker.getObject(channelId)?.config.type;
 
 			const workerTokenCredentialId = worker.config.channelUserConfig?.[channelType!];
 			if (!workerTokenCredentialId) {
@@ -217,23 +219,23 @@ export class WorkerBroker extends BaseBroker<WorkerConfig, Worker, object> {
 				try {
 					const channel = BrokerManager.channelBroker.getObject(request.channelId);
 					if (channel) {
-						const workerTokenCredentialId = worker.config.channelUserConfig?.[channel.config.subtype];
+						const workerTokenCredentialId = worker.config.channelUserConfig?.[channel.config.type];
 
 						if (workerTokenCredentialId) {
 							const workerTokenCredential = await CredentialHelper.instance.getSecret(workerTokenCredentialId).catch((error: Error) => {
 								this.logger.error(
-									`handleRequest() Error getting worker token for worker ${worker.config.id} and channel ${channel.config.id} of type ${channel.config.subtype}`,
+									`handleRequest() Error getting worker token for worker ${worker.config.id} and channel ${channel.config.id} of type ${channel.config.type}`,
 									error
 								);
 								throw error;
 							});
 							if (!workerTokenCredential?.token) {
 								this.logger.error(
-									`handleRequest() Worker ${worker.config.id} does not have a token for channel ${channel.config.id} of type ${channel.config.subtype}`
+									`handleRequest() Worker ${worker.config.id} does not have a token for channel ${channel.config.id} of type ${channel.config.type}`
 								);
 								this.logger.debug(`${jsonStringify(workerTokenCredential)}`);
 								throw new Error(
-									`Worker ${worker.config.id} does not have a token for channel ${channel.config.id} of type ${channel.config.subtype}`
+									`Worker ${worker.config.id} does not have a token for channel ${channel.config.id} of type ${channel.config.type}`
 								);
 							}
 							let workerToken = workerTokenCredential.token as string;
@@ -263,10 +265,10 @@ export class WorkerBroker extends BaseBroker<WorkerConfig, Worker, object> {
 							});
 						} else {
 							this.logger.error(
-								`handleRequest() Worker ${worker.config.id} does not have a token for channel ${channel.config.id} of type ${channel.config.subtype}`
+								`handleRequest() Worker ${worker.config.id} does not have a token for channel ${channel.config.id} of type ${channel.config.type}`
 							);
 							throw new Error(
-								`Worker ${worker.config.id} does not have a token for channel ${channel.config.id} of type ${channel.config.subtype}`
+								`Worker ${worker.config.id} does not have a token for channel ${channel.config.id} of type ${channel.config.type}`
 							);
 						}
 					} else {

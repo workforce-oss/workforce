@@ -8,8 +8,7 @@ export class CodingToolMetadata {
             id: crypto.randomUUID(),
             name: "Coding Tool",
             description: "A tool that runs a coding task.",
-            type: "tool",
-            subtype: "coding-tool",
+            type: "coding-tool",
             orgId: orgId,
             variables: {
                 read_only: false,

@@ -46,7 +46,7 @@ export class ResourceDb extends BaseModel {
 		const base = super.toModel();
 		const model: ResourceConfig = {
 			...base,
-			subtype: this.subtype as ResourceType,
+			type: this.type as ResourceType,
 			flowId: this.flowId,
 		};
 		if (this.credentialId) {

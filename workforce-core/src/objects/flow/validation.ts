@@ -11,34 +11,34 @@ export function validateFlowSchema(flow:
 	const errors: VariableSchemaValidationError[] = [];
 	if (flow.tasks && flow.tasks.length > 0) {
 		for (const task of flow.tasks) {
-			errors.push(...VariablesSchema.validateBaseObject(task));
+			errors.push(...VariablesSchema.validateBaseObject(task, "task"));
 			errors.push(...validateTask(flow, task));
 		}
 	}
 	if (flow.channels && flow.channels.length > 0) {
 		for (const channel of flow.channels) {
-			errors.push(...VariablesSchema.validateBaseObject(channel));
+			errors.push(...VariablesSchema.validateBaseObject(channel, "channel"));
 		}
 	}
 	if (flow.documentation && flow.documentation.length > 0) {
 		for (const documentation of flow.documentation) {
-			errors.push(...VariablesSchema.validateBaseObject(documentation));
+			errors.push(...VariablesSchema.validateBaseObject(documentation, "documentation"));
 		}
 	}
 	if (flow.resources && flow.resources.length > 0) {
 		for (const resource of flow.resources) {
-			errors.push(...VariablesSchema.validateBaseObject(resource));
+			errors.push(...VariablesSchema.validateBaseObject(resource, "resource"));
 		}
 	}
 	if (flow.tools && flow.tools.length > 0) {
 		for (const tool of flow.tools) {
-			errors.push(...VariablesSchema.validateBaseObject(tool));
+			errors.push(...VariablesSchema.validateBaseObject(tool, "tool"));
 			errors.push(...validateTool(flow, tool));
 		}
 	}
 	if (flow.trackers && flow.trackers.length > 0) {
 		for (const tracker of flow.trackers) {
-			errors.push(...VariablesSchema.validateBaseObject(tracker));
+			errors.push(...VariablesSchema.validateBaseObject(tracker, "tracker"));
 		}
 	}
 	return errors;

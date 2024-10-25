@@ -1,7 +1,9 @@
+import { APICallOptions } from "workforce-api-client";
 import { Auth } from "../auth/auth.js";
 import { initApi, requireFlow, requireOrg } from "./base.js";
+import { ApiClient } from "../../../workforce-core/dist/objects/base/api_client.js";
 
-export async function getResource(type: string, id: string, options: {
+export async function getResource(type: string, id: string, options: APICallOptions & {
     api?: string,
 }) {
     const api = initApi(type, options.api);
@@ -9,7 +11,7 @@ export async function getResource(type: string, id: string, options: {
         return;
     }
 
-    const response = await api.get(id);
+    const response = await api.get(id, options);
     if (Array.isArray(response)) {
         for (const error of response) {
             console.log(error.message);
@@ -20,11 +22,7 @@ export async function getResource(type: string, id: string, options: {
     }
 }
 
-export async function listResources(type: string, options: {
-    api?: string,
-    orgId?: string,
-    flow?: string,
-}) {
+export async function listResources(type: string, options: APICallOptions & {api: string}) {
     const authConfig = Auth.config();
     let orgId = options.orgId || authConfig.orgId;
 
@@ -33,7 +31,7 @@ export async function listResources(type: string, options: {
         return;
     }
 
-    const flowValid = requireFlow(type, options.flow);
+    const flowValid = requireFlow(type, options.flowId);
     if (!flowValid) {
         return;
     }
@@ -44,28 +42,26 @@ export async function listResources(type: string, options: {
     }
 
     if (type === "orgs") {
-        const response = await api.list();
+        const response = await api.list(options);
         for (const item of response) {
-            console.log(`${item.id}: ${JSON.stringify(item, null, 2)}`);
+            console.log(`${(item as any).id}: ${JSON.stringify(item, null, 2)}`);
         }
         return;
     }
     console.log(`Listing ${type} for org ${orgId}`);
-    const response = await api.list({ orgId: orgId ?? "", flowId: options.flow ?? "" });
+    const response = await api.list({ orgId: orgId ?? "", flowId: options.flowId ?? "" } as APICallOptions);
     for (const item of response) {
-        console.log(`${item.id}: ${JSON.stringify(item, null, 2)}`);
+        console.log(`${(item as any).id}: ${JSON.stringify(item, null, 2)}`);
     }
 }
 
-export async function deleteResource(type: string, id: string, options: {
-    api: string,
-}) {
+export async function deleteResource(type: string, id: string, options: APICallOptions & {api: string}) {
     const api = initApi(type, options.api);
     if (!api) {
         return;
     }
 
-    const response = await api.delete(id);
+    const response = await api.delete(id, options);
     if (Array.isArray(response)) {
         for (const error of response) {
             console.log(error.message);

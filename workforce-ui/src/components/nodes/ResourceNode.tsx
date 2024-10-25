@@ -30,6 +30,7 @@ export const ResourceNode = ({ data, selected }: { data: CustomNodeData<Resource
 	return (
 		<GenericNode
 			data={data}
+			objectType="resource"
 			selected={selected}
 			children={""}
 			headerColor={CustomColors.resource}

@@ -7,12 +7,12 @@ import expressWs from "express-ws";
 import { setupServer } from "msw/node";
 import { Sequelize } from "sequelize-typescript";
 import request from "supertest";
-import { ResourceConfig } from "../../../src/model.js";
-import { FlowRoutes } from "../../../src/objects/flow/api.js";
+import { FlowRouter } from "../../../src/objects/flow/api.js";
 import { FlowDb } from "../../../src/objects/flow/db.js";
 import { FlowConfig } from "../../../src/objects/flow/model.js";
 import { createBasicToolConfig, createOrg, createUser, newDb } from "../../helpers/db.js";
 import { createJwt, issuerHandlers } from "../../helpers/jwt.js";
+import { ResourceConfig } from "../../../src/objects/resource/model.js";
 
 chai.use(deepEqualInAnyOrder);
 
@@ -30,8 +30,7 @@ describe("Flow API", () => {
 					name: "test-channel",
 					orgId: customOrgId || orgId,
 					description: "test",
-					type: "channel",
-					subtype: "mock",
+					type: "mock-channel",
 					variables: {
 						output: "test-channel-output",
 					},
@@ -43,8 +42,7 @@ describe("Flow API", () => {
 					name: "test-resource",
 					orgId: customOrgId || orgId,
 					description: "test",
-					type: "resource",
-					subtype: "mock",
+					type: "mock-resource",
 					variables: {
 						output: "test-resource-output",
 					},
@@ -56,8 +54,7 @@ describe("Flow API", () => {
 				{
 					name: "test-input-task",
 					description: "test",
-					type: "task",
-					subtype: "mock",
+					type: "mock-task",
 					orgId: customOrgId || orgId,
 					defaultChannel: "test-channel",
 					inputs: {},
@@ -66,13 +63,13 @@ describe("Flow API", () => {
 					},
 					subtasks: [{
 						name: "test-input-task2",
-					}]
+					}],
+					costLimit: 4,
 				},
 				{
 					name: "test-input-task2",
 					description: "test",
-					type: "task",
-					subtype: "mock",
+					type: "mock-task",
 					orgId: customOrgId || orgId,
 					inputs: {
 						message: "test-input-task"
@@ -80,6 +77,7 @@ describe("Flow API", () => {
 					variables: {
 						prompt_template: "test",
 					},
+					costLimit: 2,
 				}
 			],
 		});
@@ -88,8 +86,7 @@ describe("Flow API", () => {
 		name: "test-resource",
 		orgId: customOrgId || orgId,
 		description: "test",
-		type: "resource",
-		subtype: "mock",
+		type: "mock-resource",
 		variables: {
 			output: "test-resource-output",
 		},
@@ -111,7 +108,7 @@ describe("Flow API", () => {
 		);
 		orgId = randomUUID();
 
-		app.use("/flows", FlowRoutes);
+		app.use("/orgs/:orgId/flows", FlowRouter);
 	});
 	beforeEach(async () => {
 		await sequelize.sync({ force: true });
@@ -131,7 +128,7 @@ describe("Flow API", () => {
 			const flowConfig: FlowConfig = basicConfig();
 
 			const response = await request(app)
-				.post("/flows")
+				.post(`/orgs/${orgId}/flows`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
 				.send(flowConfig)
@@ -162,10 +159,9 @@ describe("Flow API", () => {
 
 			const flowConfig: FlowConfig = basicConfig(otherOrgId);
 			await request(app)
-				.post("/flows")
+				.post(`/orgs/${otherOrgId}/flows`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
-				.query({ orgId: otherOrgId })
 				.send(flowConfig)
 				.expect(404);
 		});
@@ -174,8 +170,7 @@ describe("Flow API", () => {
 			flowConfig.tools = [{
 				name: "test-tool",
 				description: "test",
-				type: "tool",
-				subtype: "mock",
+				type: "mock-tool",
 				orgId: orgId,
 				variables: {
 					output: "test-tool-output",
@@ -184,7 +179,7 @@ describe("Flow API", () => {
 			flowConfig.tasks![0].tools = [{ name: "test-tool" }];
 
 			const response = await request(app)
-				.post("/flows")
+				.post(`/orgs/${orgId}/flows`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
 				.send(flowConfig)
@@ -198,10 +193,9 @@ describe("Flow API", () => {
 			delete retrievedFlowConfig.tasks![0].tools;
 
 			const updated = await request(app)
-				.post(`/flows`)
+				.post(`/orgs/${orgId}/flows`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
-				.query({ orgId: orgId })
 				.send(retrievedFlowConfig)
 				.expect(201);
 			expect(updated.body.tasks?.[0]?.tools?.length).to.equal(undefined, "expected no tools");
@@ -215,10 +209,9 @@ describe("Flow API", () => {
 			await flowDb.save();
 
 			const response = await request(app)
-				.get(`/flows/${flowDb.id}`)
+				.get(`/orgs/${orgId}/flows/${flowDb.id}`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
-				.query({ orgId: orgId })
 				.expect(200);
 			flowConfig.resources![0].id = response.body.resources![0].id;
 			flowConfig.resources![0].flowId = response.body.resources![0].flowId;
@@ -241,10 +234,9 @@ describe("Flow API", () => {
 			await flowDb.save();
 
 			await request(app)
-				.get(`/flows/${flowDb.id}`)
+				.get(`/org/${otherOrgId}/flows/${flowDb.id}`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
-				.query({ orgId: otherOrgId })
 				.expect(404);
 		});
 	});
@@ -256,9 +248,8 @@ describe("Flow API", () => {
 			await flowDb.save();
 
 			const response = await request(app)
-				.get(`/flows`)
+				.get(`/orgs/${orgId}/flows`)
 				.set("Authorization", `Bearer ${jwt}`)
-				.query({ orgId: orgId })
 				.expect(200);
 
 			expect(response.body).to.deep.equal([
@@ -281,17 +272,15 @@ describe("Flow API", () => {
 			await flowDb.save();
 
 			await request(app)
-				.get(`/flows`)
+				.get(`/orgs/${otherOrgId}/flows`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
-				.query({ orgId: otherOrgId })
 				.expect(404);
 
 			const response = await request(app)
-				.get(`/flows`)
+				.get(`/orgs/${orgId}/flows`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
-				.query({ orgId: orgId })
 				.expect(200);
 
 			expect(response.body).to.deep.equal([]);
@@ -308,7 +297,7 @@ describe("Flow API", () => {
 			updatedFlowConfig.name = "updated name";
 
 			await request(app)
-				.put(`/flows/${flowDb.id}`)
+				.put(`/orgs/${orgId}/flows/${flowDb.id}`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
 				.send(updatedFlowConfig)
@@ -343,7 +332,7 @@ describe("Flow API", () => {
 			const updatedFlowConfig: FlowConfig = basicConfig(otherOrgId);
 
 			await request(app)
-				.put(`/flows/${flowDb.id}`)
+				.put(`/org/${orgId}/flows/${flowDb.id}`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
 				.send(updatedFlowConfig)
@@ -358,10 +347,9 @@ describe("Flow API", () => {
 			await flowDb.save();
 
 			await request(app)
-				.delete(`/flows/${flowDb.id}`)
+				.delete(`/orgs/${orgId}/flows/${flowDb.id}`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
-				.query({ orgId: orgId })
 				.expect(200);
 
 			const retrievedFlowDb = await FlowDb.findByPk(flowDb.id);
@@ -377,10 +365,9 @@ describe("Flow API", () => {
 			await flowDb.save();
 
 			await request(app)
-				.delete(`/flows/${flowDb.id}`)
+				.delete(`/org/${otherOrgId}/flows/${flowDb.id}`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
-				.query({ orgId: otherOrgId })
 				.expect(404);
 		});
 	});

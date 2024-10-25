@@ -8,8 +8,7 @@ export class OpenAPIChannelToolMetadata {
             id: crypto.randomUUID(),
             name: "OpenAPI Channel Tool",
             description: "A tool that calls an OpenAPI service and sends the response to a channel.",
-            type: "tool",
-            subtype: "openapi-channel-tool",
+            type: "openapi-channel-tool",
             orgId: orgId,
             variables: {},
         }

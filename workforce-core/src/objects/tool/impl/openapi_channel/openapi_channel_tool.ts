@@ -22,7 +22,7 @@ export class OpenAPIChannelTool extends Tool<ToolConfig> {
             this.logger.error("Channel not configured.");
             throw new Error("Channel not configured.");
         }
-        const channelSubType = BrokerManager.channelBroker.getObject(request.channelId)?.config.subtype;
+        const channelSubType = BrokerManager.channelBroker.getObject(request.channelId)?.config.type;
         if (!channelSubType) {
             this.logger.error("Channel subtype not configured.");
             throw new Error("Channel subtype not configured.");
@@ -95,7 +95,7 @@ export class OpenAPIChannelTool extends Tool<ToolConfig> {
                     humanState: request.toolCall.humanState,
                     sessionId: request.toolCall.sessionId,
                     toolRequestId: request.requestId,
-                    toolType: this.config.subtype,
+                    toolType: this.config.type,
                     timestamp: Date.now(),
                 }],
                 senderId: this.config.id!,

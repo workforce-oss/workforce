@@ -1,9 +1,9 @@
-import { RestApi, WorkforceAPIClient } from "workforce-api-client";
+import { RestApi, WorkforceAPI, WorkforceAPIClient } from "workforce-api-client";
 import { Auth } from "../auth/auth.js";
 
 export const resourceTypes = ["orgs", "flows", "workers", "credentials", "users", "org-users", "document-repositories", "channels", "channel-sessions", "channel-messages", "tasks", "task-executions", "resources", "resource-versions", "resource-writes", "documentation", "document-relations"];
 
-export function initApi(type: string, baseUrl?: string): RestApi<any, any> | undefined {
+export function initApi(type: string, baseUrl?: string): WorkforceAPI | undefined {
     const authConfig = Auth.config();
     if (!authConfig?.auth?.accessToken) {
         console.error("Please login first.");
@@ -19,6 +19,9 @@ export function initApi(type: string, baseUrl?: string): RestApi<any, any> | und
     }
 
     const basePath = apiUrl.split("/").slice(3).join("/");
+
+    console.log(`API URL: ${apiUrl}`);
+    console.log(`Base Path: ${basePath}`);
 
     WorkforceAPIClient.init({
         accessToken,
@@ -79,11 +82,11 @@ export function requireFlow(type: string, flowId?: string): boolean {
     return true;
 }
 
-export function selectApi(type: string): RestApi<any, any> | undefined {
+export function selectApi(type: string): WorkforceAPI | undefined {
     switch (type) {
         case "org":
         case "orgs":
-            return WorkforceAPIClient.OrgAPI;
+            return 
         case "flow":
         case "flows":
             return WorkforceAPIClient.FlowAPI;
@@ -107,10 +110,10 @@ export function selectApi(type: string): RestApi<any, any> | undefined {
             return WorkforceAPIClient.ChannelAPI;
         case "channel-session":
         case "channel-sessions":
-            return WorkforceAPIClient.ChannelSessionAPI;
+            return WorkforceAPIClient.ChannelAPI.ChannelSessions;
         case "channel-message":
         case "channel-messages":
-            return WorkforceAPIClient.ChannelMessageAPI;
+            return WorkforceAPIClient.ChannelAPI.ChannelMessages;
         case "task":
         case "tasks":
             return WorkforceAPIClient.TaskAPI;
@@ -122,10 +125,10 @@ export function selectApi(type: string): RestApi<any, any> | undefined {
             return WorkforceAPIClient.ResourceAPI;
         case "resource-version":
         case "resource-versions":
-            return WorkforceAPIClient.ResourceVersionAPI;
+            return WorkforceAPIClient.ResourceAPI.ResourceVersions;
         case "resource-write":
         case "resource-writes":
-            return WorkforceAPIClient.ResourceWriteAPI;
+            return WorkforceAPIClient.ResourceAPI.ResourceWrites;
         case "documentation":
             return WorkforceAPIClient.DocumentationAPI;
         default:

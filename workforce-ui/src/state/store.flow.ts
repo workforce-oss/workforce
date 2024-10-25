@@ -20,6 +20,7 @@ import { FlowManager } from "../manager/flow_manager";
 import { CustomNodeData } from "../nodes/nodeData";
 import { NewObjectNode } from "../nodes/nodes";
 import { createEdge, getHandleIdData, incrementString } from "../util/util";
+import { StateCreator } from "zustand";
 
 export type RFState = {
 	nodes: Node<CustomNodeData<BaseConfig>>[];
@@ -70,20 +71,16 @@ export const flowState = (flowData: FlowData) => {
 			onNodesChange: (changes: NodeChange[]) => {
 				let newFlow: FlowData = undefined;
 				for (const change of changes) {
-					if (change.type === "add" && change.item.data.config.type === "credential") {
+					if (change.type === "add" && change.item.data.type === "credential") {
 						get().addCredential(change.item.data.config);
 
 					} else if (change.type === "add") {
 						newFlow = _.cloneDeep(get().flowData);
-						FlowManager.addObject(newFlow, change.item.data.config);
+						FlowManager.addObject(newFlow, change.item.data.config, change.item.data.type);
 					} else if (change.type === "remove") {
 						newFlow = _.cloneDeep(get().flowData);
 						const node = get().nodes.find((node) => node.id === change.id);
-						if (node.data.config.type === "credential") {
-							get().removeCredential(node.data.config as CredentialConfig);
-						} else {
-							FlowManager.removeObject(newFlow, (node.data.config as any).name);
-						}
+						FlowManager.removeObject(newFlow, (node.data.config as any).name, (node.data as any).type);
 					}
 				}
 				set({
@@ -220,7 +217,7 @@ export const flowState = (flowData: FlowData) => {
 					cloned.data.config = clonedConfig;
 					cloned.data.config.variables = variables;
 					const flow = _.cloneDeep(get().flowData);
-					FlowManager.updateObject(flow, cloned.data.config);
+					FlowManager.updateObject(flow, cloned.data.config, cloned.data.type);
 					const index = get().nodes.findIndex((node) => node.id === nodeId);
 					set({
 						nodes: [...get().nodes.slice(0, index), cloned, ...get().nodes.slice(index + 1)],
@@ -237,7 +234,7 @@ export const flowState = (flowData: FlowData) => {
 					cloned.data.config = clonedConfig;
 					cloned.data.config.credential = credential;
 					const flow = _.cloneDeep(get().flowData);
-					FlowManager.updateObject(flow, cloned.data.config);
+					FlowManager.updateObject(flow, cloned.data.config, cloned.data.type);
 					const index = get().nodes.findIndex((node) => node.id === nodeId);
 					set({
 						nodes: [...get().nodes.slice(0, index), cloned, ...get().nodes.slice(index + 1)],
@@ -254,7 +251,7 @@ export const flowState = (flowData: FlowData) => {
 					cloned.data = data;
 					const flow = _.cloneDeep(get().flowData);
 
-					FlowManager.updateObject(flow, (cloned.data.config as BaseConfig));
+					FlowManager.updateObject(flow, (cloned.data.config as BaseConfig), cloned.data.type);
 
 					const index = get().nodes.findIndex((node) => node.id === nodeId);
 					set({
@@ -287,7 +284,7 @@ export const flowState = (flowData: FlowData) => {
 				const config = FlowManager.getObjectByName(get().flowData, (node.data.config as BaseConfig).name);
 				const clonedConfig = _.cloneDeep(config) as TaskConfig;
 
-				if (node && node.data.config.type === "task") {
+				if (node && node.data.type === "task") {
 					console.log(`Adding input ${name} to task ${nodeId}`);
 					const cloned = _.cloneDeep(node) as Node<CustomNodeData<TaskConfig>>;
 					cloned.data.config = clonedConfig;
@@ -320,7 +317,7 @@ export const flowState = (flowData: FlowData) => {
 				const config = FlowManager.getObjectByName(get().flowData, (node.data.config as BaseConfig).name);
 				const clonedConfig = _.cloneDeep(config) as TaskConfig;
 
-				if (node && node.data.config.type === "task") {
+				if (node && node.data.type === "task") {
 					const cloned = _.cloneDeep(node) as Node<CustomNodeData<TaskConfig>>;
 					cloned.data.config = clonedConfig;
 					if (!cloned.data.config.inputs) {
@@ -342,8 +339,8 @@ export const flowState = (flowData: FlowData) => {
 
 
 					cloned.data.renameTaskInputProperty(oldName, newName);
-					FlowManager.removeObject(flow, cloned.data.config.name);
-					FlowManager.addObject(flow, cloned.data.config);
+					FlowManager.removeObject(flow, cloned.data.config.name, cloned.data.type);
+					FlowManager.addObject(flow, cloned.data.config, cloned.data.type);
 					FlowManager.removeConnection(flow, "", "", clonedConfig.id, oldName);
 					const edgeChanges: EdgeChange[] = [];
 					for (const sourceId of sourceIds) {
@@ -351,13 +348,13 @@ export const flowState = (flowData: FlowData) => {
 						const sourceNode = get().nodes.find((node) => node.data.config.id === sourceId || (node.data.config as BaseConfig).name === sourceId);
 						if (sourceNode) {
 							let sourceParam = "";
-							if (sourceNode.data.config.type === "resource") {
+							if (sourceNode.data.type === "resource") {
 								sourceParam = "data";
-							} else if (sourceNode.data.config.type === "channel") {
+							} else if (sourceNode.data.type === "channel") {
 								sourceParam = "ref";
-							} else if (sourceNode.data.config.type === "tracker") {
+							} else if (sourceNode.data.type === "tracker") {
 								sourceParam = "ticket";
-							} else if (sourceNode.data.config.type === "tool") {
+							} else if (sourceNode.data.type === "tool") {
 								sourceParam = "output";
 							}
 
@@ -403,8 +400,8 @@ export const flowState = (flowData: FlowData) => {
 						}
 					}
 					delete cloned.data.config.inputs[name];
-					FlowManager.removeObject(flow, cloned.data.config.name);
-					FlowManager.addObject(flow, cloned.data.config);
+					FlowManager.removeObject(flow, cloned.data.config.name, cloned.data.type);
+					FlowManager.addObject(flow, cloned.data.config, cloned.data.type);
 					FlowManager.removeConnection(flow, "", "", cloned.data.config.id, name);
 					const index = get().nodes.findIndex((node) => node.id === nodeId);
 					const edgeChanges: EdgeChange[] = [];
@@ -412,13 +409,13 @@ export const flowState = (flowData: FlowData) => {
 						const sourceNode = get().nodes.find((node) => node.data.config.id === sourceId || (node.data.config as BaseConfig).name === sourceId);
 						if (sourceNode) {
 							let sourceParam = "";
-							if (sourceNode.data.config.type === "resource") {
+							if (sourceNode.data.type === "resource") {
 								sourceParam = "data";
-							} else if (sourceNode.data.config.type === "channel") {
+							} else if (sourceNode.data.type === "channel") {
 								sourceParam = "ref";
-							} else if (sourceNode.data.config.type === "tracker") {
+							} else if (sourceNode.data.type === "tracker") {
 								sourceParam = "ticket";
-							} else if (sourceNode.data.config.type === "tool") {
+							} else if (sourceNode.data.type === "tool") {
 								sourceParam = "output";
 							}
 							edgeChanges.push({
@@ -475,7 +472,7 @@ export const flowState = (flowData: FlowData) => {
 				});
 			},
 			getCredentialsForType: (type: ObjectSubtype) => {
-				return (get().flowData.credentials ?? []).filter((c) => c.subtype === type);
+				return (get().flowData.credentials ?? []).filter((c) => c.type === type);
 			},
 			setCredentials: (credentials: CredentialConfig[]) => {
 				set({
@@ -514,5 +511,5 @@ export const flowState = (flowData: FlowData) => {
 				return _.isEqual(currentClone, previousClone);
 			},
 		}
-	);
+	) as StateCreator<RFState, [], [never, unknown][]>; // eslint-disable-line
 };

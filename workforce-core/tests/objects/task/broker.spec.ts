@@ -77,7 +77,7 @@ describe("Task Broker", () => {
 			messageCount: 5,
 		});
 		workerDb.skills = ["test-role"];
-		workerDb.channelUserConfig = jsonStringify({ mock: channelUserConfigDb.id });
+		workerDb.channelUserConfig = jsonStringify({ "mock-channel": channelUserConfigDb.id });
 		await workerDb.save();
 
 		const inputTrackerDb = await createBasicTracker(orgId, flow.id);
@@ -87,8 +87,7 @@ describe("Task Broker", () => {
 		const taskDb = await createBasicTask(orgId, flow.id);
 		taskDb.name = "test-task";
 		taskDb.description = "test";
-		taskDb.type = "task";
-		taskDb.subtype = "mock";
+		taskDb.type = "mock-task";
 		taskDb.flowId = flow.id;
 		taskDb.orgId = orgId;
 		taskDb.inputs = jsonStringify({
@@ -191,7 +190,7 @@ describe("Task Broker", () => {
 			messageCount: 5,
 		});
 		testWorkerDb.name = "test-worker";
-		testWorkerDb.channelUserConfig = jsonStringify({ mock: channelUserConfigDb.id });
+		testWorkerDb.channelUserConfig = jsonStringify({ "mock-channel": channelUserConfigDb.id });
 		testWorkerDb.skills = ["test-role"];
 		await testWorkerDb.save();
 
@@ -303,7 +302,7 @@ describe("Task Broker", () => {
 		});
 		testWorkerDb.name = "test-worker";
 		testWorkerDb.skills = ["test-role"];
-		testWorkerDb.channelUserConfig = jsonStringify({ mock: channelUserConfigDb.id });
+		testWorkerDb.channelUserConfig = jsonStringify({ "mock-channel": channelUserConfigDb.id });
 		await testWorkerDb.save();
 
 		const testTaskDb = await createBasicTask(orgId, flow.id);
@@ -403,7 +402,7 @@ describe("Task Broker", () => {
 		});
 		testWorkerDb.name = "test-worker";
 		testWorkerDb.skills = ["test-role"];
-		testWorkerDb.channelUserConfig = jsonStringify({ mock: channelUserConfigDb.id });
+		testWorkerDb.channelUserConfig = jsonStringify({ "mock-channel": channelUserConfigDb.id });
 		await testWorkerDb.save();
 
 		const testTaskDb = await createBasicTask(orgId, flow.id);
@@ -531,7 +530,7 @@ describe("Task Broker", () => {
 		});
 		testWorkerDb.name = "test-worker";
 		testWorkerDb.skills = ["test-role"];
-		testWorkerDb.channelUserConfig = jsonStringify({ mock: channelUserConfigDb.id });
+		testWorkerDb.channelUserConfig = jsonStringify({ "mock-channel": channelUserConfigDb.id });
 		await testWorkerDb.save();
 
 		const rootTaskDb = await createBasicTask(orgId, flow.id);

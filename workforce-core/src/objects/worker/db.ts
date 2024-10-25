@@ -52,7 +52,7 @@ export class WorkerDb extends BaseModel {
         const base = super.toModel();
         const model: WorkerConfig = {
             ...base,
-            subtype: this.subtype as WorkerType,
+            type: this.type as WorkerType,
         };
         if (this.credentialId) {
             model.credential = this.credentialId;

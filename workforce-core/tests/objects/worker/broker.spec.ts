@@ -2,8 +2,7 @@ import { expect } from "chai";
 import { randomUUID } from "crypto";
 import { Sequelize } from "sequelize-typescript";
 import { BrokerManager } from "../../../src/manager/broker_manager.js";
-import { FunctionCall } from "../../../src/model.js";
-import { TASK_COMPLETE_FUNCTION_NAME } from "../../../src/objects/base/model.js";
+import { TASK_COMPLETE_FUNCTION_NAME, ToolCall } from "../../../src/objects/base/model.js";
 import { MockChannel } from "../../../src/objects/channel/impl/mock/mock_channel.js";
 import { DocumentRepositoryBroker } from "../../../src/objects/document_repository/broker.js";
 import { MockWorker } from "../../../src/objects/worker/impl/mock/mock_worker.js";
@@ -53,7 +52,7 @@ describe("Worker Broker", () => {
 
 		const worker = new MockWorker(workerConfig);
 		
-		await BrokerManager.workerBroker.register(worker, {});
+		await BrokerManager.workerBroker.register(worker);
 		let workPerformed = false;
 		let gotWork: WorkResponse | undefined;
 		await BrokerManager.workerBroker.subscribe(workerConfig.id!, async (work: WorkResponse) => {
@@ -91,7 +90,7 @@ describe("Worker Broker", () => {
 						message: "worker-output",
 					},
 				},
-				sessionId: (gotWork?.output as FunctionCall)?.sessionId ?? "",
+				sessionId: (gotWork?.output as ToolCall)?.sessionId ?? "",
 			},
 		});
 	});
@@ -124,17 +123,17 @@ describe("Worker Broker", () => {
 			final_message: "test-message",
 		});
 		workerDb.skills = ["test-role"];
-		workerDb.channelUserConfig = jsonStringify({ mock: channelUserConfigDb.id });
+		workerDb.channelUserConfig = jsonStringify({ "mock-channel": channelUserConfigDb.id });
 		await workerDb.save();
 
 		await BrokerManager.init()
-		const channel = new MockChannel(channelDb.toModel());
+		const channel = new MockChannel(channelDb.toModel(), () => {});
 		await BrokerManager.channelBroker.register(channel);
 
-		const documentRepositoryBroker = new DocumentRepositoryBroker({});
+		const documentRepositoryBroker = new DocumentRepositoryBroker({mode: "in-memory"});
 
 		const worker = new MockWorker(workerDb.toModel());
-		await BrokerManager.workerBroker.register(worker, {});
+		await BrokerManager.workerBroker.register(worker);
 		let workPerformed = false;
 		let gotWork: WorkResponse | undefined;
 		await BrokerManager.workerBroker.subscribe(workerDb.id!, async (work: WorkResponse) => {
@@ -171,7 +170,7 @@ describe("Worker Broker", () => {
 						message: "worker-output",
 					},
 				},
-				sessionId: (gotWork?.output as FunctionCall)?.sessionId ?? "",
+				sessionId: (gotWork?.output as ToolCall)?.sessionId ?? "",
 			},
 		});
 	});

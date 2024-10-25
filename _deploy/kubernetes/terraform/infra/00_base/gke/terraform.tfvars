@@ -7,3 +7,4 @@ install_nvidia_operator      = false
 install_nvidia_toolkit       = false
 install_nvidia_driver        = false
 enable_nvidia_timeslicing    = false
+scale_istio_to_zero          = true

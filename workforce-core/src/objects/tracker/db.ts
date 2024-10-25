@@ -45,7 +45,7 @@ export class TrackerDb extends BaseModel {
         const base = super.toModel();
         const model: TrackerConfig = {
             ...base,
-            subtype: this.subtype as TrackerType,
+            type: this.type as TrackerType,
             flowId: this.flowId,
         };
         if (this.credentialId) {

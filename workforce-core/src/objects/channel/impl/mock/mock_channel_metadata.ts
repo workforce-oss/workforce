@@ -7,8 +7,7 @@ export class MockChannelMetadata {
             id: crypto.randomUUID(),
             name: "Mock Channel",
             description: "Mock Channel",
-            type: "channel",
-            subtype: "mock",
+            type: "mock-channel",
             orgId: orgId,
         };
     }

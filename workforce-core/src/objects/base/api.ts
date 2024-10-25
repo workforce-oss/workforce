@@ -1,5 +1,5 @@
 import bodyParser from "body-parser";
-import express, { RequestHandler } from "express";
+import express, { RequestHandler, Router } from "express";
 import { reviver } from "../../util/json.js";
 import { DbFactory } from "./factory/db_factory.js";
 import { ObjectType } from "./factory/types.js";
@@ -11,127 +11,110 @@ import { Logger } from "../../logging/logger.js";
 import { ChannelType } from "../channel/model.js";
 import { CredentialHelper } from "../credential/helper.js";
 import { WorkerConfig } from "../worker/model.js";
-import { BaseConfig } from "./model.js";
-import { DocumentRepositoryConfig } from "../document_repository/model.js";
 import { BaseModel, BaseModelAttributes } from "./db.js";
+import { BaseConfig } from "./model.js";
 
 /**
  * This file contains the CRUD handlers for the base objects.
  * These handlers are used by the API router to handle requests.
  */
-export function ModelHandlers(type: ObjectType): CrudHandlers {
+export function ModelRouter(type: ObjectType, routerOptions?: RouterOptions): Router {
+	const handlers = ModelHandlers(type, routerOptions?.authorizationOptions);
+	handlers.update = handlers.create;
+	return CrudRouter(handlers, routerOptions?.additionalRoutes);
+}
+
+export function CrudRouter(handlers: CrudHandlers, additionalHandlers?: ((router: Router) => void)[]): Router {
+	const router = Router({ mergeParams: true });
+	if (additionalHandlers) {
+		additionalHandlers.forEach((handler) => handler(router));
+	}
+	router.post("/", ...handlers.create);
+	router.get("/:id", ...handlers.read);
+	router.get("/", ...handlers.list);
+	router.put("/:id", ...handlers.update);
+	router.delete("/:id", ...handlers.delete);
+
+	return router;
+}
+
+export function ModelHandlers(type: ObjectType, authorizationOptions?: AuthorizationOptions): CrudHandlers {
 	return {
 		create: [
 			bodyParser.json({
 				reviver: reviver,
 			}),
-			AuthorizationHelper.withOrgRole(["admin", "maintainer"]),
-			validateVariablesSchema,
-			async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+			AuthorizationHelper.withOrgRole(authorizationOptions?.routePermissions?.create ?? ["admin", "maintainer"]),
+			validateVariablesSchema(type),
+			async (req: express.Request, res: express.Response) => {
 				try {
+					const orgId = req.params.orgId;
+					const flowId = req.params.flowId;
+					const id = req.params.id;
+					const body = req.body as BaseConfig | undefined;
 
-					const body = req.body as BaseConfig;
-					if (!body.orgId || !body.name) {
-						res.status(400).send("Missing orgId or name");
+					if (!body?.name) {
+						res.status(400).send([{ message: "Missing name" }]);
 						return;
 					}
 
-					const found = await DbFactory.getType(type).findOne({
-						where: {
-							orgId: body.orgId,
-							name: body.name,
-							[Op.or]: [
-								{
-									status: {
-										[Op.is]: null
-									},
-								},
-								{
-									status: {
-										[Op.ne]: "deleted"
-									},
-								},
-							],
+					body.orgId = orgId;
+					if (flowId) {
+						body.flowId = flowId;
+					}
+					let found: BaseModel & { flowId?: string } | null = null;
+					if (id) {
+						found = await DbFactory.getType(type).findByPk(id);
+						if (found?.orgId !== orgId) {
+							res.status(404).send({ message: "Invalid OrgId" });
+							return;
+						} else if (flowId && found?.flowId !== flowId) {
+							res.status(404).send({ message: "Invalid FlowId" });
+							return;
 						}
-					});
-					// TODO: Remove hack for worker - We are allowing upserts for workers
-					if (found && type !== "worker" && type !== "document_repository") {
-						res.status(409).send(`A ${type} with the name ${body.name} already exists`);
-						return;
 					} else {
-						if (type === "worker") {
-							await CredentialHelper.instance.replaceCredentialNameWithId(body);
-							const workerConfig = body as WorkerConfig;
-							if (workerConfig.channelUserConfig) {
-								for (const channelType of Object.keys(workerConfig.channelUserConfig ?? {})) {
-									const channelCredential = workerConfig.channelUserConfig[channelType as ChannelType];
-									const credentialId = await CredentialHelper.instance.getCredentialIdForName(
-										workerConfig.orgId,
-										channelCredential
-									);
-									if (!credentialId) {
-										res.status(400).send([
-											{
-												message: `Credential ${channelCredential} not found`,
-											}
-										]);
-										return;
-									}
-									workerConfig.channelUserConfig[channelType as ChannelType] = credentialId;
-								}
-							}
-						} else if (type === "document_repository") {
-							await CredentialHelper.instance.replaceCredentialNameWithId(body);
-						}
-						if (!body.id && body.variables?.user_id) {
-							body.id = body.variables?.user_id as string;
-						}
-						let result: unknown;
-						if (!found) {
-							const db = DbFactory.createDb(type, body);
-							db.loadModel(body);
-							if (body.id) {
-								db.id = body.id;
-								Logger.getInstance(`${type}-api`).info(`Setting id for ${type}: ${body.id}`);
-								db.setDataValue("id", body.id);
-							}
-
-							await db.save();
-							result = db.toModel();
-						} else {
-							found.loadModel(body);
-							await found.save();
-							result = found.toModel();
-						}
-
-						if (type === "worker") {
-							await CredentialHelper.instance.replaceCredentialIdWithName(result as WorkerConfig);
-							for (const channelType of Object.keys((result as WorkerConfig).channelUserConfig ?? {})) {
-								const channelCredential = (result as WorkerConfig).channelUserConfig![
-									channelType as ChannelType
-								];
-								const credentialName = await CredentialHelper.instance.getCredentialNameForId(
-									channelCredential
-								);
-								if (!credentialName) {
-									res.status(400).send([
-										{
-											message: `Credential ${channelCredential} not found`,
-										}
-									]);
-									return;
-								}
-								(result as WorkerConfig).channelUserConfig![channelType as ChannelType] =
-									credentialName;
-							}
-						} else if (type === "document_repository") {
-							await CredentialHelper.instance.replaceCredentialIdWithName(result as DocumentRepositoryConfig);
-						}
-						res.status(201).send(result);
+						found = await DbFactory.getType(type).findOne({
+							where: whereQuery({ orgId, name: body.name, flowId }),
+						});
 					}
+					try {
+						await replaceCredentialNamesWithIds(body, type, orgId);
+					} catch (e) {
+						Logger.getInstance(`${type}-api`).error(`${(e as Error).message}`, e);
+						res.status(400).send([{ message: (e as Error).message }]);
+						return
+					}
+
+					if (!body.id && body.variables?.user_id) {
+						body.id = body.variables?.user_id as string;
+					}
+					let result: unknown;
+					let status = 201;
+					if (!found) {
+						const db = DbFactory.createDb(type, body);
+						db.loadModel(body);
+						if (body.id) {
+							db.id = body.id;
+							Logger.getInstance(`${type}-api`).info(`Setting id for ${type}: ${body.id}`);
+							db.setDataValue("id", body.id);
+						}
+
+						await db.save();
+						result = db.toModel();
+					} else {
+						found.loadModel(body);
+						await found.save();
+						result = found.toModel();
+						status = 200;
+					}
+
+					await replaceCredentialIdsWithNames(result as BaseConfig, type);
+
+					res.status(status).send(result);
+
 				} catch (e) {
 					Logger.getInstance(`${type}-api`).error(`${req.originalUrl} ${(e as Error).message}`, e);
-					next(e);
+					res.status(500).send([{ message: (e as Error).message }]);
 				}
 			},
 		],
@@ -139,84 +122,30 @@ export function ModelHandlers(type: ObjectType): CrudHandlers {
 			bodyParser.json({
 				reviver: reviver,
 			}),
-			async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+			AuthorizationHelper.withOrgRole(authorizationOptions?.routePermissions?.read ?? ["admin", "maintainer"]),
+			async (req: express.Request, res: express.Response) => {
 				try {
-					if (!req.auth?.payload.sub) {
-						res.status(401).send("Unauthorized");
-						return;
-					}
-
-					const where: WhereOptions<BaseModelAttributes> = {
-						id: req.params.id,
-						[Op.or]: [
-							{
-								status: {
-									[Op.is]: null
-								},
-							},
-							{
-								status: {
-									[Op.ne]: "deleted"
-								},
-							},
-						]
-					};
+					const orgId = req.params.orgId;
+					const flowId = req.params.flowId;
+					const id = req.params.id;
 
 					const found = await DbFactory.getType(type).findOne({
-						where
+						where: whereQuery({ orgId, id, flowId }),
 					});
 					if (!found) {
+						Logger.getInstance(`${type}-api`).error(`Not Found: ${req.originalUrl}, orgId: ${orgId}, flowId: ${flowId} id: ${req.params.id}`);
 						res.status(404).send([{
 							message: "Not Found",
 						}]);
 						return;
 					}
 
-					// validate relations
-					if (found.spaceId) {
-						const hasSpaceRoles = await AuthorizationHelper.hasSpaceRoles(["admin", "maintainer", "developer"], req.auth?.payload.sub, found.spaceId);
-						if (!hasSpaceRoles) {
-							res.status(404).send([{
-								message: "Not Found",
-							}]);
-							return;
-						}
-					} else {
-						const hasOrgRoles = await AuthorizationHelper.hasOrgRoles(["admin", "maintainer", "developer"], req.auth?.payload.sub, found.orgId);
-						if (!hasOrgRoles) {
-							res.status(404).send([{
-								message: "Not Found",
-							}]);
-							return;
-						}
-					}
-
-
 					const model = found.toModel();
-					if (type === "worker") {
-						await CredentialHelper.instance.replaceCredentialIdWithName(model);
-						for (const channelType of Object.keys((model as WorkerConfig).channelUserConfig ?? {})) {
-							const channelCredential = (model as WorkerConfig).channelUserConfig![
-								channelType as ChannelType
-							];
-							const credentialName = await CredentialHelper.instance.getCredentialNameForId(
-								channelCredential
-							);
-							if (!credentialName) {
-								res.status(400).send([{
-									message: `Credential ${channelCredential} not found`
-								}]);
-								return;
-							}
-							(model as WorkerConfig).channelUserConfig![channelType as ChannelType] = credentialName;
-						}
-					} else if (type === "document_repository") {
-						await CredentialHelper.instance.replaceCredentialIdWithName(model);
-					}
+					await replaceCredentialIdsWithNames(model, type);
 					res.send(model);
 				} catch (e) {
 					Logger.getInstance(`${type}-api`).error(`${req.originalUrl} ${(e as Error).message}`, e);
-					next(e);
+					res.status(500).send({ message: (e as Error).message });
 				}
 			},
 		],
@@ -224,222 +153,50 @@ export function ModelHandlers(type: ObjectType): CrudHandlers {
 			bodyParser.json({
 				reviver: reviver,
 			}),
-			AuthorizationHelper.withOrgRole(["admin", "maintainer"]),
-			async (req: express.Request, res: express.Response, next: express.NextFunction) => {
+			AuthorizationHelper.withOrgRole(authorizationOptions?.routePermissions?.list ?? ["admin", "maintainer"]),
+			async (req: express.Request, res: express.Response) => {
 				try {
-					// unless this is in the credentials path, we need to check for a flowId
-					if (type !== "worker" && type !== "document_repository") {
-						if (!req.query.flowId) {
-							res.status(400).send([{
-								message: "Missing flowId",
-							}]);
-							return;
-						}
+					const orgId = req.params.orgId;
+					const flowId = req.params.flowId;
 
-						const found = await DbFactory.getType(type).findAll({
-							where: {
-								orgId: req.query.orgId as string,
-								flowId: req.query.flowId as string,
-								[Op.or]: [
-									{
-										status: {
-											[Op.is]: null
-										},
-									},
-									{
-										status: {
-											[Op.ne]: "deleted"
-										},
-									},
-								],
-
-							},
-							include: {
-								all: true,
-							},
-						});
-						const result = found.map((f: BaseModel) => f.toModel());
-						res.send(result);
-					} else {
-						const found = await DbFactory.getType(type).findAll({
-							where: {
-								orgId: req.query.orgId as string,
-								[Op.or]: [
-									{
-										status: {
-											[Op.is]: null
-										},
-									},
-									{
-										status: {
-											[Op.ne]: "deleted"
-										},
-									},
-								],
-							},
-							include: {
-								all: true,
-							},
-						});
-						const result = found.map((f: BaseModel) => f.toModel());
-						if (type === "worker") {
-							for (const worker of result) {
-								await CredentialHelper.instance.replaceCredentialIdWithName(worker);
-								for (const channelType of Object.keys((worker as WorkerConfig).channelUserConfig ?? {})) {
-									const channelCredential = (worker as WorkerConfig).channelUserConfig![
-										channelType as ChannelType
-									];
-									const credentialName = await CredentialHelper.instance.getCredentialNameForId(
-										channelCredential
-									);
-									if (!credentialName) {
-										res.status(400).send([{
-											message: `Credential ${channelCredential} not found`
-										}]);
-										return;
-									}
-									(worker as WorkerConfig).channelUserConfig![channelType as ChannelType] = credentialName;
-								}
-							}
-						} else if (type === "document_repository") {
-							for (const repository of result) {
-								await CredentialHelper.instance.replaceCredentialIdWithName(repository);
-							}
-						}
-
-						res.send(result);
-					}
-				} catch (e) {
-					Logger.getInstance(`${type}-api`).error(`${req.originalUrl} ${(e as Error).message}`, e);
-					next(e);
-				}
-			},
-		],
-		update: [
-			bodyParser.json({
-				reviver: reviver,
-			}),
-			AuthorizationHelper.withOrgRole(["admin", "maintainer"]),
-			validateVariablesSchema,
-			async (req: express.Request, res: express.Response, next: express.NextFunction) => {
-				try {
-					const body = req.body as BaseConfig;
-					const found = await DbFactory.getType(type).findOne({
-						where: {
-							orgId: body.orgId,
-							id: req.params.id,
-							[Op.or]: [
-								{
-									status: {
-										[Op.is]: null
-									},
-								},
-								{
-									status: {
-										[Op.ne]: "deleted"
-									},
-								},
-							],
+					const found = await DbFactory.getType(type).findAll({
+						where: whereQuery({ orgId, flowId }),
+						include: {
+							all: true,
 						},
 					});
-					if (!found) {
-						res.status(404).send([{
-							message: "Not Found",
-						}]);
-						return;
-					}
-					if (type === "worker") {
-						const workerConfig = body as WorkerConfig;
-						await CredentialHelper.instance.replaceCredentialNameWithId(workerConfig);
-						if (workerConfig.channelUserConfig) {
-							for (const channelType of Object.keys(workerConfig.channelUserConfig ?? {})) {
-								const channelCredential = workerConfig.channelUserConfig[channelType as ChannelType];
-								const credentialId = await CredentialHelper.instance.getCredentialIdForName(
-									workerConfig.orgId,
-									channelCredential
-								);
-								if (!credentialId) {
-									res.status(400).send([{
-										message: `Credential ${channelCredential} not found`
-									}]);
-									return;
-								}
-								workerConfig.channelUserConfig[channelType as ChannelType] = credentialId;
-							}
-						}
-					} else if (type === "document_repository") {
-						await CredentialHelper.instance.replaceCredentialNameWithId(body);
-					}
-					found.loadModel(body);
-					await found.save();
-					const result = found.toModel();
-					if (type === "worker") {
-						await CredentialHelper.instance.replaceCredentialIdWithName(result);
-						for (const channelType of Object.keys((result as WorkerConfig).channelUserConfig ?? {})) {
-							const channelCredential = (result as WorkerConfig).channelUserConfig![
-								channelType as ChannelType
-							];
-							const credentialName = await CredentialHelper.instance.getCredentialNameForId(
-								channelCredential
-							);
-							if (!credentialName) {
-								res.status(400).send([{
-									message: `Credential ${channelCredential} not found`
-								}]);
-								return;
-							}
-							(result as WorkerConfig).channelUserConfig![channelType as ChannelType] = credentialName;
-						}
-					} else if (type === "document_repository") {
-						await CredentialHelper.instance.replaceCredentialIdWithName(result);
-					}
-					res.send(result);
+
+					const models = found.map((f: BaseModel) => f.toModel());
+					await Promise.all(models.map(async (r) => {
+						await replaceCredentialIdsWithNames(r, type);
+					}));
+					res.send(models);
 				} catch (e) {
 					Logger.getInstance(`${type}-api`).error(`${req.originalUrl} ${(e as Error).message}`, e);
-					next(e);
+					res.status(500).send({ message: (e as Error).message });
 				}
 			},
 		],
+		// No Update handler for now, just doing upserts with create
+		update: [],
 		delete: [
 			bodyParser.json({
 				reviver: reviver,
 			}),
+			AuthorizationHelper.withSpaceRole(authorizationOptions?.routePermissions?.delete ?? ["admin", "maintainer"]),
 			async (req: express.Request, res: express.Response, next: express.NextFunction) => {
 				try {
-					if (!req.auth?.payload.sub) {
-						res.status(401).send("Unauthorized");
-						return;
-					}
-
+					const orgId = req.params.orgId;
+					const flowId = req.params.flowId;
+					const id = req.params.id;
 					const found = await DbFactory.getType(type).findOne({
-						where: {
-							id: req.params.id,
-						},
+						where: whereQuery({ orgId, id, flowId }),
 					});
 					if (!found) {
 						res.status(404).send([{
 							message: "Not Found",
 						}]);
 						return;
-					}
-
-					// validate relations
-					if (found.spaceId) {
-						const hasSpaceRoles = await AuthorizationHelper.hasSpaceRoles(["admin", "maintainer", "developer"], req.auth?.payload.sub, found.spaceId);
-						if (!hasSpaceRoles) {
-							res.status(404).send([{
-								message: "Not Found",
-							}]);
-							return;
-						}
-					} else {
-						const hasOrgRoles = await AuthorizationHelper.hasOrgRoles(["admin", "maintainer", "developer"], req.auth?.payload.sub, found.orgId);
-						if (!hasOrgRoles) {
-							res.status(404).send([{
-								message: "Not Found",
-							}]);
-							return;
-						}
 					}
 
 					await found.destroy();
@@ -465,27 +222,136 @@ export interface CrudHandlers {
 	delete: RequestHandler[];
 };
 
+export interface RouterOptions {
+	additionalRoutes?: ((router: Router) => void)[];
+	authorizationOptions?: AuthorizationOptions;
+}
+
+export interface AuthorizationOptions {
+	routePermissions?: RoutePermissions;
+}
+
+export interface RoutePermissions {
+	create?: string[];
+	read?: string[];
+	list?: string[];
+	update?: string[];
+	delete?: string[];
+}
+
+const whereQuery = (options: { orgId: string, id?: string, name?: string, flowId?: string }): WhereOptions<BaseModelAttributes> => {
+	const { orgId, id, name, flowId } = options;
+	let where: WhereOptions<BaseModelAttributes> = {
+		orgId,
+	}
+	if (name) {
+		where = {
+			...where,
+			name,
+		}
+	}
+	if (id) {
+		where = {
+			...where,
+			id,
+		}
+	}
+
+	if (flowId) {
+		where = {
+			...where,
+			flowId,
+		}
+	} else {
+		where = {
+			...where,
+			[Op.or]: [
+				{
+					status: {
+						[Op.is]: null
+					},
+				},
+				{
+					status: {
+						[Op.ne]: "deleted"
+					},
+				},
+			],
+		}
+	}
+	return where;
+}
+
+const replaceCredentialNamesWithIds = async (config: BaseConfig, objectType: ObjectType, orgId: string): Promise<void> => {
+	if (objectType === "worker") {
+		await replaceWorkerCredentialNamesWithIds(config as WorkerConfig, orgId);
+	} else {
+		await CredentialHelper.instance.replaceCredentialNameWithId(config, orgId);
+	}
+}
+
+const replaceCredentialIdsWithNames = async (config: BaseConfig, objectType: ObjectType): Promise<void> => {
+	if (objectType === "worker") {
+		await replaceWorkerCredentialIdsWithNames(config as WorkerConfig);
+	} else {
+		await CredentialHelper.instance.replaceCredentialIdWithName(config);
+	}
+}
+
+const replaceWorkerCredentialIdsWithNames = async (config: WorkerConfig): Promise<void> => {
+	await CredentialHelper.instance.replaceCredentialIdWithName(config);
+	for (const channelType of Object.keys(config.channelUserConfig ?? {})) {
+		const channelCredential = (config).channelUserConfig![
+			channelType as ChannelType
+		];
+		const credentialName = await CredentialHelper.instance.getCredentialNameForId(
+			channelCredential
+		);
+		if (!credentialName) {
+			throw new Error(`Credential ${channelCredential} not found`);
+		}
+		config.channelUserConfig![channelType as ChannelType] = credentialName;
+	}
+}
+
+const replaceWorkerCredentialNamesWithIds = async (config: WorkerConfig, orgId: string): Promise<void> => {
+	await CredentialHelper.instance.replaceCredentialNameWithId(config, orgId);
+	if (!config.channelUserConfig) {
+		return;
+	}
+	for (const channelType of Object.keys(config.channelUserConfig)) {
+		const channelCredential = config.channelUserConfig[channelType as ChannelType];
+		const credentialId = await CredentialHelper.instance.getCredentialIdForName(
+			config.orgId,
+			channelCredential
+		);
+		if (!credentialId) {
+			throw new Error(`Credential ${channelCredential} not found`);
+		}
+		config.channelUserConfig[channelType as ChannelType] = credentialId;
+	}
+}
 /**
  * This function validates that the variables in the request match the variables schema.
  * If the variables do not match the schema, the request is rejected.
  */
-export const validateVariablesSchema: RequestHandler = (
+export const validateVariablesSchema = (objectType: ObjectType): RequestHandler => (
 	req: express.Request,
 	res: express.Response,
 	next: express.NextFunction
 ) => {
 	try {
 		const body = req.body as BaseConfig;
-		const errors = VariablesSchema.validateBaseObject(body);
+		const errors = VariablesSchema.validateBaseObject(body, objectType);
 		if (errors && errors.length > 0) {
-			Logger.getInstance("credential-api").error(
+			Logger.getInstance("object-api").error(
 				`validateVariablesSchema() validation errors: ${JSON.stringify(errors, null, 2)}`
 			);
 			res.status(400).send(JSON.stringify(errors, null, 2));
 			return;
 		}
 	} catch (e) {
-		Logger.getInstance("credential-api").error(
+		Logger.getInstance("object-api").error(
 			`validateVariablesSchema() error executing validation: ${(e as Error).message}`,
 			e
 		);

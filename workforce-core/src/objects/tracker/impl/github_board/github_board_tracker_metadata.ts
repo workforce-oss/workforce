@@ -4,15 +4,14 @@ import { TrackerConfig } from "../../model.js";
 
 export class GithubBoardTrackerMetadata {
     public static defaultConfig(orgId: string): TrackerConfig {
-        const base = {
+        const base: TrackerConfig = {
             id: crypto.randomUUID(),
             orgId: orgId,
             name: "Github Board Tracker",
             description: "A Github Board Tracker.",
-            type: "tracker",
-            subtype: "github-board-tracker",
+            type: "github-board-tracker",
             variables:  {}
-        } as TrackerConfig;
+        };
 
         // use variables schema to populate default values
         const schema = GithubBoardTrackerMetadata.variablesSchema();

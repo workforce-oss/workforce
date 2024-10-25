@@ -8,8 +8,7 @@ export class GoogleDriveToolMetadata {
             id: crypto.randomUUID(),
             name: "Google Drive Tool",
             description: "A tool that interacts with Google Drive.",
-            type: "tool",
-            subtype: "google-drive-tool",
+            type: "google-drive-tool",
             orgId: orgId,
             variables: {},
         }

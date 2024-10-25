@@ -8,8 +8,7 @@ export class GitDocumentRepositoryMetadata {
         return {
             id: crypto.randomUUID(),
             orgId,
-            type: "document_repository",
-            subtype: "git-document-repository",
+            type: "git-document-repository",
             name: "Git Document Repository",
             description: "Git Document Repository",
             documentChunkStrategy: "section",

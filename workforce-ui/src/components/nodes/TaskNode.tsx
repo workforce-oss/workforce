@@ -20,7 +20,7 @@ export const TaskNode = ({ data, selected }: { data: CustomNodeData<TaskConfig>;
 	const { selectedFlow } = metaStore(metaSelector, shallow);
 	const { updateNodeData } = flowStates.get(selectedFlow.id)(selector, shallow);
 	return (
-		<GenericNode data={data} selected={selected} children={""} headerColor={CustomColors.task}
+		<GenericNode data={data} objectType="task" selected={selected} children={""} headerColor={CustomColors.task}
 			additionalConfiguration={
 				<div className="flex flex-wrap max-w-xl justify-between items-center dark:text-white mt-1 px-5 py-2">
 					<div className="w-full">

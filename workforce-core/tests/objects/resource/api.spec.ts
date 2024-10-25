@@ -5,7 +5,7 @@ import { ResourceConfig } from "../../../src/objects/resource/model.js";
 import express from "express";
 import expressWs from "express-ws";
 import { auth } from "express-oauth2-jwt-bearer";
-import { ResourceRoutes } from "../../../src/objects/resource/api.js";
+import { ResourceRouter } from "../../../src/objects/resource/api.js";
 import request from "supertest";
 import { createJwt, issuerHandlers } from "../../helpers/jwt.js";
 import { expect } from "chai";
@@ -39,7 +39,7 @@ describe("Resource API", () => {
 		orgId = randomUUID();
 		jwt = await createJwt({ payload: { orgId } });
 
-		app.use("/resources", ResourceRoutes);
+		app.use(`/orgs/:orgId/flows/:flowId/resources`, ResourceRouter);
 	});
     beforeEach(async () => {
         await sequelize.sync({ force: true });
@@ -60,7 +60,7 @@ describe("Resource API", () => {
 			const resourceConfig: ResourceConfig = createBasicResourceConfig(orgId, flow.id);
 
 			const response = await request(app)
-				.post("/resources")
+				.post(`/orgs/${orgId}/flows/${flow.id}/resources`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
 				.send(resourceConfig)
@@ -79,10 +79,9 @@ describe("Resource API", () => {
 			
 			const flow = await createBasicFlow(orgId);
 			
-
 			const resourceConfig: ResourceConfig = createBasicResourceConfig(flow.id, otherOrgId);
 			await request(app)
-				.post("/resources")
+				.post(`/orgs/${otherOrgId}/flows/${flow.id}/resources`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
 				.send(resourceConfig)
@@ -95,7 +94,7 @@ describe("Resource API", () => {
 			resourceConfig.variables = {};
 
 			await request(app)
-				.post("/resources")
+				.post(`/orgs/${orgId}/flows/${flow.id}/resources`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
 				.send(resourceConfig)
@@ -109,10 +108,9 @@ describe("Resource API", () => {
 			const resourceDb = await createBasicResource(orgId, flow.id);
 
 			const response = await request(app)
-				.get(`/resources/${resourceDb.id}`)
+				.get(`/orgs/${orgId}/flows/${flow.id}/resources/${resourceDb.id}`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
-				.query({ orgId })
 				.expect(200);
 
 			expect(response.body).to.deep.equal(resourceDb.toModel());
@@ -125,10 +123,9 @@ describe("Resource API", () => {
 			const createdResourceDb = await createBasicResource(otherOrgId, flow.id);
 
 			await request(app)
-				.get(`/resources/${createdResourceDb.id}`)
+				.get(`/orgs/${otherOrgId}/flows/${flow.id}/resources/${createdResourceDb.id}`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
-				.query({ orgId: otherOrgId })
 				.expect(404);
 		});
 	});
@@ -138,22 +135,11 @@ describe("Resource API", () => {
 			const resourceDb = await createBasicResource(orgId, flow.id);
 
 			const response = await request(app)
-				.get(`/resources`)
+				.get(`/orgs/${orgId}/flows/${flow.id}/resources`)
 				.set("Authorization", `Bearer ${jwt}`)
-				.query({ flowId: flow.id, orgId })
 				.expect(200);
 
 			expect(response.body).to.deep.equal([resourceDb.toModel()]);
-		});
-		it("should not retrieve resources when flowId is missing", async () => {
-			const flow = await createBasicFlow(orgId);
-			const resourceDb = await createBasicResource(orgId, flow.id);
-
-			await request(app)
-			.get(`/resources`)
-			.set("Authorization", `Bearer ${jwt}`)
-			.query({ orgId })
-			.expect(400);
 		});
 		it("should not retrieve resources for a different org", async () => {
 			const otherOrgId = randomUUID();
@@ -163,10 +149,9 @@ describe("Resource API", () => {
 			const createdResourceDb = await createBasicResource(otherOrgId, flow.id);
 
 			const response = await request(app)
-				.get(`/resources`)
+				.get(`/orgs/${otherOrgId}/resources`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
-				.query({ flowId: flow.id, orgId: otherOrgId })
 				.expect(404);
 		});
 	});
@@ -178,7 +163,7 @@ describe("Resource API", () => {
 			updatedResourceConfig.name = "updated-name";
 
 			await request(app)
-				.put(`/resources/${resourceDb.id}`)
+				.put(`/orgs/${orgId}/flows/${flow.id}/resources/${resourceDb.id}`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
 				.send(updatedResourceConfig)
@@ -201,7 +186,7 @@ describe("Resource API", () => {
 			updatedResourceConfig.name = "updated-name";
 
 			await request(app)
-				.put(`/resources/${resourceDb.id}`)
+				.put(`/orgs/${orgId}/flows/${flow.id}/resources/${resourceDb.id}`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
 				.send(updatedResourceConfig)
@@ -216,7 +201,7 @@ describe("Resource API", () => {
 			updatedResourceConfig.variables = {};
 
 			await request(app)
-				.put(`/resources/${resourceDb.id}`)
+				.put(`/orgs/${orgId}/flows/${flow.id}/resources/${resourceDb.id}`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
 				.send(updatedResourceConfig)
@@ -230,10 +215,9 @@ describe("Resource API", () => {
 			const resourceDb = await createBasicResource(orgId, flow.id);
 
 			await request(app)
-				.delete(`/resources/${resourceDb.id}`)
+				.delete(`/orgs/${orgId}/flows/${flow.id}/resources/${resourceDb.id}`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
-				.query({ orgId })
 				.expect(200);
 
 			const retrievedResourceDb = await ResourceDb.findByPk(resourceDb.id);
@@ -248,10 +232,9 @@ describe("Resource API", () => {
 			const resourceDb = await createBasicResource(otherOrgId, flow.id);
 
 			await request(app)
-				.delete(`/resources/${resourceDb.id}`)
+				.delete(`/orgs/${otherOrgId}/flows/${flow.id}/resources/${resourceDb.id}`)
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
-				.query({ orgId: otherOrgId })
 				.expect(404);
 		});
 	});

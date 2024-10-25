@@ -8,8 +8,7 @@ export class InternalDocumentRepositoryMetadata {
         return {
             id: crypto.randomUUID(),
             orgId,
-            type: "document_repository",
-            subtype: "internal-document-repository",
+            type: "internal-document-repository",
             name: "Internal Document Repository",
             description: "Internal Document Repository",
             documentChunkStrategy: "section",

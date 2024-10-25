@@ -7,3 +7,4 @@ istio_gateway_service_type = "NodePort"
 install_nvidia_operator = false
 install_nvidia_driver = true
 install_nvidia_toolkit = true
+scale_istio_to_zero = true

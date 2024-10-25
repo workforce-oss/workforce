@@ -1,0 +1,7 @@
+users:
+- username: tester
+  password: password
+  firstName: Test
+  lastName: User
+  email: tester@example.com
+  

@@ -8,8 +8,7 @@ export class MockWorkerMetadata {
             orgId: orgId,
             name: "Mock Worker",
             description: "A worker that mocks a chat session",
-            type: "worker",
-            subtype: "mock",
+            type: "mock-worker",
         }
     }
 

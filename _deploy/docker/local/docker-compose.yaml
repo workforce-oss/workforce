@@ -138,6 +138,20 @@ services:
       POSTGRES_DB: app
     volumes:
       - postgres-data:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4
+    hostname: pgadmin
+    restart: unless-stopped
+    stop_grace_period: 1s
+    ports:
+      - "8086:80"
+    networks:
+      - frontend
+      - backend
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@example.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+
   weaviate:
     image: cr.weaviate.io/semitechnologies/weaviate:1.26.6
     hostname: weaviate

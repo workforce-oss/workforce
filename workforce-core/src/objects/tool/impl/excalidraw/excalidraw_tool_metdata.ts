@@ -8,8 +8,7 @@ export class ExcalidrawToolMetadata {
             id: crypto.randomUUID(),
             name: "Excalidraw Tool",
             description: "A tool that interacts with Excalidraw.",
-            type: "tool",
-            subtype: "excalidraw-tool",
+            type: "excalidraw-tool",
             orgId: orgId,
             variables: {},
         }

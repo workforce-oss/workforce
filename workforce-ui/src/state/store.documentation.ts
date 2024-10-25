@@ -2,7 +2,7 @@
 import { WorkforceAPIClient } from "workforce-api-client";
 import { DocumentData, DocumentRepositoryConfig, VariableSchemaValidationError } from "workforce-core/model";
 import { temporal } from "zundo";
-import { create } from "zustand";
+import { create, StateCreator } from "zustand";
 
 export type DocumentRepositoryState = {
     message: string | undefined;
@@ -38,7 +38,7 @@ export const documentRepositoryStore = create<DocumentRepositoryState>()(
         },
         addDocumentRepository: (documentRepository: DocumentRepositoryConfig) => {
             WorkforceAPIClient.DocumentRepositoryAPI
-                .create(documentRepository)
+                .create(documentRepository, { orgId: documentRepository.orgId })
                 .then((response: DocumentRepositoryConfig | VariableSchemaValidationError[]) => {
                     if (Array.isArray(response)) {
                         const error = response.map((e) => e.message).join("\n");
@@ -61,7 +61,7 @@ export const documentRepositoryStore = create<DocumentRepositoryState>()(
         },
         removeDocumentRepository: (documentRepository: DocumentRepositoryConfig) => {
             WorkforceAPIClient.DocumentRepositoryAPI
-                .delete(documentRepository.id)
+                .delete(documentRepository.id, { orgId: documentRepository.orgId })
                 .then(() => {
                     console.log(`deleteDocumentRepository() deleted documentRepository ${documentRepository.name}`);
                     set({
@@ -77,7 +77,7 @@ export const documentRepositoryStore = create<DocumentRepositoryState>()(
         },
         updateDocumentRepository: (documentRepository: DocumentRepositoryConfig) => {
             WorkforceAPIClient.DocumentRepositoryAPI
-                .update(documentRepository, documentRepository.id)
+                .update(documentRepository, documentRepository.id, { orgId: documentRepository.orgId })
                 .then((response: DocumentRepositoryConfig | VariableSchemaValidationError[]) => {
                     if (Array.isArray(response)) {
                         const error = response.map((e) => e.message).join("\n");
@@ -173,5 +173,5 @@ export const documentRepositoryStore = create<DocumentRepositoryState>()(
                     });
                 });
         },
-    }))
+    })) as StateCreator<DocumentRepositoryState, [], [never, unknown][]>
 );

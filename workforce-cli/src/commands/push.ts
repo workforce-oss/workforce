@@ -26,9 +26,13 @@ export async function push(
     
     const basePath = apiUrl.split("/").slice(3).join("/");
 
+    console.log("Pushing data to Workforce");
+    console.log(`API URL: ${apiUrl}`);
+    console.log(`Base Path: ${basePath}`);
+
     WorkforceAPIClient.init({
         accessToken,
-        baseUrl: options.api,
+        baseUrl: apiUrl,
         basePath
     });
 
@@ -78,7 +82,7 @@ export async function push(
     if (data.roles && data.roles.length > 0) {
         for (const role of data.roles) {
             const api = WorkforceAPIClient.OrgUserAPI;
-            const response = await api.create(role).catch((e) => {
+            const response = await api.create(role, {orgId: role.orgId}).catch((e) => {
                 console.log(`Error creating role ${role.role}`);
                 return undefined;
             });
@@ -104,7 +108,7 @@ export async function push(
             }
             const api = WorkforceAPIClient.SkillAPI;
             skill.orgId = orgId;
-            const response = await api.create(skill).catch((e) => {
+            const response = await api.create(skill, {orgId}).catch((e) => {
                 console.log(`Error creating skill ${skill.name}`);
                 return undefined;
             });
@@ -127,18 +131,14 @@ export async function push(
                 console.log(`OrgId is required for credential ${credential.name}`);
                 continue;
             }
-            credential.orgId = orgId;
-            credential.subtype = credential.type as ObjectSubtype;
-            credential.type = "credential";
 
             const api = WorkforceAPIClient.CredentialAPI;
             console.log({
                 name: credential.name,
                 type: credential.type,
-                subtype: credential.subtype,
                 orgId: credential.orgId,
             });
-            const response = await api.create(credential).catch((e) => {
+            const response = await api.create(credential, {orgId}).catch((e) => {
                 console.log(`Error creating credential ${credential.name}`);
                 return undefined;
             });
@@ -161,13 +161,10 @@ export async function push(
                 console.log(`OrgId is required for worker ${worker.name}`);
                 continue;
             }
-            worker.orgId = orgId;
-            worker.subtype = worker.type as WorkerType;
-            worker.type = "worker";
 
             const api = WorkforceAPIClient.WorkerAPI;
 
-            const response = await api.create(worker).catch((e) => {
+            const response = await api.create(worker, {orgId}).catch((e) => {
                 console.log(`Error creating worker ${worker.name}`);
                 return undefined;
             });
@@ -194,11 +191,8 @@ export async function push(
                 continue;
             }
 
-            docRepo.orgId = orgId;
-            docRepo.subtype = docRepo.type as DocumentRepositoryType;
-            docRepo.type = "document_repository";
             const api = WorkforceAPIClient.DocumentRepositoryAPI;
-            const response = await api.create(docRepo).catch((e) => {
+            const response = await api.create(docRepo, {orgId}).catch((e) => {
                 console.log(`Error creating document repository ${docRepo.name}`);
                 return undefined;
             });
@@ -221,8 +215,6 @@ export async function push(
                 console.log(`OrgId is required for flow ${flow.name}`);
                 continue;
             }
-            flow.orgId = orgId;
-            formatFlow(flow, orgId);
             const errors = validateFlowSchema(flow);
 
             if (errors.length > 0) {
@@ -233,7 +225,7 @@ export async function push(
             }
 
             const api = WorkforceAPIClient.FlowAPI;
-            const response = await api.create(flow).catch((e) => {
+            const response = await api.create(flow, {orgId}).catch((e) => {
                 console.log(`Error creating flow ${flow.name}`);
                 return undefined;
             });
@@ -312,50 +304,4 @@ function parseData(path: string): {
     }
 
     return data;
-}
-
-function formatFlow(flow: FlowConfig, orgId: string) {
-	flow.orgId = orgId;
-	if (flow.tasks) {
-		for (const task of flow.tasks) {
-			task.orgId = orgId;
-			task.subtype = task.type as TaskType;
-			task.type = "task";
-		}
-	}
-    if (flow.resources) {
-        for (const resource of flow.resources) {
-            resource.orgId = orgId;
-            resource.subtype = resource.type as ResourceType;
-            resource.type = "resource";
-        }
-    }
-    if (flow.channels) {
-        for (const channel of flow.channels) {
-            channel.orgId = orgId;
-            channel.subtype = channel.type as ChannelType;
-            channel.type = "channel";
-        }
-    }
-    if (flow.documentation) {
-        for (const doc of flow.documentation) {
-            doc.orgId = orgId;
-            doc.subtype = doc.type as DocumentationType;
-            doc.type = "documentation";
-        }
-    }
-    if (flow.tools) {
-        for (const tool of flow.tools) {
-            tool.orgId = orgId;
-            tool.subtype = tool.type as ToolType;
-            tool.type = "tool";
-        }
-    }
-    if (flow.trackers) {
-        for (const tracker of flow.trackers) {
-            tracker.orgId = orgId;
-            tracker.subtype = tracker.type as TrackerType;
-            tracker.type = "tracker";
-        }
-    }
 }

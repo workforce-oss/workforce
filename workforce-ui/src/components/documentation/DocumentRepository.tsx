@@ -41,7 +41,7 @@ export const DocumentRepositoryComponent = (props: { config: DocumentRepositoryC
             return;
         }
         WorkforceAPIClient.DocumentRepositoryAPI
-            .get(config.id)
+            .get(config.id, { orgId: currentOrg.id })
             .then((config) => {
                 setDetails(config);
                 hydrateDocuments(config);
@@ -53,7 +53,7 @@ export const DocumentRepositoryComponent = (props: { config: DocumentRepositoryC
     }, [config, expanded, currentOrg]);
 
     useEffect(() => {
-        setCredentialList(credentials.filter((credential) => documentRepositoryTypes.includes(credential.subtype as DocumentRepositoryType)));
+        setCredentialList(credentials.filter((credential) => documentRepositoryTypes.includes(credential.type as DocumentRepositoryType)));
     }, [credentials, currentOrg]);
 
 
@@ -67,7 +67,7 @@ export const DocumentRepositoryComponent = (props: { config: DocumentRepositoryC
                     </Grid>
 
                     <Grid item xs={4}>
-                        <Typography color="text.secondary">{config.subtype}</Typography>
+                        <Typography color="text.secondary">{config.type}</Typography>
                     </Grid>
                     <Grid item xs={2}>
                         {expanded && (
@@ -122,6 +122,7 @@ export const DocumentRepositoryComponent = (props: { config: DocumentRepositoryC
                     <Grid item xs={12}>
                         <SchemaVariableListComponent
                             config={details}
+                            objectType="document_repository"
                             onPropertyChange={(name, newValue) => {
                                 setDetails({
                                     ...details,
@@ -138,7 +139,7 @@ export const DocumentRepositoryComponent = (props: { config: DocumentRepositoryC
                     <Grid item xs={12}>
                         <b>Documents</b>
                     </Grid>
-                    {config.subtype === "internal-document-repository" && (
+                    {config.type === "internal-document-repository" && (
                         <Grid item xs={12}>
                             <Grid container spacing={2}>
                                 <Grid item xs={6}>

@@ -53,9 +53,8 @@ export const WorkerAddComponent = () => {
 	const [details, setDetails] = useState<WorkerConfig>({
 		name: "",
 		orgId: currentOrg.id,
-		subtype: "ai-worker",
+		type: "ai-worker",
 		description: "",
-		type: "worker",
 		channelUserConfig: {
 		} as Record<ChannelType, string>,
 		variables: {},
@@ -66,7 +65,7 @@ export const WorkerAddComponent = () => {
 	}, [currentOrg]);
 
 	useEffect(() => {
-		setCredentialList(credentials.filter((credential) => workerTypes.includes(credential.subtype as WorkerType)));
+		setCredentialList(credentials.filter((credential) => workerTypes.includes(credential.type as WorkerType)));
 	}, [credentials]);
 
 	return editting ? (
@@ -101,15 +100,15 @@ export const WorkerAddComponent = () => {
 								style={{
 									minWidth: 235,
 								}}
-								value={details.subtype}
+								value={details.type}
 								onChange={(e) => {
 									setDetails({
 										...details,
-										subtype: e.target.value as WorkerType,
+										type: e.target.value as WorkerType,
 									});
 								}}
 							>
-								{[...new Set(workerTypes)].filter(t => t !== "mock").map((subtype) => (
+								{[...new Set(workerTypes)].filter(t => !t.startsWith("mock")).map((subtype) => (
 									<MenuItem value={subtype} key={subtype}>{subtype}</MenuItem>
 								))}
 							</TextField>
@@ -170,6 +169,7 @@ export const WorkerAddComponent = () => {
 					<Grid item xs={12}>
 						<SchemaVariableListComponent
 							config={details}
+							objectType="worker"
 							onPropertyChange={(name, newValue) => {
 								setDetails({
 									...details,
@@ -187,7 +187,7 @@ export const WorkerAddComponent = () => {
 						<b>Channel Tokens</b>
 					</Grid>
 					{channelTypes
-						.filter((channelType) => channelType !== "mock")
+						.filter((channelType) => !channelType.startsWith("mock"))
 						.map((channelType) => (
 							<Grid item xs={12} key={channelType}>
 								<TextField
@@ -210,7 +210,7 @@ export const WorkerAddComponent = () => {
 									{credentials
 										.filter((credential) =>
 											channelUserCredentialTypes.includes(
-												credential.subtype as ChannelUserCredentialType
+												credential.type as ChannelUserCredentialType
 											)
 										)
 
@@ -281,9 +281,8 @@ export const WorkerAddComponent = () => {
 					setDetails({
 						name: "",
 						orgId: currentOrg.id,
-						subtype: "ai-worker",
+						type: "ai-worker",
 						description: "",
-						type: "worker",
 						variables: {},
 					});
 					setEditting(true);

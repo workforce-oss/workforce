@@ -7,8 +7,8 @@ import { ChannelConfig } from "../model.js";
 
 export class ChannelFactory {
     static create(config: ChannelConfig, onFailure: (objectId: string, error: string) => void): Channel {
-        switch (config.subtype) {
-            case "mock":
+        switch (config.type) {
+            case "mock-channel":
                 return new MockChannel(config, onFailure);
             case "slack-channel":
                 return new SlackChannel(config, onFailure);
@@ -17,7 +17,7 @@ export class ChannelFactory {
             case "discord-channel":
                 return new DiscordChannel(config, onFailure);
             default:
-                throw new Error(`ChannelFactory.create() unknown channel type ${config.subtype as string}`);
+                throw new Error(`ChannelFactory.create() unknown channel type ${config.type as string}`);
         }
     }
 }

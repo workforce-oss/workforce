@@ -4,6 +4,7 @@ import { Logger } from "../../logging/logger.js";
 import { ToolDb } from "./db.js";
 import { ToolStateDb } from "./db.state.js";
 
+// Add security middleware when using this endpoint
 export function ToolImageHandlers(): Record<string, RequestHandler[]> {
     return {
         get: [
@@ -59,5 +60,5 @@ export function ToolImageHandlers(): Record<string, RequestHandler[]> {
     };
 }
 
-export const ToolImageRoutes: Router = express.Router({ mergeParams: true });
-ToolImageRoutes.get("/", ToolImageHandlers().get);
+export const ToolImageRouter: Router = express.Router({ mergeParams: true });
+ToolImageRouter.get("/", ToolImageHandlers().get);

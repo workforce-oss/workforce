@@ -6,15 +6,15 @@ import { TrackerConfig } from "../model.js";
 
 export class TrackerFactory {
     static create(config: TrackerConfig, onFailure: (objectId: string, error: string) => void): Tracker<TrackerConfig> {
-        switch (config.subtype) {
-            case "mock":
+        switch (config.type) {
+            case "mock-tracker":
                 return new MockTracker(config);
             case "github-board-tracker":
                 return new GithubBoardTracker(config, onFailure);
             case "trello-tracker":
                 return new TrelloTracker(config, onFailure);
             default:
-                throw new Error(`TrackerFactory.create() unknown tracker type ${config.type}`);
+                throw new Error(`TrackerFactory.create() unknown tracker type ${config.type as string}`);
         }
     }
 }

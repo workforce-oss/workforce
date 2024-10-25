@@ -8,8 +8,7 @@ export class NativeChannelMetadata {
             id: crypto.randomUUID(),
             name: "Native Channel",
             description: "Native Channel",
-            type: "channel",
-            subtype: "native-channel",
+            type: "native-channel",
             orgId: orgId,
             variables: {
                 channel_name: "",

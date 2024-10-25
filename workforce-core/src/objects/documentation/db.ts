@@ -46,7 +46,7 @@ export class DocumentationDb extends BaseModel {
         const base = super.toModel();
         const model: DocumentationConfig = {
             ...base,
-            subtype: this.subtype as DocumentationType,
+            type: this.type as DocumentationType,
             flowId: this.flowId,
         };
 

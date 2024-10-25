@@ -6,30 +6,18 @@ import { Logger } from "../logging/logger.js";
 export class AuthorizationHelper {
     static withOrgRole(roles: string[]): RequestHandler {
         return (req, res, next) => {
-            const body = req.body as { orgId?: string } || {};
-            const query = req.query as { orgId?: string } || {};
-
             if (!req.auth?.payload.sub) {
                 Logger.getInstance("AuthorizationHelper").error("withOrgRole() No sub in payload");
                 res.status(401).send("Unauthorized");
                 return;
             }
 
-            if (!query.orgId && !body.orgId) {
+            const orgId = req.params.orgId;
+
+            if (!orgId) {
                 Logger.getInstance("AuthorizationHelper").error("withOrgRole() No orgId provided");
                 res.status(400).send("Bad Request");
                 return;
-            }
-
-            if (req.query?.orgId && body.orgId && (query.orgId !== body.orgId)) {
-                Logger.getInstance("AuthorizationHelper").error(`WithOrgRole() OrgId mismatch: query: ${query.orgId} body: ${body.orgId}`);
-                res.status(400).send("Bad Request");
-                return;
-            }
-
-            let orgId = query.orgId;
-            if (!orgId) {
-                orgId = body.orgId;
             }
 
             if (orgId) {
@@ -39,18 +27,20 @@ export class AuthorizationHelper {
                         return;
                     }
 
+                    Logger.getInstance("AuthorizationHelper").debug("withOrgRole() User does not have required roles");
                     res.status(404).send("Not Found");
                 }).catch(() => {
+                    Logger.getInstance("AuthorizationHelper").error("Error checking org roles");
                     res.status(404).send("Not Found");
                 });
             } else {
+                Logger.getInstance("AuthorizationHelper").error("withOrgRole() No orgId provided");
                 res.status(404).send("Not Found");
             }
         }
     }
 
     static async hasOrgRoles(roles: string[], userId: string, orgId: string): Promise<boolean> {
-
         const relationships = await OrgUserRelationDb.findAll({
             where: {
                 orgId: orgId,
@@ -67,6 +57,7 @@ export class AuthorizationHelper {
         }
 
         if (relationships.some(r => roles.includes(r.role))) {
+            Logger.getInstance("AuthorizationHelper").debug("hasOrgRoles() User has required roles");
             return true;
         }
 
@@ -82,38 +73,17 @@ export class AuthorizationHelper {
                 return;
             }
 
-            const body = req.body as { orgId?: string, spaceId?: string } || {};
-            const query = req.query as { orgId?: string, spaceId?: string } || {};
+            const params = req.params as { orgId?: string, spaceId?: string } || {};
+            const orgId = params.orgId;
+            const spaceId = params.spaceId;
 
-            if (req.query?.orgId && body.orgId && (query.orgId !== body.orgId)) {
-                Logger.getInstance("AuthorizationHelper").error(`withSpaceRole() OrgId mismatch: query: ${query.orgId} body: ${body.orgId}`);
-                res.status(400).send("Bad Request");
-                return;
-            }
-
-            if (query.spaceId && body.spaceId && (query.spaceId !== body.spaceId)) {
-                Logger.getInstance("AuthorizationHelper").error(`withSpaceRole() SpaceId mismatch: query: ${query.spaceId} body: ${body.spaceId}`);
-                res.status(400).send("Bad Request");
-                return;
-            }
-
-            let orgId = query.orgId;
-            if (!orgId) {
-                orgId = body.orgId;
-            }
-
-            let spaceId = query.spaceId;
-            if (!spaceId) {
-                spaceId = body.spaceId;
-            }
-
-            if (orgId) {
+            if (orgId && !spaceId) {
                 this.hasOrgRoles(roles, req.auth.payload.sub, orgId).then((hasRoles) => {
                     if (hasRoles) {
                         next();
                         return;
                     }
-
+                    Logger.getInstance("AuthorizationHelper").debug("withSpaceRole() User does not have org roles");
                     res.status(404).send("Not Found");
                 }).catch((e) => {
                     Logger.getInstance("AuthorizationHelper").error("Error checking org roles", e);
@@ -125,13 +95,14 @@ export class AuthorizationHelper {
                         next();
                         return;
                     }
-
+                    Logger.getInstance("AuthorizationHelper").debug("withSpaceRole() User does not have required roles");
                     res.status(404).send("Not Found");
                 }).catch((e) => {
                     Logger.getInstance("AuthorizationHelper").error("Error checking space roles", e);
                     res.status(404).send("Not Found");
                 });
             } else {
+                Logger.getInstance("AuthorizationHelper").error("withSpaceRole() No orgId or spaceId provided");
                 res.status(404).send("Not Found");
             }
         };

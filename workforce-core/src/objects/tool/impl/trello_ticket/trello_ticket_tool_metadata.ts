@@ -8,8 +8,7 @@ export class TrelloTicketToolMetadata {
             id: crypto.randomUUID(),
             name: "Trello Ticket Tool",
             description: "A tool that creates a Trello ticket.",
-            type: "tool",
-            subtype: "trello-ticket-tool",
+            type: "trello-ticket-tool",
             orgId: orgId,
             variables: {
                 purpose: "Create a Trello ticket.",

@@ -20,6 +20,11 @@ resource "helm_release" "istiod" {
   namespace  = "istio-system"
 
   depends_on = [helm_release.base]
+
+  set {
+    name = "global.defaultPodDisruptionBudget.minAvailable"
+    value = var.scale_to_zero ? "0" : "1"
+  }
 }
 
 resource "helm_release" "ingress" {

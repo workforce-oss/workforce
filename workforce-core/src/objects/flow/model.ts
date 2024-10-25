@@ -19,3 +19,5 @@ export interface FlowConfig {
     tools?: ToolConfig[];
     trackers?: TrackerConfig[];
 }
+
+export const flowObjectTypes = ["channel", "documentation", "resource", "task", "tool", "tracker"];

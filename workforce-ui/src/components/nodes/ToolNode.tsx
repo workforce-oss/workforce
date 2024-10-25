@@ -28,6 +28,6 @@ export const ToolNode = ({ data, selected }: { data: CustomNodeData<ToolConfig>;
 	}, [flowData]);
 
 	return (
-		<GenericNode data={data} selected={selected} children={""} headerColor={CustomColors.tool} />
+		<GenericNode data={data} objectType="tool" selected={selected} children={""} headerColor={CustomColors.tool} />
 	);
 };

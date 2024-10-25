@@ -1,5 +1,5 @@
 import { expect } from 'chai';
-import { convertJsonSchemaToVariablesSchema } from '../../../src/objects/base/variables_schema_tools';
+import { convertJsonSchemaToVariablesSchema } from '../../../src/objects/base/variables_schema_tools.js';
 import _ from 'lodash';
 import { describe } from 'mocha';
 

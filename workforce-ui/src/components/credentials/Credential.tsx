@@ -12,9 +12,13 @@ import { shallow } from "zustand/shallow";
 import { CredentialState, credentialStore } from "../../state/store.credentials";
 import { SchemaVariableListComponent } from "../SchemaVariableListComponent";
 import { WorkforceAPIClient } from "workforce-api-client";
+import { ContextState, contextStore } from "../../state/store.context";
 
 const selector = (state: CredentialState) => ({
 	updateCredential: state.updateCredential,
+});
+const contextSelector = (state: ContextState) => ({
+	currentOrg: state.currentOrg,
 });
 
 
@@ -23,13 +27,14 @@ export const CredentialComponent = (props: { config: CredentialConfig; }) => {
 	const { updateCredential } = credentialStore(selector, shallow);
 	const [expanded, setExpanded] = useState(false);
 	const [details, setDetails] = useState<CredentialConfig>(config);
+	const { currentOrg } = contextStore(contextSelector, shallow);
 
 	useEffect(() => {
 		if (!expanded) {
 			return;
 		}
 		WorkforceAPIClient.CredentialAPI
-			.get(config.id)
+			.get(config.id, { orgId: currentOrg.id })
 			.then((config) => {
 				setDetails(config);
 			});
@@ -45,13 +50,14 @@ export const CredentialComponent = (props: { config: CredentialConfig; }) => {
 					</Grid>
 
 					<Grid item xs={6}>
-						<Typography color="text.secondary">{config.subtype}</Typography>
+						<Typography color="text.secondary">{config.type}</Typography>
 					</Grid>
 				</Grid>
 			</AccordionSummary>
 			<AccordionDetails>
 				<SchemaVariableListComponent
 					config={details}
+					objectType="credential"
 					onPropertyChange={(name, newValue) => {
 						updateCredential({
 							...details,

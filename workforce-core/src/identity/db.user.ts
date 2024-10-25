@@ -1,7 +1,8 @@
 import { randomUUID } from "crypto";
 import { Optional, STRING, UUID } from "sequelize";
-import { Column, Model, Table } from "sequelize-typescript";
+import { Column, HasMany, Model, Table } from "sequelize-typescript";
 import { WorkforceUser } from "./model.js";
+import { OrgUserRelationDb } from "./db.org_user.js";
 
 export interface UserAttributes {
     id: string;
@@ -56,6 +57,9 @@ export class UserDb extends Model<UserAttributes, UserCreationAttributes> {
     })
     declare email: string;
 
+    @HasMany(() => OrgUserRelationDb, { onDelete: "CASCADE" })
+    declare relations?: OrgUserRelationDb[];
+
     public toModel(): WorkforceUser {
         const model: WorkforceUser = {
             id: this.id,
@@ -66,6 +70,9 @@ export class UserDb extends Model<UserAttributes, UserCreationAttributes> {
         };
         if (this.idpId) {
             model.idpId = this.idpId;
+        }
+        if (this.relations) {
+            model.relations = this.relations.map((r) => r.toModel());
         }
 
         return model;

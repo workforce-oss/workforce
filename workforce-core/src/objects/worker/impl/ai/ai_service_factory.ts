@@ -16,7 +16,7 @@ export class AIServiceFactory {
         } else if (config.variables?.model && mockModels.includes(config.variables.model as string)) {
             return new MockAIService();
         } else {
-            throw new Error(`Unknown AI service type: ${config.subtype}`);
+            throw new Error(`Unknown AI service type: ${config.type}`);
         }
     }
 }

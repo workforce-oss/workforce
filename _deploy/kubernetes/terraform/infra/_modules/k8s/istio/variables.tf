@@ -27,6 +27,12 @@ variable "enable_gke_security_policy" {
   default     = false
 }
 
+variable "scale_to_zero" {
+  type        = bool
+  description = "Whether to scale istio to 0."
+  default     = false
+}
+
 variable enable_ip_source_restriction {
   type = bool
 

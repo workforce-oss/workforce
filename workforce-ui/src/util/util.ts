@@ -99,7 +99,7 @@ export class CustomColors {
 
 export class CustomIcons {
     static readonly icons: Map<ObjectSubtype, typeof SvgIcon> = new Map([
-        ['mock', Code],
+        ['mock-channel', Code],
         // ['local-chat-channel', WifiChannel],
         ['slack-channel', WifiChannel],
         ['native-channel', WifiChannel],
@@ -119,7 +119,7 @@ export class CustomIcons {
         ['github-board-tracker', GitHub],
         ['trello-tracker', Assignment],
         ['ai-worker', SmartToy],
-        ['default', TextFields],
+        ['default-documentation', TextFields],
     ]);
 }
 

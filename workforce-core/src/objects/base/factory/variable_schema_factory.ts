@@ -25,12 +25,13 @@ import { WorkerConfig, WorkerType, workerTypes } from "../../worker/model.js";
 import { BaseConfig } from "../model.js";
 import { VariablesSchema } from "../variables_schema.js";
 import { VariableSchemaElement } from "../variables_schema_model.js";
+import { ObjectType } from "./types.js";
 
 
 export class VariablesSchemaFactory {
 	private static logger: Logger = Logger.getInstance("VariablesSchemaFactory");
-	static for<T extends BaseConfig>(model: T): VariablesSchema {
-		switch (model.type) {
+	static for<T extends BaseConfig>(model: T, objectType: ObjectType): VariablesSchema {
+		switch (objectType) {
 			case "credential": {
 				const schema = this.getCredentialVariablesSchema(model as CredentialConfig);
 				this.logger.debug(`Credential variables schema: ${schema.toJsonString()}`);
@@ -57,32 +58,32 @@ export class VariablesSchemaFactory {
 			case "worker":
 				return WorkerConfigFactory.variablesSchemaFor(model as WorkerConfig).withoutSensitive();
 			default:
-				return new VariablesSchema(new Map<string, VariableSchemaElement>(), model.type, model.subtype);
+				return new VariablesSchema(new Map<string, VariableSchemaElement>(), objectType, model.type);
 		}
 	}
 
 	private static getCredentialVariablesSchema<T extends BaseConfig>(model: T): VariablesSchema {
-		if (channelUserCredentialTypes.includes(model.subtype as ChannelUserCredentialType)) {
+		if (channelUserCredentialTypes.includes(model.type as ChannelUserCredentialType)) {
 			return ChannelUserCredentialConfigFactory.variablesSchemaFor(
 				model as ChannelUserCredential
 			).onlySensitive();
-		} else if (channelTypes.includes(model.subtype as ChannelType)) {
+		} else if (channelTypes.includes(model.type as ChannelType)) {
 			return ChannelConfigFactory.variablesSchemaFor(model as ChannelConfig).onlySensitive();
-		} else if (documentationTypes.includes(model.subtype as DocumentationType)) {
+		} else if (documentationTypes.includes(model.type as DocumentationType)) {
 			return DocumentationConfigFactory.variablesSchemaFor(model as DocumentationConfig).onlySensitive();
-		} else if (documentRepositoryTypes.includes(model.subtype as DocumentRepositoryType)) {
+		} else if (documentRepositoryTypes.includes(model.type as DocumentRepositoryType)) {
 			return DocumentRepositoryConfigFactory.variablesSchemaFor(model as DocumentRepositoryConfig).onlySensitive();
-		} else if (resourceTypes.includes(model.subtype as ResourceType)) {
+		} else if (resourceTypes.includes(model.type as ResourceType)) {
 			return ResourceConfigFactory.variablesSchemaFor(model as ResourceConfig).onlySensitive();
-		} else if (taskTypes.includes(model.subtype as TaskType)) {
+		} else if (taskTypes.includes(model.type as TaskType)) {
 			return TaskConfigFactory.variablesSchemaFor(model as TaskConfig).onlySensitive();
-		} else if (toolTypes.includes(model.subtype as ToolType)) {
+		} else if (toolTypes.includes(model.type as ToolType)) {
 			return ToolConfigFactory.variablesSchemaFor(model as ToolConfig).onlySensitive();
-		} else if (trackerTypes.includes(model.subtype as TrackerType)) {
+		} else if (trackerTypes.includes(model.type as TrackerType)) {
 			return TrackerConfigFactory.variablesSchemaFor(model as TrackerConfig).onlySensitive();
-		} else if (workerTypes.includes(model.subtype as WorkerType)) {
+		} else if (workerTypes.includes(model.type as WorkerType)) {
 			return WorkerConfigFactory.variablesSchemaFor(model as WorkerConfig).onlySensitive();
 		}
-		throw new Error(`VariablesSchemaFactory.getCredentialVariablesSchema() unknown subtype ${model.subtype}`);
+		throw new Error(`VariablesSchemaFactory.getCredentialVariablesSchema() unknown subtype ${model.type}`);
 	}
 }

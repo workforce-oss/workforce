@@ -8,8 +8,7 @@ export class OpenAPIToolMetadata {
             id: crypto.randomUUID(),
             name: "OpenAPI Tool",
             description: "A tool that calls an OpenAPI service.",
-            type: "tool",
-            subtype: "openapi-tool",
+            type: "openapi-tool",
             orgId: orgId,
             variables: {},
         }

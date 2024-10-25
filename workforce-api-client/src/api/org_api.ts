@@ -8,6 +8,7 @@ export class OrgAPI extends RestApi<WorkforceOrg, VariableSchemaValidationError>
             OrgAPI.instance = new OrgAPI({
                 basePath: options?.basePath ?? "/workforce-api",
                 resource: "orgs",
+                objectType: "org",
                 baseUrl: options?.baseUrl,
                 accessToken: options?.accessToken,
                 validate: () => []

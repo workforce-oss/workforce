@@ -25,10 +25,11 @@ export class VariablesSchema extends Map<string, VariableSchemaElement> {
   }
 
   public static validateBaseObject(
-    model: BaseConfig
+    model: BaseConfig,
+    type: ObjectType
   ): VariableSchemaValidationError[] {
-    const errors = VariablesSchemaFactory.for(model).validateObject(
-      `${model.type}/${model.name}`,
+    const errors = VariablesSchemaFactory.for(model, type).validateObject(
+      `${type}/${model.name}`,
       model.variables
     );
     return errors;
@@ -151,11 +152,22 @@ export class VariablesSchema extends Map<string, VariableSchemaElement> {
         }
       }
       if (schemaElement.type === "number") {
+        // check if the number is a number
+        if (typeof element !== "number") {
+          errors.push({
+            message: `${ansi.white.underline(objectName)}:\n\t${ansi.red.italic(
+              `'${element as string}'`
+            )} ${ansi.red.italic("is not a number for")} ${ansi.cyan.italic(
+              elementName
+            )}.`,
+          });
+          return errors;
+        }
         if (schemaElement.min !== undefined) {
-          if ((element as number) < schemaElement.min) {
+          if ((element) < schemaElement.min) {
             errors.push({
               message: `${ansi.white.underline(objectName)}:\n\t${ansi.red.italic(
-                `'${element as number}'`
+                `'${element}'`
               )} ${ansi.red.italic(
                 "is less than the minimum value for"
               )} ${ansi.cyan.italic(elementName)}: ${ansi.green.italic(
@@ -165,10 +177,10 @@ export class VariablesSchema extends Map<string, VariableSchemaElement> {
           }
         }
         if (schemaElement.max !== undefined) {
-          if ((element as number) > schemaElement.max) {
+          if ((element) > schemaElement.max) {
             errors.push({
               message: `${ansi.white.underline(objectName)}:\n\t${ansi.red.italic(
-                `'${element as number}'`
+                `'${element}'`
               )} ${ansi.red.italic(
                 "is greater than the maximum value for"
               )} ${ansi.cyan.italic(elementName)}: ${ansi.green.italic(
@@ -177,6 +189,7 @@ export class VariablesSchema extends Map<string, VariableSchemaElement> {
             });
           }
         }
+
       }
       return errors;
     }
@@ -279,7 +292,7 @@ export class VariablesSchema extends Map<string, VariableSchemaElement> {
 
 export function mockVariablesSchema(type: ObjectType): VariablesSchema {
   const schema = new Map<string, VariableSchemaElement>();
-  const subtype = "mock";
+  const subtype = `mock-${type}`;
   schema.set("output", {
     type: "string",
     description: "An output value to use for testing",
@@ -299,6 +312,11 @@ export function mockVariablesSchema(type: ObjectType): VariablesSchema {
     type: "string",
     description: "A toolcall to use for testing",
   })
-  return new VariablesSchema(schema, type, subtype);
+  schema.set("secret_key", {
+    type: "number",
+    description: "A secret value to test credential handling",
+    sensitive: true,
+  });
+  return new VariablesSchema(schema, type, subtype as ObjectSubtype);
 }
 

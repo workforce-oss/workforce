@@ -9,8 +9,7 @@ export class RawTextResourceMetadata {
             orgId: orgId,
             name: "Raw Text Resource",
             description: "A raw text resource.",
-            type: "resource",
-            subtype: "raw-text-resource",
+            type: "raw-text-resource",
             variables: {
                 text: "",
             }

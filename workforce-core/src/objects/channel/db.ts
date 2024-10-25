@@ -49,7 +49,7 @@ export class ChannelDb extends BaseModel {
         }
         return {
             ...base,
-            subtype: this.subtype as ChannelType,
+            type: this.type as ChannelType,
             flowId: this.flowId,
         };
     }

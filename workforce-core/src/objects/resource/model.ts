@@ -40,7 +40,7 @@ export interface ResourceWrite {
 export type ResourceWriteStatus = "started" | "complete" | "error";
 
 export const resourceTypes = [
-    "mock",
+    "mock-resource",
     "api-resource",
     "github-repo-resource",
     "raw-text-resource",
@@ -48,6 +48,6 @@ export const resourceTypes = [
 ] as const;
 
 export interface ResourceConfig extends BaseConfig {
-    subtype: ResourceType;
+    type: ResourceType;
     example?: string;
 }

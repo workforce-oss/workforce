@@ -1,7 +1,7 @@
 import { WorkforceAPIClient } from "workforce-api-client";
 import { CredentialConfig } from "workforce-core/model";
 import { temporal } from "zundo";
-import { create } from "zustand";
+import { create, StateCreator } from "zustand";
 
 export type CredentialState = {
     message: string | undefined;
@@ -15,13 +15,13 @@ export type CredentialState = {
 };
 
 export const credentialStore = create<CredentialState>()(
-    temporal((set, get: () => CredentialState) => ({
+    temporal((set) => ({
         message: undefined,
         error: undefined,
         credentials: [],
         addCredential: (credential: CredentialConfig) => {
             WorkforceAPIClient.CredentialAPI
-                .create(credential)
+                .create(credential, {orgId: credential.orgId})
                 .then((c) => {
                     if (!Array.isArray(c)) {
                         set((state) => ({
@@ -42,7 +42,7 @@ export const credentialStore = create<CredentialState>()(
         },
         removeCredential: (credential: CredentialConfig) => {
             WorkforceAPIClient.CredentialAPI
-                .delete(credential.id)
+                .delete(credential.id, {orgId: credential.orgId})
                 .then((c) => {
                     if (!Array.isArray(c)) {
                         set((state) => ({
@@ -62,7 +62,7 @@ export const credentialStore = create<CredentialState>()(
         },
         updateCredential: (credential: CredentialConfig) => {
             WorkforceAPIClient.CredentialAPI
-                .update(credential, credential.id)
+                .update(credential, credential.id, {orgId: credential.orgId})
                 .then((c) => {
                     if (!Array.isArray(c)) {
                         set((state) => ({
@@ -108,7 +108,7 @@ export const credentialStore = create<CredentialState>()(
             });
         },
         getDetails: (credential: CredentialConfig) => {
-            return WorkforceAPIClient.CredentialAPI.get(credential.id);
+            return WorkforceAPIClient.CredentialAPI.get(credential.id, {orgId: credential.orgId});
         },
-    }))
+    })) as StateCreator<CredentialState, [], [never, unknown][]>
 );

@@ -8,8 +8,7 @@ export class MessageChannelToolMetadata {
             id: crypto.randomUUID(),
             name: "Message Channel Tool",
             description: "A tool that sends messages to a channel.",
-            type: "tool",
-            subtype: "message-channel-tool",
+            type: "message-channel-tool",
             orgId: orgId,
             variables: {},
         }

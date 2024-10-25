@@ -12,7 +12,6 @@ export abstract class Tracker<TConfig extends TrackerConfig> extends BaseObject<
     constructor(config: TConfig, onFailure: (objectId: string, error: string) => void) {
         super(config, onFailure);
         if (config.webhooksEnabled) {
-            this.logger.debug(`constructor() subtype=${config.subtype} webhooksEnabled=true`)
             this.registerWebhookHandler(config.orgId, config.id!).then(() => {
                 this.logger.debug(`registerWebhookHandler() orgId=${config.orgId} id=${config.id}`);
             }).catch((err) => {
@@ -20,7 +19,7 @@ export abstract class Tracker<TConfig extends TrackerConfig> extends BaseObject<
                 onFailure(config.id!, "Error registering webhook handler");
             });
         } else {
-            this.logger.debug(`constructor() subtype=${config.subtype} webhooksEnabled=false`)
+            this.logger.debug(`constructor() type=${config.type} webhooksEnabled=false`)
         }
     }
 

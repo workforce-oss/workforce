@@ -171,8 +171,8 @@ export default function Shell() {
 		if (!auth?.session?.auth?.accessToken) {
 			return;
 		}
-		WorkforceAPIClient.OrgUserAPI.list().then((relations) => {
-			const mappedOrgs: OrgData[] = relations.map((relation) => {
+		WorkforceAPIClient.UserAPI.get(auth.userId).then((user) => {
+			const mappedOrgs: OrgData[] = user.relations?.map((relation) => {
 				return {
 					id: relation.orgId,
 					description: "",

@@ -14,4 +14,5 @@ module "base" {
   enable_gke_security_policy   = var.enable_gke_security_policy
   enable_ip_source_restriction = var.enable_ip_source_restriction
   allowed_ips                  = var.allowed_ips
+  scale_istio_to_zero          = var.scale_istio_to_zero
 }

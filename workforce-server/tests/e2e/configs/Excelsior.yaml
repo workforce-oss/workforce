@@ -14,7 +14,7 @@ channels:
 documentation:
   - name: Documentation
     description: Documentation
-    type: default
+    type: default-documentation
     variables:
       desiredTokens: 512
       maxTokens: 1024
@@ -26,7 +26,7 @@ tools:
   - name: Google Slides
     description: A tool that interacts with Google Slides.
     type: google-slides-tool
-    credential: google-slides-2
+    credential: google-slides
   - name: Excalidraw Tool
     description: A tool that interacts with Excalidraw.
     type: excalidraw-tool
@@ -34,7 +34,7 @@ tools:
   - name: Google Drive
     description: A tool that interacts with Google Drive.
     type: google-drive-tool
-    credential: google-drive-2
+    credential: google-drive
 trackers: []
 tasks:
   - name: Chat

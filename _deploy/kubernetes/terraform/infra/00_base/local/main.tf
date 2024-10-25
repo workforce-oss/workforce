@@ -9,8 +9,9 @@ module "base" {
   install_nvidia_driver        = var.install_nvidia_driver
   install_nvidia_toolkit       = var.install_nvidia_toolkit
   install_nvidia_operator      = var.install_nvidia_operator
+  scale_istio_to_zero          = var.scale_istio_to_zero
 
-  enable_ngrok = var.enable_ngrok
-  ngrok_api_key = var.ngrok_api_key
+  enable_ngrok     = var.enable_ngrok
+  ngrok_api_key    = var.ngrok_api_key
   ngrok_auth_token = var.ngrok_auth_token
 }

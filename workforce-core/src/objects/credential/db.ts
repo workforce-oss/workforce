@@ -36,7 +36,6 @@ export class CredentialDb extends BaseModel {
             description: model.description,
             orgId: model.orgId,
             type: model.type,
-            subtype: model.subtype,
         }
         super.loadModel(withoutVariables);
         this.secretId = model.secretId!;

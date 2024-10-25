@@ -9,8 +9,7 @@ export class GithubPullRequestResourceMetadata {
             orgId: orgId,
             name: "Github Pull Request Resource",
             description: "A Github Pull Request resource.",
-            type: "resource",
-            subtype: "github-pull-request-resource",
+            type: "github-pull-request-resource",
             variables: {
 
             }

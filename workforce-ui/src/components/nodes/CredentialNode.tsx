@@ -35,18 +35,19 @@ export const CredentialNode = ({ data, selected }: { data: CustomNodeData<Creden
 	const { selectedFlow } = metaStore(metaSelector, shallow);
 
 	const { flowData } = flowStates.get(selectedFlow.id)(selector, shallow) as RFState;
-	const [type, setType] = useState<ObjectSubtype>(data.config.subtype as ObjectSubtype);
+	const [type, setType] = useState<ObjectSubtype>(data.config.type as ObjectSubtype);
 
 	useEffect(() => {
 		const node = selectedFlow.nodes?.find((node) => node.id === data.config.id);
-		if (node && node.data?.subtype !== type) {
-			setType(node.data?.subtype as ObjectSubtype);
+		if (node && node.data?.type !== type) {
+			setType(node.data?.type as ObjectSubtype);
 		}
 	}, [data]);
 
 	return (
 		<GenericNode
 			data={data}
+			objectType="credential"
 			selected={selected}
 			headerColor={CustomColors.credential}
 			readOnly={true}

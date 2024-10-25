@@ -111,9 +111,11 @@ export class TaskDb extends BaseModel {
     const inputs = jsonParse(this.inputs);
     const subtasks = jsonParse(this.subtasks)
     const outputs = this.outputs;
+    const costLimit = this.costLimit;
+
     const config: TaskConfig = {
       ...base,
-      subtype: this.subtype as TaskType,
+      type: this.type as TaskType,
       flowId: this.flowId,
     };
 
@@ -151,6 +153,10 @@ export class TaskDb extends BaseModel {
 
     if (outputs) {
       config.outputs = outputs;
+    }
+
+    if (costLimit) {
+      config.costLimit = costLimit;
     }
 
     if (this.flow) {
@@ -225,6 +231,12 @@ export class TaskDb extends BaseModel {
       this.defaultChannel = model.defaultChannel;
     } else {
       this.defaultChannel = null;
+    }
+
+    if (model.costLimit) {
+      this.costLimit = model.costLimit;
+    } else {
+      this.costLimit = null;
     }
     return this;
   }

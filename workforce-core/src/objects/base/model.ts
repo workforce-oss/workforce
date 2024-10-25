@@ -1,4 +1,4 @@
-import { ObjectType, ObjectSubtype } from "./factory/types.js";
+import { ObjectSubtype } from "./factory/types.js";
 
 export const TASK_COMPLETE_FUNCTION_NAME = "complete_task";
 export const SUBTASK_SUMMARY_FUNCTION_NAME = "provide_summary";
@@ -38,8 +38,7 @@ export interface BaseConfig {
     flowId?: string;
     name: string;
     description: string;
-    type: ObjectType;
-    subtype: ObjectSubtype;
+    type: ObjectSubtype;
     credential?: string;
     variables?: Record<string, unknown>;
 }

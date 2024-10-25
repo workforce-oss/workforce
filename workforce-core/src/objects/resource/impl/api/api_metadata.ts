@@ -8,8 +8,7 @@ export class ApiResourceMetadata {
             id: crypto.randomUUID(),
             name: "Custom Webhook",
             description: "A resource that calls a custom webhook.",
-            type: "resource",
-            subtype: "api-resource",
+            type: "api-resource",
             orgId: orgId,
             variables: {},
         }

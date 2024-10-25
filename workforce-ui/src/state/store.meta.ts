@@ -1,7 +1,7 @@
 import { v4 as uuidv4 } from "uuid";
 import { VariableSchemaValidationError, WorkerConfig, CredentialConfig, FlowConfig } from "workforce-core/model";
 import { temporal } from "zundo";
-import { create } from "zustand";
+import { create, StateCreator } from "zustand";
 import { FlowManager } from "../manager/flow_manager";
 import { RFState, flowState } from "./store.flow";
 import { incrementString } from "../util/util";
@@ -95,7 +95,7 @@ export const metaStore = create<MetaState>()(
 				flow.name = incrementString(flow.name);
 			}
 			WorkforceAPIClient.FlowAPI
-				.create(flow)
+				.create(flow, { orgId })
 				.catch((e) => {
 					console.error(e);
 				})
@@ -156,7 +156,7 @@ export const metaStore = create<MetaState>()(
 			}
 			const newStatus = flow.status === "active" ? "inactive" : "active";
 			WorkforceAPIClient.FlowAPI
-				.update({ ...flow, status: newStatus }, flow.id)
+				.update({ ...flow, status: newStatus }, flow.id, { orgId: flow.orgId })
 				.catch((e) => {
 					console.error(e);
 				})
@@ -169,7 +169,7 @@ export const metaStore = create<MetaState>()(
 
 		saveFlow: (flow: FlowConfig) => {
 			WorkforceAPIClient.FlowAPI
-				.create(flow)
+				.create(flow, { orgId: flow.orgId })
 				.then((response: FlowConfig | VariableSchemaValidationError[]) => {
 					if (Array.isArray(response)) {
 						const error = response.map((e) => e.message).join("\n");
@@ -198,15 +198,14 @@ export const metaStore = create<MetaState>()(
 				name: "New Credential",
 				description: "New Credential",
 				orgId,
-				type: "credential",
-				subtype: "github-repo-resource",
+				type: "github-repo-resource",
 				variables: {},
 			};
 			if (get().credentials.find((c) => c.name === credential.name)) {
 				credential.name = incrementString(credential.name);
 			}
 			WorkforceAPIClient.CredentialAPI
-				.create(credential)
+				.create(credential, { orgId })
 				.then((response: CredentialConfig | VariableSchemaValidationError[]) => {
 					if (Array.isArray(response)) {
 						const error = response.map((e) => e.message).join("\n");
@@ -234,7 +233,7 @@ export const metaStore = create<MetaState>()(
 		},
 		deleteCredential: (credential: CredentialConfig) => {
 			WorkforceAPIClient.CredentialAPI
-				.delete(credential.id)
+				.delete(credential.id, { orgId: credential.orgId })
 				.then(() => {
 					console.log(`deleteCredential() deleted credential ${credential.name}`);
 					set({
@@ -250,7 +249,7 @@ export const metaStore = create<MetaState>()(
 		},
 		saveCredential: (credential: CredentialConfig) => {
 			WorkforceAPIClient.CredentialAPI
-				.create(credential)
+				.create(credential, { orgId: credential.orgId })
 				.then((response: CredentialConfig | VariableSchemaValidationError[]) => {
 					if (Array.isArray(response)) {
 						const error = response.map((e) => e.message).join("\n");
@@ -279,15 +278,14 @@ export const metaStore = create<MetaState>()(
 				name: "New Worker",
 				description: "New Worker",
 				orgId,
-				type: "worker",
-				subtype: "ai-worker",
+				type: "ai-worker",
 				variables: {},
 			};
 			if (get().workers.find((w) => w.name === worker.name)) {
 				worker.name = incrementString(worker.name);
 			}
 			WorkforceAPIClient.WorkerAPI
-				.create(worker)
+				.create(worker, { orgId })
 				.then((response: WorkerConfig | VariableSchemaValidationError[]) => {
 					if (Array.isArray(response)) {
 						const error = response.map((e) => e.message).join("\n");
@@ -315,7 +313,7 @@ export const metaStore = create<MetaState>()(
 		},
 		deleteWorker: (worker: WorkerConfig) => {
 			WorkforceAPIClient.WorkerAPI
-				.delete(worker.id)
+				.delete(worker.id, { orgId: worker.orgId })
 				.then(() => {
 					console.log(`deleteWorker() deleted worker ${worker.name}`);
 					set({
@@ -331,7 +329,7 @@ export const metaStore = create<MetaState>()(
 		},
 		saveWorker: (worker: WorkerConfig) => {
 			WorkforceAPIClient.WorkerAPI
-				.create(worker)
+				.create(worker, { orgId: worker.orgId })
 				.then((response: WorkerConfig | VariableSchemaValidationError[]) => {
 					if (Array.isArray(response)) {
 						const error = response.map((e) => e.message).join("\n");
@@ -404,7 +402,7 @@ export const metaStore = create<MetaState>()(
 					}
 					Promise.all(
 						data.map((flow) => {
-							return WorkforceAPIClient.FlowAPI.get(flow.id);
+							return WorkforceAPIClient.FlowAPI.get(flow.id, { orgId: orgId });
 						})
 					)
 						.then((allFlows) => {
@@ -455,5 +453,5 @@ export const metaStore = create<MetaState>()(
 					})
 				});
 		},
-	}))
+	})) as StateCreator<MetaState, [], [never, unknown][]>
 );

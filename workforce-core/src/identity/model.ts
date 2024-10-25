@@ -26,6 +26,7 @@ export interface WorkforceUser {
     firstName: string;
     lastName: string;
     email: string;
+    relations?: WorkforceOrgUserRelation[];
 }
 
 export type WorkforceUserCreateRequest = {
