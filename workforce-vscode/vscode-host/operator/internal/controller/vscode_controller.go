@@ -18,9 +18,10 @@ package controller
 
 import (
 	"context"
-	"k8s.io/apimachinery/pkg/api/resource"
 	"os"
 	"time"
+
+	"k8s.io/apimachinery/pkg/api/resource"
 
 	"istio.io/api/networking/v1alpha3"
 	istio "istio.io/client-go/pkg/apis/networking/v1alpha3"

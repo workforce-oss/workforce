@@ -90,11 +90,11 @@ variable "weaviate_secret_data" {
 
 variable "keycloak_admin_secret_data" {
   type = object({
-      KEYCLOAK_BASE_URL        = string
-      KEYCLOAK_REALM_NAME      = string
-      KEYCLOAK_ADMIN_CLIENT_ID = string
-      KEYCLOAK_ADMIN_USERNAME  = string
-      KEYCLOAK_ADMIN_PASSWORD  = string
+    KEYCLOAK_BASE_URL        = string
+    KEYCLOAK_REALM_NAME      = string
+    KEYCLOAK_ADMIN_CLIENT_ID = string
+    KEYCLOAK_ADMIN_USERNAME  = string
+    KEYCLOAK_ADMIN_PASSWORD  = string
   })
   description = "Data to create the keycloak admin secret."
 }
@@ -114,6 +114,7 @@ variable "apps" {
     name                     = string
     namespace                = string
     image                    = string
+    image_pull_policy        = optional(string)
     http_port                = number
     http_supports_websockets = optional(bool, false)
     http_ingress_enabled     = optional(bool, false)

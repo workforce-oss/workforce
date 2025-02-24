@@ -1,7 +1,7 @@
 import chai, { expect } from "chai";
 import deepEqualInAnyOrder from "deep-equal-in-any-order";
 import { randomUUID } from "crypto";
-import express from "express";
+import express, { Application } from "express";
 import { auth } from "express-oauth2-jwt-bearer";
 import expressWs from "express-ws";
 import { setupServer } from "msw/node";
@@ -17,7 +17,7 @@ import { ResourceConfig } from "../../../src/objects/resource/model.js";
 chai.use(deepEqualInAnyOrder);
 
 describe("Flow API", () => {
-	const { app, getWss, applyTo } = expressWs(express());
+	const app = expressWs(express() as unknown as expressWs.Application).app as unknown as Application & expressWs.WithWebsocketMethod;
 
 	const basicConfig = (customOrgId?: string): FlowConfig => (
 		{
@@ -129,6 +129,7 @@ describe("Flow API", () => {
 
 			const response = await request(app)
 				.post(`/orgs/${orgId}/flows`)
+				.query({ replaceIdsWithNames: true })
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
 				.send(flowConfig)
@@ -210,6 +211,7 @@ describe("Flow API", () => {
 
 			const response = await request(app)
 				.get(`/orgs/${orgId}/flows/${flowDb.id}`)
+				.query({ replaceIdsWithNames: true })
 				.set("Authorization", `Bearer ${jwt}`)
 				.set("Content-Type", "application/json")
 				.expect(200);

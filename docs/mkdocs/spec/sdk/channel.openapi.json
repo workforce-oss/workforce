@@ -1,0 +1,304 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Custom Channel Implementation",
+    "description": "Spec for Custom Channel Implementation",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/orgs/${orgId}/objects/{typeName}": {
+      "parameters": [
+        {
+          "name": "orgId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        },
+        {
+          "name": "typeName",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string"
+          }
+        }
+      ],
+      "get": {
+        "summary": "Connect to an endpoint to manage a specific object type",
+        "description": "Connect to an endpoint to manage a specific object type",
+        "callbacks": {
+          "ChannelMessageEvent": {
+            "/objects/{$request.parameters#/orgId}/{$request.paremeters#/typeName}" :{
+              "description": "This is a websocket endpoint that will send and receive messages for the channel",
+              "get": {
+                "requestBody": {
+                  "description": "Event received by the channel to send to the workforce platform",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/CustomChannelEvent"
+                      }
+                    }
+                  }
+                },
+                "responses": {
+                  "default": {
+                    "description": "Event sent to the channel from the workforce platform",
+                    "content": {
+                      "application/json": {
+                        "schema": {
+                          "$ref": "#/components/schemas/CustomChannelEvent"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/destroy/{id}": {
+      "$ref": "./base.openapi.json#/paths/~1destroy~1{id}"
+    }
+  },
+  "components": {
+    "schemas": {
+      "ChannelConfig": {
+        "$ref": "./base.openapi.json#/components/schemas/BaseConfig"
+      },
+      "CustomChannelEventBase": {
+        "type": "object",
+        "properties": {
+          "channelId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "timestamp": {
+            "type": "number",
+            "description": "Unix timestamp in milliseconds"
+          },
+          "taskExecutionId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "eventType": {
+            "type": "string",
+            "description": "Type of event",
+            "enum": [
+              "register",
+              "message_start",
+              "message_part",
+              "message_end",
+              "new_session",
+              "join",
+              "leave",
+              "error"
+            ]
+          }
+        }
+      },
+      "CustomChannelMessageEvent": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CustomChannelEventBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "senderId": {
+                "type": "string",
+                "description": "UserId of the sender"
+              },
+              "messageId": {
+                "type": "string",
+                "description": "The channel implementation-specific message ID"
+              },
+              "threadId": {
+                "type": "string",
+                "description": "Thread ID of the message"
+              },
+              "text": {
+                "type": "string",
+                "description": "The message content"
+              },
+              "displayName": {
+                "type": "string",
+                "description": "Display name of the sender"
+              },
+              "toolCalls": {
+                "type": "array",
+                "description": "List of tool calls that are part of the message. This may be used to provide responses to tool calls received on the messageRequest endpoint, for rich user interfaces that implement them. A common example would be for dynamically generated forms.",
+                "items": {
+                  "$ref": "./base.openapi.json#/components/schemas/ToolCall"
+                }
+              },
+              "images": {
+                "type": "array",
+                "description": "List of images that are part of the message",
+                "items": {
+                  "$ref": "./base.openapi.json#/components/schemas/WorkforceImage"
+                }
+              },
+              "files": {
+                "type": "array",
+                "description": "List of files that are part of the message",
+                "items": {
+                  "$ref": "./base.openapi.json#/components/schemas/WorkforceFile"
+                }
+              }
+            },
+            "required": [
+              "senderId",
+              "messageId",
+              "threadId"
+            ]
+          }
+        ]
+      },
+      "CustomChannelNewSessionEvent": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CustomChannelEventBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "threadId": {
+                "type": "string",
+                "description": "The channel implementation-specific session ID"
+              }
+            },
+            "required": [
+              "threadId"
+            ]
+          }
+        ]
+      },
+      "CustomChannelJoinEvent": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CustomChannelEventBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "workerId": {
+                "type": "string",
+                "description": "UserId of the worker"
+              },
+              "token": {
+                "type": "string",
+                "description": "Token to authenticate the worker"
+              },
+              "threadId": {
+                "type": "string",
+                "description": "The channel implementation-specific session ID"
+              },
+              "username": {
+                "type": "string",
+                "description": "Username of the worker"
+              }
+            },
+            "required": [
+              "workerId",
+              "token"
+            ]
+          }
+        ]
+      },
+      "CustomChannelLeaveEvent": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CustomChannelEventBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "workerId": {
+                "type": "string",
+                "description": "UserId of the worker"
+              },
+              "threadId": {
+                "type": "string",
+                "description": "The channel implementation-specific session ID"
+              }
+            },
+            "required": [
+              "workerId"
+            ]
+          }
+        ]
+      },
+      "CustomChannelErrorEvent": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/CustomChannelEventBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "error": {
+                "type": "string",
+                "description": "Error message"
+              }
+            },
+            "required": [
+              "error"
+            ]
+          }
+        ]
+      },
+      "CustomChannelEvent": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/CustomChannelMessageEvent"
+          },
+          {
+            "$ref": "#/components/schemas/CustomChannelNewSessionEvent"
+          },
+          {
+            "$ref": "#/components/schemas/CustomChannelJoinEvent"
+          },
+          {
+            "$ref": "#/components/schemas/CustomChannelLeaveEvent"
+          },
+          {
+            "$ref": "#/components/schemas/CustomChannelErrorEvent"
+          },
+          {
+            "$ref": "#/components/schemas/ChannelConfig"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "eventType",
+          "mapping": {
+            "register": "#/components/schemas/ChannelConfig",
+            "message_start": "#/components/schemas/CustomChannelMessageEvent",
+            "message_part": "#/components/schemas/CustomChannelMessageEvent",
+            "message_end": "#/components/schemas/CustomChannelMessageEvent",
+            "new_session": "#/components/schemas/CustomChannelNewSessionEvent",
+            "join": "#/components/schemas/CustomChannelJoinEvent",
+            "leave": "#/components/schemas/CustomChannelLeaveEvent",
+            "error": "#/components/schemas/CustomChannelErrorEvent"
+          }
+        }
+      }
+    }
+  }
+}

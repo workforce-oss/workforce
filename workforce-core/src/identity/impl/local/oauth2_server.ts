@@ -351,7 +351,7 @@ export class OAuth2Server {
                             scope: "openId"
                         },
                         subject: data.userId,
-                        audience: Configuration.OAuth2Audience,
+                        audience: client_id === "workforce-cli" ? "workforce-cli" : Configuration.OAuth2Audience,
                     });
                 } else if (grant_type === "client_credentials") {
                     if (!client_id || !client_secret) {

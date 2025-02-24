@@ -59,7 +59,7 @@ export const FlowRouter: Router = CrudRouter({
                     await found.loadModel(model);
                     await found.save();
                     const updated = await FlowDb.findByPk(model.id, { include: { all: true } });
-                    res.status(201).send(await updated!.toModel({ replaceIdsWithNames: true }));
+                    res.status(201).send(await updated!.toModel({ replaceIdsWithNames: req.query.replaceIdsWithNames === "true" }));
                     return;
                 }
             }
@@ -78,7 +78,7 @@ export const FlowRouter: Router = CrudRouter({
             await db.loadModel(model);
             await db.save();
             const updated = await FlowDb.findByPk(db.id, { include: { all: true } });
-            const updatedModel = await updated!.toModel({ replaceIdsWithNames: true });
+            const updatedModel = await updated!.toModel({ replaceIdsWithNames: req.query.replaceIdsWithNames === "true" });
             res.status(201).send(updatedModel);
         } catch (e) {
             Logger.getInstance("flow-api").error(`${req.originalUrl} ${(e as Error).message}`, e)
@@ -105,7 +105,7 @@ export const FlowRouter: Router = CrudRouter({
                 return;
             }
 
-            const model = await found.toModel({ replaceIdsWithNames: true });
+            const model = await found.toModel({ replaceIdsWithNames: req.query.replaceIdsWithNames === "true" });
             res.send(model);
         } catch (e) {
             Logger.getInstance("flow-api").error(`${req.originalUrl} ${(e as Error).message}`, e)
@@ -162,7 +162,7 @@ export const FlowRouter: Router = CrudRouter({
             await db.loadModel(model);
             await db.save();
             const updated = await FlowDb.findByPk(db.id, { include: { all: true } });
-            res.send(await updated!.toModel({ replaceIdsWithNames: true }));
+            res.send(await updated!.toModel({ replaceIdsWithNames: req.query.replaceIdsWithNames === "true" }));
         } catch (e) {
             Logger.getInstance("flow-api").error(`${req.originalUrl} ${(e as Error).message}`, e)
             res.status(500).send({ message: "Unknown Error updating flow" });

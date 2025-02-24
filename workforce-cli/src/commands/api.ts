@@ -11,6 +11,12 @@ export async function getResource(type: string, id: string, options: APICallOpti
         return;
     }
 
+    if (type === "flow") {
+        options.queryParams = {
+            replaceIdsWithNames: "true",
+        }
+    }
+
     const response = await api.get(id, options);
     if (Array.isArray(response)) {
         for (const error of response) {
@@ -39,6 +45,12 @@ export async function listResources(type: string, options: APICallOptions & {api
     const api = initApi(type, options.api);
     if (!api) {
         return;
+    }
+
+    if (type === "flows") {
+        options.queryParams = {
+            replaceIdsWithNames: "true",
+        }
     }
 
     if (type === "orgs") {

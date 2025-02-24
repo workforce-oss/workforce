@@ -28,6 +28,7 @@ export class OpenAIService implements AIService {
 		});
 		this.config = config;
 	}
+
 	async inference(args: {
 		chatSession: ChatSession,
 		functions: FunctionDocument[] | undefined,

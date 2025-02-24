@@ -1,7 +1,7 @@
 import expressWs from "express-ws";
 import { BaseComponent } from "../base.js";
 import { WorkforceComponent } from "../model.js";
-import { Configuration, SecretDb, SecretRoutes, WorkforceClient } from "workforce-core";
+import { Configuration, OrgDb, OrgUserRelationDb, SecretDb, SecretRoutes, SpaceDb, SpaceUserRelationDb, UserDb, WorkforceClient } from "workforce-core";
 import { RequestHandler } from "express";
 import { ModelCtor, Sequelize } from "sequelize-typescript";
 
@@ -10,12 +10,19 @@ export class SecretsApiComponent extends BaseComponent {
         super(componentName);
     }
 
-    async init(app: expressWs.Application): Promise<void> {
+    async init(app: expressWs.WithWebsocketMethod): Promise<void> {
         this.logger.info(`${this.componentName} is ready`);
     }
 
     dbModels(): ModelCtor[] {
-        return [SecretDb];
+        return [
+            OrgDb,
+            SpaceDb,
+            UserDb,
+            OrgUserRelationDb,
+            SpaceUserRelationDb,
+            SecretDb
+        ];
     }
 
     publicKeys(): Map<WorkforceClient, string> {

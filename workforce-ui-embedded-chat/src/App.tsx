@@ -3,6 +3,7 @@ import { Auth, AuthSession, ChatBoxMessage, ChatBoxState, chatStore, uuidv4 } fr
 import { NativeChatSocketAPI, WorkforceAPIClient } from 'workforce-api-client';
 import { shallow } from "zustand/shallow";
 import { ChatBoxComponent, ChatBoxMode } from './components/ChatBoxComponent';
+import { OpenAIVoiceInterface } from 'workforce-ui-openai-webrtc';
 
 
 const chatBoxSelector = (state: ChatBoxState) => {
@@ -36,9 +37,15 @@ const modes = ['default', 'webview'];
 class mockWorkforce {
     public getAttribute(key: string) {
         switch (key) {
+            case orgIdKey:
+                return "7448b1cd-6131-479c-ba2f-8a949a86df4f";
+            case channelIdKey:
+                return "e73172be-86ab-41f9-b81d-bda24d7e67d4";
             case draggableKey:
                 return 'true';
             case anonymousKey:
+                return 'false';
+            case voiceEnabledKey:
                 return 'true';
             default:
                 return undefined;
@@ -57,8 +64,8 @@ function App() {
     const channelId = workforce.getAttribute(channelIdKey);
     const taskExecutionId = workforce.getAttribute(taskExecutionIdKey);
     const threadId = workforce.getAttribute(threadIdKey) ?? fallbackThreadId;
-    const workforceUrl = workforce.getAttribute(workforceUrlKey) ?? 'http://localhost:8085';
-    const workforceSocketUrl = workforce.getAttribute(workforceSocketUrlKey) ?? 'ws://localhost:8085';
+    const workforceUrl = workforce.getAttribute(workforceUrlKey) ?? 'http://localhost:8084';
+    const workforceSocketUrl = workforce.getAttribute(workforceSocketUrlKey) ?? 'ws://localhost:8084';
     const anonymous = (workforce.getAttribute(anonymousKey) ?? 'false') === 'true';
     const authToken = workforce.getAttribute(authTokenKey) ?? '';
     const issuedAt = workforce.getAttribute(issuedAtKey) ?? '';
@@ -67,7 +74,7 @@ function App() {
     const tokenType = workforce.getAttribute(tokenTypeKey) ?? '';
     const draggable = workforce.getAttribute(draggableKey) ? workforce.getAttribute(draggableKey) === 'true' : false;
     const voiceEnabled = workforce.getAttribute(voiceEnabledKey) ? workforce.getAttribute(voiceEnabledKey) === 'true' : false;
-    const workforceAuthUrl = workforce.getAttribute('data-workforce-auth-url') ?? 'http://localhost:8085/insecure';
+    const workforceAuthUrl = workforce.getAttribute('data-workforce-auth-url') ?? 'http://localhost:8084/insecure';
     let mode = workforce.getAttribute(modeKey) ?? 'default';
 
     const [authSession, setAuthSession] = useState<{
@@ -79,6 +86,8 @@ function App() {
     const authActive = useRef<boolean>(false);
 
     const { addMessage, selectSession, selectedMessages } = chatStore(chatBoxSelector, shallow);
+
+    const [voiceService, setVoiceService] = useState<OpenAIVoiceInterface | undefined>(undefined);
 
     
     if (!modes.includes(mode)) {
@@ -165,6 +174,45 @@ function App() {
     }, [chatSocketApi]);
 
     useEffect(() => {
+        if (!voiceEnabled || !chatSocketApi) {
+            return;
+        }
+
+        // if (!selectedMessages || selectedMessages.length === 0) {
+        //     return;
+        // }
+
+        let workerId = "";
+        const userId = authSession?.userId ?? senderId;
+        for (const message of selectedMessages ?? []) {
+            if (message.senderId !== userId) {
+                workerId = message.senderId;
+                break;
+            
+            }
+        }
+
+        if (!workerId) {
+            workerId = "worker"
+            // return;
+        }
+
+        if (workerId === voiceService?.metadata?.workerId) {
+            return;
+        }
+
+        const voiceInterface = new OpenAIVoiceInterface(chatSocketApi, {
+            taskExecutionId: taskExecutionId,
+            threadId: threadId,
+            userId,
+            workerId, 
+        })
+
+        setVoiceService(voiceInterface);
+        
+    }, [chatSocketApi])
+
+    useEffect(() => {
         if (authActive.current) {
             return;
         }
@@ -209,6 +257,7 @@ function App() {
                         draggingEnabled={draggable}
                         mode={mode as ChatBoxMode}
                         voiceEnabled={voiceEnabled}
+                        voiceService={voiceService}
                         onMessageInput={(message) => {
                             try {
                                 const messageId = uuidv4();

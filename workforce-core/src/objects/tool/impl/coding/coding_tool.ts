@@ -22,7 +22,7 @@ export class CodingTool extends Tool<ToolConfig> {
             this.instanceManager = KubernetesManager.getInstance();
         } else {
             const serverUrl = config.variables?.server_url as string | undefined;
-            this.instanceManager = LocalManager.getInstance(serverUrl ?? "http://localhost:8085/vscode-extension-server");
+            this.instanceManager = LocalManager.getInstance(serverUrl ?? "http://localhost:8084/vscode-extension-server");
         }
     }
 

@@ -43,7 +43,7 @@ export class CodingToolMetadata {
             type: "string",
             description: "The URL of the local server to run the tool on. Required if mode is local. ",
             required: false,
-            default: "http://localhost:8085/vscode-extension-server",
+            default: "http://localhost:8084/vscode-extension-server",
         });
         schema.set("read_only", {
             type: "boolean",

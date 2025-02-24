@@ -11,6 +11,10 @@ RUN yarn workspace workforce-api-client run build
 COPY ./workforce-ui-core /app/workforce-ui-core
 RUN yarn workspace workforce-ui-core run build
 
+COPY ./workforce-ui-openai-webrtc /app/workforce-ui-openai-webrtc
+RUN yarn workspace workforce-ui-openai-webrtc run build
+
+
 COPY ./workforce-ui-embedded-chat /app/workforce-ui-embedded-chat
 RUN yarn workspace workforce-ui-embedded-chat run build
 RUN ls -la /app/workforce-ui-embedded-chat/build/static/js

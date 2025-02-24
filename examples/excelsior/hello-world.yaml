@@ -13,7 +13,7 @@ flows:
       variables:
         channel_name: excelsior
         anonymous_access: false
-        oauth2_issuer_uri: http://localhost:8085/insecure
+        oauth2_issuer_uri: http://localhost:8084/insecure
         oauth2_audience: "https://api/"
         oauth2_claims: ""
       credential: native-channel

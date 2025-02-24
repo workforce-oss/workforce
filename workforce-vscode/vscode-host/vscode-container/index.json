@@ -1,0 +1,6 @@
+{
+    "caches": [
+        "restaurant-management-ui/node_modules",
+        "./test"
+    ]
+}

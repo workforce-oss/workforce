@@ -1,4 +1,4 @@
-import { Subject, Subscription } from "rxjs";
+import { Subscription } from "rxjs";
 import { Logger } from "../../../../logging/logger.js";
 import { WebhookAuthClaimsValidation, WebhookRoute, WebhookRouteManager } from "../../../../manager/webhook_route_manager.js";
 import { VariablesSchema } from "../../../base/variables_schema.js";
@@ -42,9 +42,6 @@ export class NativeChannel extends Channel {
             client_identifier: "threadId",
             webSocket: true
         };
-        if (this.config.variables?.voice_enabled) {
-            this.setupVoiceInterface();
-        }
         // do a short delay to ensure any existing destroy() calls have completed
         this.initWebsocket();
         this.ensureRoute();
@@ -94,67 +91,6 @@ export class NativeChannel extends Channel {
         }, 1000 * 5);
     }
 
-    private setupVoiceInterface() {
-        const transcriptionSubject = new Subject<{
-            senderId: string,
-            threadId: string,
-            messageId: string,
-            transcription: string
-        }>();
-        transcriptionSubject.subscribe({
-            next: (transcription) => {
-                this.dataCache.sessionThreads.get(transcription.threadId).then((threadSessionId) => {
-                    this.logger.debug(`Received voice transcription
-                threadId=${transcription.threadId}
-                senderId=${transcription.senderId}
-                messageId=${transcription.messageId}
-                threadSessionId=${threadSessionId}
-                `);
-                    WebhookRouteManager.getInstance().then((manager) => {
-                        const nativeMessage: NativeChannelMessage = {
-                            threadId: transcription.threadId,
-                            timestamp: Date.now(),
-                            senderId: transcription.senderId,
-                            messageId: transcription.messageId,
-                            text: transcription.transcription,
-                            final_part: true
-                        }
-
-                        manager.sendWebhookEvent({
-                            body: nativeMessage,
-                            objectId: this.config.id!,
-                            orgId: this.config.orgId,
-                            path: this.webhookPath,
-                            clientId: transcription.threadId
-                        })
-                    }).catch((error: Error) => {
-                        this.logger.error(`Error sending voice transcription to client: ${error.message}`);
-                    });
-
-                    const channelEvent: ChannelMessageEvent = {
-                        channelId: this.config.id!,
-                        senderId: transcription.senderId,
-                        users: [transcription.senderId],
-                        messageId: transcription.messageId,
-                        message: transcription.transcription,
-                        taskExecutionId: threadSessionId,
-                        channelMessageData: {
-                            "threadId": transcription.threadId,
-                        }
-                    }
-                    this.subject.next(channelEvent);
-                }).catch((error: Error) => {
-                    this.logger.error(`Error getting session thread for voice transcription: ${error.message}`);
-                });
-
-            },
-            error: (error: Error) => {
-                this.logger.error(`Error in voice transcription: ${error.message}`);
-            }
-        });
-        this.voiceInterface = new NativeChannelVoiceInterface({ config: this.config, transcriptionSubject });
-    }
-
     private async handleMessage(message: NativeChannelMessage): Promise<void> {
         this.logger.debug(`Received message ${JSON.stringify(message)}`);
         let threadId: string | undefined = message.threadId;
@@ -169,7 +105,7 @@ export class NativeChannel extends Channel {
         if (message.command === "join" && sessionId) {
             await this.addUser(sessionId);
             return;
-        }
+        } 
 
         const channelEvent: ChannelMessageEvent = {
             channelId: this.config.id!,
@@ -189,7 +125,7 @@ export class NativeChannel extends Channel {
                     name: toolCall.name ?? "",
                     arguments: toolCall.arguments ?? {},
                     call_id: toolCall.call_id,
-                    sessionId: threadId,
+                    sessionId: sessionId ?? threadId,
                     result: toolCall.result,
                     humanState: toolCall.humanState,
                     toolRequestId: toolCall.toolRequestId,
@@ -198,7 +134,11 @@ export class NativeChannel extends Channel {
                     image: toolCall.image
                 }
             });
-            channelEvent.messageType = "tool_response";
+            if (channelEvent.toolCalls?.some(tc => tc.result)) {
+                channelEvent.messageType = "tool-response";
+            } else {
+                channelEvent.messageType = "tool-call"
+            }
         }
         if (message.image) {
             channelEvent.image = message.image;
@@ -267,7 +207,7 @@ export class NativeChannel extends Channel {
 
     async establishSession(taskExecutionId: string, originalMessageData?: Record<string, string>): Promise<void> {
         if (await this.dataCache.sessionThreads.has(taskExecutionId) || await this.dataCache.threadSessions.has(taskExecutionId)) {
-            this.logger.debug(`establishSession() Task exeuction ${taskExecutionId} already has a session`);
+            this.logger.debug(`establishSession() Task execution ${taskExecutionId} already has a session`);
             return;
         }
         const threadId = originalMessageData?.threadId;
@@ -278,6 +218,23 @@ export class NativeChannel extends Channel {
         this.logger.debug(`establishSession() taskExecutionId=${taskExecutionId} threadId=${threadId}`);
         await this.dataCache.sessionThreads.set(taskExecutionId, threadId);
         await this.dataCache.threadSessions.set(threadId, taskExecutionId);
+
+        WebhookRouteManager.getInstance().then((manager) => {
+            manager.sendWebhookEvent({
+                body: {
+                    type: "webrtc-session-response",
+                    ...originalMessageData
+                    
+                },
+                objectId: this.config.id!,
+                orgId: this.config.orgId,
+                path: this.webhookPath,
+                clientId: threadId
+            })
+        }).catch((error: Error) => {
+            this.logger.error(`Error sending message to client: ${error.message}`);
+        });
+
     }
 
     async leave(): Promise<void> {
@@ -285,7 +242,9 @@ export class NativeChannel extends Channel {
     }
 
     async message(message: MessageRequest): Promise<void> {
-        this.logger.debug(`message() sending message to workerId=${message.workerId} in channel ${this.config.id} message=${message.message}`);
+        this.logger.debug(`message() sending message for workerId=${message.workerId} in channel ${this.config.id} message=${message.message}`);
+        this.logger.debug(`message() toolcall count ${message.toolCalls?.length ?? 0}`)
+        this.logger.debug(`message() ${JSON.stringify(message)}`)
         const threadId = await this.dataCache.sessionThreads.get(message.taskExecutionId);
         if (!threadId) {
             this.logger.error(`No thread found for taskExecutionId=${message.taskExecutionId}`);
@@ -322,6 +281,10 @@ export class NativeChannel extends Channel {
                     taskExecutionId: message.taskExecutionId
                 }
             });
+
+            // if (message.toolCalls?.some(tc => tc.result)) {
+            //     nativeMessage.final_part = true;
+            // }
         }
         if (message.image) {
             nativeMessage.image = message.image;
@@ -347,7 +310,7 @@ export class NativeChannel extends Channel {
     }
 
 
-    destroy(): Promise<void> {
+    async destroy(): Promise<void> {
         this.logger.info(`destroy() channel ${this.config.id}`);
         if (this.ensureRouteDaemon) {
             clearInterval(this.ensureRouteDaemon);
@@ -358,11 +321,8 @@ export class NativeChannel extends Channel {
         if (this.voiceInterface) {
             this.voiceInterface.destroy();
         }
-        WebhookRouteManager.getInstance().then((manager) => {
-            manager.removeRoute(this.webhookRoute);
-        }).catch((error) => {
-            this.logger.error(`destroy() error removing route `, error);
-        });
+        const manager = await WebhookRouteManager.getInstance();
+        manager.removeRoute(this.webhookRoute);
 
         return super.destroy();
     }

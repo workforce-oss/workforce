@@ -21,7 +21,7 @@ export interface ToolRequest {
     taskExecutionId: string;
     timestamp: number;
     workerId: string;
-    workerChannelUserConfig?: Record<"mock-channel" | "slack-channel" | "native-channel" | "discord-channel", string> | undefined
+    workerChannelUserConfig?: Record<"mock-channel" | "slack-channel" | "native-channel" | "discord-channel" | "custom-channel", string> | undefined
     channelThreadId?: string;
     channelId?: string;
     machine_state?: Record<string, unknown>;

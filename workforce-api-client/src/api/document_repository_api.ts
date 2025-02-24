@@ -1,6 +1,6 @@
 import { DocumentData, DocumentRepositoryConfig, VariableSchemaValidationError, VariablesSchema } from "workforce-core/model";
 import { RestApiInstanceOptions } from "./base/rest_api.js";
-import { OrgSubResourceAPI } from "./org_api.subresource.js";
+import { OrgSubResourceAPI, OrgSubResourceCallOptions } from "./org_api.subresource.js";
 
 export class DocumentRepositoryAPI extends OrgSubResourceAPI<DocumentRepositoryConfig, VariableSchemaValidationError> {
     static instance: DocumentRepositoryAPI | undefined;
@@ -19,7 +19,12 @@ export class DocumentRepositoryAPI extends OrgSubResourceAPI<DocumentRepositoryC
         return DocumentRepositoryAPI.instance;
     }
 
-    public async listDocuments(documentRepositoryId: string): Promise<DocumentData[]> {
-        return await this.call<DocumentData[]>({ subpath: `/${documentRepositoryId}/documents`, method: "GET" });
+    public async listDocuments(documentRepositoryId: string, options: OrgSubResourceCallOptions): Promise<DocumentData[]> {
+        return await this.call<DocumentData[]>({
+            options: {
+                rootResources: this.rootResources(options)
+            },
+            subpath: `/${documentRepositoryId}/documents`, method: "GET"
+        });
     }
 }

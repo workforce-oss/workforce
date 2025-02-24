@@ -14,7 +14,7 @@ export class EngineComponent extends BaseComponent {
         super(componentName);
     }
 
-    async init(app: expressWs.Application): Promise<void> {
+    async init(app: expressWs.WithWebsocketMethod): Promise<void> {
         await ObjectManager.create();
         if (Configuration.AdminUsername && Configuration.AdminPassword && Configuration.AdminEmail) {
             this.logger.info(`Creating admin user`)

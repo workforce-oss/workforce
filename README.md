@@ -403,7 +403,7 @@ The VS Code extension is not yet published to the marketplace, so you will need 
 With the local demo running, you can install the extension by following these steps:
 
 #### 1. Download the vsix file from the following link:
-[http://localhost:8085/vscode-server/extension.vsix](http://localhost:8085/vscode-server/extension.vsix)
+[http://localhost:8084/vscode-server/extension.vsix](http://localhost:8084/vscode-server/extension.vsix)
 
 #### 2. Open the Extensions view by clicking on the square icon in the sidebar or pressing `Ctrl+Shift+X` (Cmd+Shift+X on macOS).
 
@@ -417,7 +417,7 @@ With the local demo running, you can install the extension by following these st
 
 The workforce UI is a web-based interface that allows you to interact with the workforce server. It allows you to create and manage objects, view logs, and includes a rich GUI for building flows.
 
-The UI is available at `http://localhost:8085/workforce-ui` by default.
+The UI is available at `http://localhost:8084/workforce-ui` by default.
 
 ### Overview
 

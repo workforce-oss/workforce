@@ -12,7 +12,7 @@ export class CustomNodeData<T extends BaseConfig> {
     }
     setProperty(key: string, value: any) {
         if (this.config.hasOwnProperty(key)) {
-            Object.assign(this.config, { [key]: value });
+            this.config[key] = value;
         }
     };
     addInputProperty(key: string, value: string) {
@@ -22,7 +22,7 @@ export class CustomNodeData<T extends BaseConfig> {
         if (!(this.config as TaskConfig).inputs) {
             (this.config as TaskConfig).inputs = {};
         }
-        Object.assign((this.config as TaskConfig).inputs, { [key]: value });
+        (this.config as TaskConfig).inputs[key] = value;
     }
     renameTaskInputProperty(oldKey: string, newKey: string) {
         if (!this.config.hasOwnProperty("inputs")) {
@@ -33,7 +33,7 @@ export class CustomNodeData<T extends BaseConfig> {
         }
         const value = (this.config as TaskConfig).inputs[oldKey];
         delete (this.config as TaskConfig).inputs[oldKey];
-        Object.assign((this.config as TaskConfig).inputs, { [newKey]: value });
+        (this.config as TaskConfig).inputs[newKey] = value;
     }
     deleteInputProperty(key: string) {
         if (!this.config.hasOwnProperty("inputs")) {
@@ -52,7 +52,7 @@ export class CustomNodeData<T extends BaseConfig> {
         if (!(this.config as TaskConfig).inputs) {
             (this.config as TaskConfig).inputs = {};
         }
-        Object.assign((this.config as TaskConfig).inputs, { [key]: value });
+        (this.config as TaskConfig).inputs[key] = value
     }
 
     addOutput(output: string) {

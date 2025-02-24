@@ -10,6 +10,8 @@ import { FlowHeader } from "./FlowHeader";
 import { SideBar } from "./Sidebar";
 import { WorkforceAPIClient } from "workforce-api-client";
 import { ContextState, contextStore } from "../../../state/store.context";
+import { CredentialState, credentialStore } from "../../../state/store.credentials";
+import { DocumentRepositoryState, documentRepositoryStore } from "../../../state/store.documentation";
 
 const metaSelector = (state: MetaState) => ({
 	selectedFlow: state.selectedFlow,
@@ -26,6 +28,16 @@ const metaSelector = (state: MetaState) => ({
 	alertString: state.alertString,
 	clearAlert: state.clearAlert,
 	toggleFlowActive: state.toggleFlowActive,
+});
+
+const credentialSelector = (state: CredentialState) => ({
+	credentials: state.credentials,
+	hydrateCredentials: state.hydrate,
+});
+
+const documentRepositorySelector = (state: DocumentRepositoryState) => ({
+	documentRepositories: state.documentRepositories,
+	hydrateDocumentRepositories: state.hydrate,
 });
 
 const skillSelector = (state: SkillState) => ({
@@ -50,6 +62,8 @@ export const Designer = () => {
 
 	const { hydrateSkills } = skillStore(skillSelector, shallow);
 	const { currentOrg } = contextStore(contextSelector, shallow);
+	const { credentials, hydrateCredentials } = credentialStore(credentialSelector, shallow);
+	const { documentRepositories, hydrateDocumentRepositories } = documentRepositoryStore(documentRepositorySelector, shallow);
 
 	useEffect(() => {
 		if (alertString !== "") {
@@ -60,7 +74,16 @@ export const Designer = () => {
 
 	useEffect(() => {
 		hydrateSkills(currentOrg?.id);
-	}, [currentOrg]);
+	}, [currentOrg, ready]);
+
+	
+	useEffect(() => {
+		hydrateCredentials(currentOrg?.id);
+	}, [hydrateCredentials, currentOrg, ready]);
+
+	useEffect(() => {
+		hydrateDocumentRepositories(currentOrg?.id);
+	}, [hydrateDocumentRepositories, currentOrg, ready]);
 
 	if (!ready) {
 		WorkforceAPIClient.FlowAPI
@@ -100,7 +123,7 @@ export const Designer = () => {
 								}}>
 									{
 										flows.map((flow, index) => {
-											return <FlowHeader flow={flow} key={index} />;
+											return <FlowHeader flow={flow} key={index} credentials={credentials} documentRepositories={documentRepositories} />;
 										})}
 									{/* Import flow button */}
 									<button
@@ -114,7 +137,7 @@ export const Designer = () => {
 
 												reader.onload = (e) => {
 													const contents = e.target.result;
-													importData(contents as string, currentOrg.id);
+													importData(contents as string, currentOrg.id, credentials, documentRepositories);
 												};
 												reader.readAsText(file);
 											};

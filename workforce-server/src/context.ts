@@ -1,6 +1,6 @@
 import cors from "cors";
 import dotenv from "dotenv";
-import express, { RequestHandler } from "express";
+import express, { Application, RequestHandler } from "express";
 import { auth } from "express-oauth2-jwt-bearer";
 import expressWs from "express-ws";
 import { Transaction } from "sequelize";
@@ -21,7 +21,7 @@ export class ServerContext {
     httpRoutes: Record<string, RequestHandler[]>;
     wsRoutes: Record<string, expressWs.WebsocketRequestHandler>;
     sequelize: Sequelize;
-    server?: expressWs.Application;
+    server?: expressWs.WithWebsocketMethod & Application;
     logger: Logger = Logger.getInstance("workforce-server");
     models: ModelCtor[] = [];
 
@@ -54,7 +54,10 @@ export class ServerContext {
                 ...this.httpRoutes, ...component.httpRoutes(auth({
                     issuerBaseURL: Configuration.OAuth2IssuerUri,
                     jwksUri: Configuration.OAuth2JwksUri ? Configuration.OAuth2JwksUri : undefined,
-                    audience: Configuration.OAuth2Audience,
+                    audience: [
+                        Configuration.OAuth2Audience,
+                        "workforce-cli",
+                    ]
                 }), cors())
             };
         });
@@ -65,7 +68,10 @@ export class ServerContext {
                 ...this.wsRoutes, ...component.wsRoutes({
                     issuerBaseURL: Configuration.OAuth2IssuerUri,
                     jwksUri: Configuration.OAuth2JwksUri ? Configuration.OAuth2JwksUri : undefined,
-                    audience: Configuration.OAuth2Audience,
+                    audience: [
+                        Configuration.OAuth2Audience,
+                        "workforce-cli"
+                    ]
                 })
             };
         });
@@ -117,7 +123,7 @@ export class ServerContext {
                 throw e;
             });
 
-        const { app, getWss, applyTo } = expressWs(express());
+        const app = expressWs(express() as unknown as expressWs.Application).app as unknown as Application & expressWs.WithWebsocketMethod;
 
 
         for (const [key, value] of Object.entries(this.httpRoutes)) {

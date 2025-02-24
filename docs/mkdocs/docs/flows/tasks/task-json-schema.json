@@ -1,0 +1,184 @@
+{
+  "title": "Task",
+  "description": "A task is a unit of work that can be assigned to a worker. It should be a complete definition of all requirements in terms of tooling, integrations, and instructions.",
+  "allOf": [
+    {
+      "$ref": "#/$defs/object"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "simple-task",
+            "structured-task"
+          ]
+        },
+        "requiredSkills": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The list of skills needed for this task."
+        },
+        "defaultChannel": {
+          "type": "string",
+          "description": "The default channel to use for communication."
+        },
+        "tracker": {
+          "type": "string",
+          "description": "The Name of the tracker to use for execution."
+        },
+        "documentation": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The list of documentation names to use."
+        },
+        "tools": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/tool_reference"
+          },
+          "description": "The list of tools needed for this task."
+        },
+        "triggers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The list of channels or resources to trigger the task."
+        },
+        "inputs": {
+          "type": "object",
+          "description": "The map of inputs for this task. Keys can be used in task templates using handlebars syntax. I.E., and input of message may map to a channel name, and then in the task template, you can use {{message}}",
+          "additionalProperties": {
+            "oneOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            ]
+          }
+        },
+        "outputs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The list of outputs for this task."
+        },
+        "subtasks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/subtask"
+          },
+          "description": "The list of subtasks for this task."
+        },
+        "costLimit": {
+          "type": "number",
+          "description": "The cost limit for each execution of this task."
+        },
+        "variables": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "type",
+        "requiredSkills",
+        "defaultChannel",
+        "tracker",
+        "documentation",
+        "tools",
+        "triggers",
+        "inputs",
+        "outputs",
+        "subtasks",
+        "costLimit",
+        "variables"
+      ]
+    }
+  ],
+  "$defs": {
+    "object": {
+      "type": "object",
+      "title": "Object",
+      "description": "An object is a base object that all other objects inherit from.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The unique identifier for the object",
+          "readOnly": true
+        },
+        "orgId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The unique identifier for the organization the object belongs to.",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "credential": {
+          "type": "string",
+          "description": "The name of the credential to use for this object."
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ]
+    },
+    "subtask": {
+      "type": "object",
+      "title": "Subtask",
+      "description": "A subtask is a reference to a task that can be performed as part of a larger task. Subtasks provide their own context and can be useful for creating large, complex tasks without overloading the context window.",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "async": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "tool_reference": {
+      "type": "object",
+      "title": "Tool Reference",
+      "description": "A tool reference is a reference to a tool that can be used in a task.",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "output": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  }
+}

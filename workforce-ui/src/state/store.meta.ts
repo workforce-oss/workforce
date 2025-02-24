@@ -1,5 +1,5 @@
 import { v4 as uuidv4 } from "uuid";
-import { VariableSchemaValidationError, WorkerConfig, CredentialConfig, FlowConfig } from "workforce-core/model";
+import { VariableSchemaValidationError, WorkerConfig, CredentialConfig, FlowConfig, DocumentRepositoryConfig } from "workforce-core/model";
 import { temporal } from "zundo";
 import { create, StateCreator } from "zustand";
 import { FlowManager } from "../manager/flow_manager";
@@ -40,7 +40,7 @@ export type MetaState = {
 	deleteWorker: (worker: WorkerConfig) => void;
 	saveWorker: (worker: WorkerConfig) => void;
 
-	importData: (yaml: string, orgId: string) => void;
+	importData: (yaml: string, orgId: string, credentials: CredentialConfig[], documentRepositories: DocumentRepositoryConfig[]) => void;
 	hydrate: (data: FlowConfig[], orgId: string) => void;
 };
 
@@ -351,8 +351,12 @@ export const metaStore = create<MetaState>()(
 					});
 				});
 		},
-		importData: (yaml: string, orgId: string) => {
-			const flow = FlowManager.convertFromYaml(yaml);
+		importData: (yaml: string, orgId: string, credentials: CredentialConfig[], documentRepositories: DocumentRepositoryConfig[]) => {
+			const flows = get().flows;
+			const flow = FlowManager.convertFromYaml(yaml, orgId, flows, credentials, documentRepositories);
+			if (!flow) {
+				return;
+			}
 			let selectedFlow: FlowConfig | undefined = undefined;
 
 			if (flow.id === undefined) {
@@ -366,9 +370,10 @@ export const metaStore = create<MetaState>()(
 			selectedFlow = flow;
 
 			const existingIndex = get().flows.findIndex((f) => f.id === flow.id);
-			const flows = get().flows;
 			if (existingIndex !== -1) {
 				flows[existingIndex] = flow;
+			} else {
+				flows.push(flow);
 			}
 
 			set({

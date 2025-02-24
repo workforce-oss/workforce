@@ -34,6 +34,7 @@
 **/_deploy/kubernetes/terraform/**/terraform.*.tfvars
 **/.terraform/
 **/terraform.tfstate*
+**/_deploy/kubernetes/terraform/**/backend.tf
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 **/report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json

@@ -12,7 +12,7 @@ services:
     image: nginxinc/nginx-unprivileged:1.25-alpine
     hostname: proxy
     ports:
-      - "8085:8085"
+      - "8084:8084"
     restart: unless-stopped
     stop_grace_period: 1s
     depends_on:
@@ -46,7 +46,7 @@ services:
     networks:
       - backend
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8085/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8084/health"]
       interval: 30s
       timeout: 10s
       retries: 5
@@ -70,7 +70,7 @@ services:
     env_file:
       - workforce-storage-api.env
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8085/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8084/health"]
       interval: 30s
       timeout: 10s
       retries: 5

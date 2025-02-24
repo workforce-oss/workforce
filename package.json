@@ -7,7 +7,9 @@
     "docker:build:frontend": "_build/build.sh frontend build",
     "docker:build:extension": "_build/build.sh extension build",
     "docker:local": "_deploy/docker/local/deploy.sh",
+    "docker:local:rebuild": "_build/build.sh all build && _deploy/docker/local/deploy.sh",
     "docker:push": "_build/build.sh all push",
+    "docker:push:backend": "_build/build.sh backend push",
     "generate:schema": "workforce-core/test.sh schema/generate_schema.ts"
   },
   "workspaces": [
@@ -15,11 +17,13 @@
     "workforce-api-client",
     "workforce-cli",
     "workforce-core",
+    "workforce-sdk",
     "workforce-server",
     "workforce-storage-api",
     "workforce-ui",
     "workforce-ui-core",
-    "workforce-ui-embedded-chat"
+    "workforce-ui-embedded-chat",
+    "workforce-ui-openai-webrtc"
   ],
   "dependencies": {
     "pg": "^8.11.3"

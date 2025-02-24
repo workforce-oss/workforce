@@ -1,0 +1,77 @@
+{
+  "title": "Tool",
+  "description": "A tool is an external integration that a worker may use during execution of a task.",
+  "allOf": [
+    {
+      "$ref": "#/$defs/object"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "web-service-tool",
+            "template-tool",
+            "openapi-tool",
+            "openapi-channel-tool",
+            "excalidraw-tool",
+            "google-drive-tool",
+            "google-slides-tool",
+            "coding-tool",
+            "trello-ticket-tool",
+            "github-board-ticket-tool",
+            "message-channel-tool"
+          ]
+        },
+        "channel": {
+          "type": "string",
+          "description": "The channel for the tool to use for dynamic user interaction"
+        },
+        "variables": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "type",
+        "channel",
+        "variables"
+      ]
+    }
+  ],
+  "$defs": {
+    "object": {
+      "type": "object",
+      "title": "Object",
+      "description": "An object is a base object that all other objects inherit from.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The unique identifier for the object",
+          "readOnly": true
+        },
+        "orgId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The unique identifier for the organization the object belongs to.",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "credential": {
+          "type": "string",
+          "description": "The name of the credential to use for this object."
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ]
+    }
+  }
+}

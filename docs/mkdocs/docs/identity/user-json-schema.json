@@ -1,0 +1,42 @@
+{
+  "title": "User",
+  "description": "A user is an identity that can access the system. Password can only be set and will never be returned by the api.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The unique identifier for the user",
+      "readOnly": true
+    },
+    "idpId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The unique identifier for the identity provider the user belongs to"
+    },
+    "email": {
+      "type": "string",
+      "format": "email"
+    },
+    "firstName": {
+      "type": "string"
+    },
+    "lastName": {
+      "type": "string"
+    },
+    "username": {
+      "type": "string"
+    },
+    "password": {
+      "type": "string",
+      "format": "password",
+      "description": "The password for the user. Required on create for certain identity providers. Can be part of an update. Will never be returned by the api."
+    }
+  },
+  "required": [
+    "email",
+    "firstName",
+    "lastName",
+    "username"
+  ]
+}

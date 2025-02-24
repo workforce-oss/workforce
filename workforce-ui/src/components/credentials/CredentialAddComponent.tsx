@@ -15,7 +15,7 @@ const selector = (state: CredentialState) => ({
 });
 
 const contextSelector = (state: ContextState) => ({
-    currentOrg: state.currentOrg,
+	currentOrg: state.currentOrg,
 });
 
 
@@ -87,7 +87,9 @@ export const CredentialAddComponent = () => {
 								onClick={() => {
 									addCredential({
 										name,
-										type: subtype,										description: "",
+										orgId: currentOrg.id,
+										type: subtype,
+										description: "",
 										variables: details.variables,
 									} as CredentialConfig);
 

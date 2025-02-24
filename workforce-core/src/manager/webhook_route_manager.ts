@@ -1,4 +1,4 @@
-import { RequestHandler, Request, Response } from "express";
+import { RequestHandler, Request, Response, Application } from "express";
 import expressWs, { WebsocketRequestHandler } from "express-ws";
 import { Subject, Subscription } from "rxjs";
 import { BrokerMode, SubjectFactory } from "./impl/subject_factory.js";
@@ -14,7 +14,7 @@ import { Op } from "sequelize";
 
 export class WebhookRouteManager {
 	private static _instance: WebhookRouteManager;
-	private app?: expressWs.Application;
+	private app?: expressWs.WithWebsocketMethod & Application;
 	private routeSubject?: Subject<WebhookRouteEvent>;
 	private webhookEventSubject?: Subject<WebhookEvent>;
 	private outboundSubject?: Subject<OutboundWebhookSocketEvent>;
@@ -224,7 +224,7 @@ export class WebhookRouteManager {
 		return WebhookRouteManager._instance;
 	}
 
-	public manage(app: expressWs.Application, additionalWsRoutes?: Record<string, WebsocketRequestHandler>): void {
+	public manage(app: expressWs.WithWebsocketMethod & Application, additionalWsRoutes?: Record<string, WebsocketRequestHandler>): void {
 		if (this.app && this.app === app) {
 			this.logger.error("WebhookRouteManager.manage() can only be called once");
 			return;
@@ -314,7 +314,15 @@ export class WebhookRouteManager {
 							})
 							.finally(() => {
 								this.httpHandlers.delete(event.route.path);
+								if (this.websockets.has(event.route.path)) {
+									const sockets = this.websockets.get(event.route.path);
+									for (const socket of sockets ?? []) {
+										socket.ws.close();
+									}
+								}
 								this.wsHandlers.delete(event.route.path);
+
+
 							});
 						break;
 					case "update":
@@ -372,6 +380,13 @@ export class WebhookRouteManager {
 		}
 		if (route.webSocket) {
 			this.logger.debug(`Adding websocket handler for ${route.path}`);
+			if (this.websockets.has(route.path)) {
+				const sockets = this.websockets.get(route.path);
+				for (const socket of sockets ?? []) {
+					socket.ws.close();
+				}
+				this.websockets.delete(route.path)
+			}
 			const handler = this.getWebhookSocketHandler(route);
 			this.wsHandlers.set(route.path, handler);
 		} else {
@@ -433,9 +448,13 @@ export class WebhookRouteManager {
 			this.websockets.get(route.path)?.push(client);
 
 			const pingInterval = setInterval(() => {
+				this.logger.debug(`getWebhookSocketHandler() sending ping for ${route.path}`);
 				ws.ping();
 			}, 10000);
 
+			ws.onopen = () => {
+				this.logger.debug(`getWebhookSocketHandler() websocket open for ${route.path}`);
+			}
 
 			ws.on("message", (msg: string) => {
 				if (!client.authed && route.authOptions?.authRequired) {

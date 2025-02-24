@@ -1,2 +1,7 @@
 mkdocs
 mkdocs-mermaid2-plugin
+mkdocs-material
+mkdocs-swagger-ui-tag
+mkdocs-schema-reader
+neoteroi-mkdocs
+pymdown-extensions

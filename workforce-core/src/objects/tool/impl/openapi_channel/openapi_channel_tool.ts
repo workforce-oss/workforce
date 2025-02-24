@@ -54,7 +54,7 @@ export class OpenAPIChannelTool extends Tool<ToolConfig> {
                 reject(new Error(`Timeout waiting for response for request ${request.requestId}`));
             }, 60000);
 
-            const subscription = BrokerManager.channelBroker?.subscribeToSession(request.channelId!, request.taskExecutionId, request.workerId, ["tool_response"], (message) => {
+            const subscription = BrokerManager.channelBroker?.subscribeToSession(request.channelId!, request.taskExecutionId, request.workerId, ["tool-response"], (message) => {
                 const toolCalls = message.toolCalls;
                 if (!toolCalls) {
                     return;

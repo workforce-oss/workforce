@@ -1,0 +1,74 @@
+{
+  "title": "Documentation",
+  "description": "Documentation defines the specific documents from a repository that are made available to a task.",
+  "allOf": [
+    {
+      "$ref": "#/$defs/object"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "default-documentation"
+          ]
+        },
+        "repository": {
+          "type": "string",
+          "description": "The name of the document repository to use."
+        },
+        "documents": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The list of documents from the repository to use. Null or Empty means all"
+        },
+        "variables": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "type",
+        "repository",
+        "variables"
+      ]
+    }
+  ],
+  "$defs": {
+    "object": {
+      "type": "object",
+      "title": "Object",
+      "description": "An object is a base object that all other objects inherit from.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The unique identifier for the object",
+          "readOnly": true
+        },
+        "orgId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The unique identifier for the organization the object belongs to.",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "credential": {
+          "type": "string",
+          "description": "The name of the credential to use for this object."
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ]
+    }
+  }
+}

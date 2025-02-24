@@ -78,13 +78,9 @@ export class ChannelBroker extends BaseBroker<ChannelConfig, Channel, ChannelMes
 		this.logger.error(`handleError() channel=${objectError.objectId} error=${objectError.error.message}`);
 		const channel = this.objects.get(objectError.objectId);
 		if (channel) {
-			channel.destroy().then(() => {
-				this.remove(objectError.objectId).catch((err: Error) => {
-					this.logger.error(`handleError() channel=${objectError.objectId} error=${err.message}`);
-				});
-			}).catch((err: Error) => {
+			this.remove(objectError.objectId).catch((err: Error) => {
 				this.logger.error(`handleError() channel=${objectError.objectId} error=${err.message}`);
-			})
+			});
 		}
 	}
 
@@ -136,7 +132,7 @@ export class ChannelBroker extends BaseBroker<ChannelConfig, Channel, ChannelMes
 			this.channelSubjects.get(channelId)?.unsubscribe();
 			this.channelSubjects.delete(channelId);
 		}
-	
+
 		this.errorSubscriptions.get(channelId)?.unsubscribe();
 		this.errorSubscriptions.delete(channelId);
 		this.objects.delete(channelId);
@@ -287,50 +283,63 @@ export class ChannelBroker extends BaseBroker<ChannelConfig, Channel, ChannelMes
 			this.logger.debug(
 				`subscribeToSession() message.sessionId=${message.taskExecutionId} sessionId=${sessionId}`
 			);
-			if (
-				message.taskExecutionId === sessionId &&
-				message.senderId !== workerId &&
-				messageTypes.includes(message.messageType || "chat-message")
-			) {
-				const request = {
-					messageId: message.messageId,
-					channelId: message.channelId,
-					message: message.message,
-					timestamp: Date.now(),
-					senderId: message.senderId,
-					taskExecutionId: sessionId,
-					workerId: workerId,
-				} as MessageRequest
-				if (message.toolCalls) {
-					request.toolCalls = message.toolCalls;
-				}
-				if (message.channelMessageData) {
-					request.channelMessageData = message.channelMessageData;
-				}
-				if (message.image) {
-					request.image = message.image;
-				}
-				ChannelMessageDb.findOrCreate({
-					where: {
-						id: message.messageId,
-					},
-					defaults: {
-						id: message.messageId,
-						channelId: request.channelId,
-						taskExecutionId: request.taskExecutionId,
-						request: jsonStringify(request),
-						status: "awaiting-response",
-					},
-				}).catch((error: Error) => {
-					this.logger.error(`handleRequest() channelId=${request.channelId} error=${error.message}`);
-					throw error;
-				});
-				callback(request);
+
+			if (message.taskExecutionId === sessionId) {
+				this.logger.debug(`subscribeToSession() match found`)
 			} else {
-				this.logger.debug(
-					`subscribeToSession() message.sessionId=${message.taskExecutionId} sessionId=${sessionId} not matched`
-				);
+				this.logger.debug(`subscribeToSession() no match found`)
+				return;
 			}
+			const isWorker = message.senderId === workerId;
+			if (isWorker) {
+				this.logger.debug(`subscribeToSession() message belongs to worker`)
+			}
+
+			const isToolCall = message.messageType === "tool-call";
+			if (isWorker && !isToolCall) {
+				this.logger.debug(`subscribeToSession() ignoring non-tool-call from worker`)
+				return;
+			}
+
+			if (!messageTypes.includes(message.messageType ?? "chat-message")) {
+				this.logger.debug(`subscribeToSession() messageType ${message.messageType ?? "chat-message"} not included in ${JSON.stringify(messageTypes)}`)
+				return;
+			}
+
+
+			const request = {
+				messageId: message.messageId,
+				channelId: message.channelId,
+				message: message.message,
+				timestamp: Date.now(),
+				senderId: message.senderId,
+				taskExecutionId: sessionId,
+				workerId: workerId,
+			} as MessageRequest
+			if (message.toolCalls) {
+				request.toolCalls = message.toolCalls;
+			}
+			if (message.channelMessageData) {
+				request.channelMessageData = message.channelMessageData;
+			}
+			if (message.image) {
+				request.image = message.image;
+			}
+			ChannelMessageDb.findOrCreate({
+				where: {
+					id: message.messageId,
+				},
+				defaults: {
+					id: message.messageId,
+					channelId: request.channelId,
+					taskExecutionId: request.taskExecutionId,
+					request: jsonStringify(request),
+					status: "awaiting-response",
+				},
+			}).catch((error: Error) => {
+				this.logger.error(`handleRequest() channelId=${request.channelId} error=${error.message}`);
+			});
+			callback(request);
 		});
 	}
 

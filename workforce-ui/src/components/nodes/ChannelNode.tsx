@@ -12,7 +12,10 @@ export const ChannelNode = ({ data, selected }: { data: CustomNodeData<ChannelCo
 
     const getEmbedSnippet = () => {
         return data.config.id ? `<script defer="defer"
-        src="/embedded-chat/static/js/main.js"
+        src="${window.location.origin}/embedded-chat/static/js/main.js"
+        data-workforce-draggable="true"
+        data-workforce-anonymous="${data.config.variables?.anonymous ?? "false"}"
+        data-workforce-org-id="${data.config.orgId}"
         data-workforce-channel-id="${data.config.id}">
     </script>` : "";
     }

@@ -16,7 +16,9 @@ export class GithubBoardTrackerMetadata {
         // use variables schema to populate default values
         const schema = GithubBoardTrackerMetadata.variablesSchema();
         schema.forEach((value, key) => {
-            base.variables![key] = value.default;
+            if (value.default) {
+                base.variables![key] = value.default;
+            }
         });
 
         return base;

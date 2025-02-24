@@ -12,6 +12,10 @@ export const openAIModels = [
     "gpt-4o"
 ]
 
+export const openAIRealtimeModels = [
+    "gpt-4o-realtime-preview-2024-12-17"
+]
+
 export const anthropicModels = [
     "claude-3-5-sonnet-20240620",
     "claude-3-opus-20240229",
@@ -24,4 +28,8 @@ export const groqModels = [
     "llama2-70b-4096",
     "mixtral-8x7b-32768",
     "gemma-7b-it"
+]
+
+export const googleModels = [
+    "gemini-1.5-pro"
 ]

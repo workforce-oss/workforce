@@ -1,5 +1,5 @@
 import { WebsocketAPI, WebsocketApiCreationArgs, WebsocketApiInstanceOptions } from "./base/websocket_api.js";
-import { Subject } from "rxjs";
+import { Subject, Subscription } from "rxjs";
 import { NativeChannelMessage } from "workforce-core/model";
 
 export class NativeChatSocketAPI extends WebsocketAPI {
@@ -40,8 +40,12 @@ export class NativeChatSocketAPI extends WebsocketAPI {
         });
     }
 
-    public sendChatMessage(message: NativeChannelMessage): void {
-        this.send(message);
+    public subscribe(callback: (message: NativeChannelMessage) => void): Subscription {
+        return this.eventSubject?.subscribe(callback);
+    }
+
+    public sendChatMessage(message: NativeChannelMessage, callback?: {messageType: string, callback: (data: any) => void}): void {
+        this.send(message, callback);
     }
 
     public async handleMessages(data: any): Promise<void> {
@@ -52,6 +56,7 @@ export class NativeChatSocketAPI extends WebsocketAPI {
             console.log("Auth failed");
             return;
         }
+        super.handleMessages(data);
         this.eventSubject?.next(data);
     }
 }

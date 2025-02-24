@@ -52,7 +52,7 @@ variable "turn_server" {
 
 variable "weaviate_enabled" {
   type        = bool
-  description = "Whether to enable weaviate"  
+  description = "Whether to enable weaviate"
 }
 
 variable "postgres_secret_data" {
@@ -97,19 +97,21 @@ variable "gke_app_roles" {
   description = "The gcp roles to assign to workloads"
 }
 
-variable "workforce_admin_secret_data" {
-  type = object({
-    ADMIN_USERNAME = string
-    ADMIN_PASSWORD = string
-    ADMIN_EMAIL    = string
-  })
-}
+// We are producing this dynamically
+# variable "workforce_admin_secret_data" {
+#   type = object({
+#     ADMIN_USERNAME = string
+#     ADMIN_PASSWORD = string
+#     ADMIN_EMAIL    = string
+#   })
+# }
 
 variable "apps" {
   type = map(object({
     name                     = string
     namespace                = string
     image                    = string
+    image_pull_policy        = optional(string)
     http_port                = number
     http_supports_websockets = optional(bool, false)
     http_ingress_enabled     = optional(bool, false)
@@ -125,17 +127,17 @@ variable "apps" {
       mount_path = string
       secret_key = string
     })), {})
-    cpu_limit      = optional(string, "")
-    cpu_request    = optional(string, "")
-    memory_limit   = string
-    memory_request = string
-    gpu_limit      = optional(number, 0)
-    host_aliases   = optional(map(string), {})
+    cpu_limit          = optional(string, "")
+    cpu_request        = optional(string, "")
+    memory_limit       = string
+    memory_request     = string
+    gpu_limit          = optional(number, 0)
+    host_aliases       = optional(map(string), {})
     prometheus_enabled = optional(bool, false)
     kubernetes_cluster_service_account_rules = optional(list(object({
-        api_groups = list(string)
-        resources  = list(string)
-        verbs      = list(string)
+      api_groups = list(string)
+      resources  = list(string)
+      verbs      = list(string)
     })), [])
   }))
 

@@ -36,8 +36,8 @@ const sessionId = uuidv4();
 let orgId = '5104753b-89e5-42c6-9f63-23140029aa50';
 let channelId = 'f45dacdc-76fc-4fb1-88ed-71d8895e4c52';
 let anonymous = 'false';
-const workforceUrl = 'localhost:8085';
-const workforceAuthUrl = 'http://localhost:8085/insecure';
+const workforceUrl = 'localhost:8084';
+const workforceAuthUrl = 'http://localhost:8084/insecure';
 
 const App = () => {
 

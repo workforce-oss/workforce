@@ -1,4 +1,4 @@
-import { RequestHandler } from "express";
+import { Application, RequestHandler } from "express";
 import { ModelCtor } from "sequelize-typescript";
 import { Logger, WorkforceClient } from "workforce-core";
 import expressWs, { WebsocketRequestHandler } from 'express-ws';
@@ -13,7 +13,7 @@ export abstract class BaseComponent {
         this.logger = Logger.getInstance(componentName);
     }
 
-    abstract init(app: expressWs.Application, additionalWsRoutes?: Record<string, WebsocketRequestHandler>): Promise<void>;
+    abstract init(app: expressWs.WithWebsocketMethod & Application, additionalWsRoutes?: Record<string, WebsocketRequestHandler>): Promise<void>;
 
     abstract dbModels(): ModelCtor[];
 

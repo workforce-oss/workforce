@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { randomUUID } from "crypto";
-import express from "express";
+import express, { Application } from "express";
 import { auth } from "express-oauth2-jwt-bearer";
 import expressWs from "express-ws";
 import { setupServer } from "msw/node";
@@ -15,7 +15,7 @@ import { createJwt, issuerHandlers } from "../../helpers/jwt.js";
 import { CredentialConfig } from "../../../src/objects/credential/model.js";
 
 describe("Worker API", () => {
-    const { app, getWss, applyTo } = expressWs(express());
+    const app = expressWs(express() as unknown as expressWs.Application).app as unknown as Application & expressWs.WithWebsocketMethod;
 
     const basicCredentialConfig = (customOrgId?: string): CredentialConfig => ({
         name: "test-credential",

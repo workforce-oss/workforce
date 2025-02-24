@@ -76,7 +76,7 @@ export class BaseModel extends Model<BaseModelAttributes, BaseModelCreationAttri
     })
     declare description: string;
 
-    @Is("subtype", (value: string) => {
+    @Is("type", (value: string) => {
         const subtype = objectSubtypes.find((subtype: ObjectSubtype) => subtype === value);
         if (!subtype) {
             throw new Error("Invalid subtype");

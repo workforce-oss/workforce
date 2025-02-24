@@ -2,7 +2,7 @@ import dagre from "dagre";
 import * as _ from "lodash";
 import { Edge, Node } from "reactflow";
 import { v4 as uuidv4 } from "uuid";
-import { BaseConfig, ObjectType, ChannelConfig, CredentialConfig, DocumentationConfig, FlowConfig, ResourceConfig, TaskConfig, ToolReference, ToolConfig, TrackerConfig } from "workforce-core/model";
+import { BaseConfig, ObjectType, ChannelConfig, CredentialConfig, DocumentationConfig, FlowConfig, ResourceConfig, TaskConfig, ToolReference, ToolConfig, TrackerConfig, channelTypes, resourceTypes, trackerTypes, ChannelType, ResourceType, taskTypes, TaskType, documentationTypes, DocumentationType, ToolType, toolTypes, TrackerType, DocumentRepositoryConfig } from "workforce-core/model";
 import YAML from "yaml";
 import { CustomNodeData, NodeDataFactory } from "../nodes/nodeData";
 import { createEdge, incrementString } from "../util/util";
@@ -88,32 +88,32 @@ export class FlowManager {
 			for (const task of data.flow.tasks) {
 				if (task.documentation) {
 					for (const ref of task.documentation) {
-						const obj = this.getObjectTypeByName(data, ref, "documentation");
+						const obj = this.getObjectById(data, ref);
 						const sourceId = obj?.id ?? ref;
 						const sourceParameter = "ref";
 						edges.push(createEdge(sourceId, sourceParameter, task.id, "documentation", "input"));
 					}
 				}
 				if (task.defaultChannel) {
-					const obj = this.getObjectTypeByName(data, task.defaultChannel, "channel");
+					const obj = this.getObjectById(data, task.defaultChannel);
 					const sourceId = obj?.id ?? task.defaultChannel;
 					const sourceParameter = "ref";
 					edges.push(createEdge(sourceId, sourceParameter, task.id, "defaultChannel", "input"));
 				}
 				if (task.tracker) {
-					const obj = this.getObjectTypeByName(data, task.tracker, "tracker");
+					const obj = this.getObjectById(data, task.tracker);
 					const sourceId = obj?.id ?? task.tracker;
 					const sourceParameter = "ticket";
 					edges.push(createEdge(sourceId, sourceParameter, task.id, "tracker", "input"));
 				}
 				if (task.tools) {
 					for (const tool of task.tools) {
-						const obj = this.getObjectTypeByName(data, tool.name, "tool");
+						const obj = this.getObjectById(data, tool.id);
 						const sourceId = obj?.id ?? tool.id;
 						const sourceParameter = "ref";
 						edges.push(createEdge(sourceId, sourceParameter, task.id, "tools", "input"));
 						if (obj && tool.output) {
-							const targetObj = this.getObjectByName(data, tool.output);
+							const targetObj = this.getObjectById(data, tool.output);
 							const targetId = targetObj?.id ?? tool.output;
 							const targetParameter = "in";
 							edges.push(createEdge(tool.id, "output", targetId, targetParameter, "input"));
@@ -122,7 +122,7 @@ export class FlowManager {
 				}
 				if (task.triggers) {
 					for (const trigger of task.triggers) {
-						const obj = this.getObjectByName(data, trigger);
+						const obj = this.getObjectById(data, trigger);
 						const sourceId = obj?.id ?? trigger;
 						const sourceParameter = "data";
 						edges.push(createEdge(sourceId, sourceParameter, task.id, "triggers", "input"));
@@ -133,38 +133,41 @@ export class FlowManager {
 						let objs = [];
 						if (Array.isArray(task.inputs[input])) {
 							for (const inputObj of task.inputs[input]) {
-								const obj = this.getObjectByName(data, inputObj);
+								const obj = this.getObjectById(data, inputObj);
 								objs.push(obj?.id ?? inputObj);
 							}
 						} else {
-							const obj = this.getObjectByName(data, task.inputs[input] as string);
+							const obj = this.getObjectById(data, task.inputs[input] as string);
 							objs.push(obj?.id ?? task.inputs[input]);
 						}
 						const ids = objs.map((obj) => obj?.id ?? obj);
 						// deduplicate
+						console.log(`Deduplicating ${input}`, objs);
 						objs = objs.filter((obj, index) => ids.indexOf(obj?.id ?? obj) === index);
+						console.log(`Deduplicated ${input}`, objs);
 						for (const obj of objs) {
-							edges.push(createEdge(obj, "output", task.id, input, "taskInput"));
+							// edges.push(createEdge(obj, "output", task.id, input, "taskInput"));
 							const sourceId = obj?.id ?? task.inputs[input];
 							console.log("Creating task input edge");
 							console.log(task);
 							console.log(input);
 							console.log(obj);
 							let sourceParameter = "output";
-							if (obj?.type === "channel") {
+							if (channelTypes.includes(obj?.type)) {
 								sourceParameter = "ref";
-							} else if (obj?.type === "resource") {
+							} else if (resourceTypes.includes(obj?.type)) {
 								sourceParameter = "data";
-							} else if (obj?.type === "tracker") {
+							} else if (trackerTypes.includes(obj?.type)) {
 								sourceParameter = "ticket";
 							}
+							console.log()
 							edges.push(createEdge(sourceId, sourceParameter, task.id, input, "taskInput"));
 						}
 					}
 				}
 				if (task.outputs) {
 					for (const output of task.outputs) {
-						const obj = this.getObjectByName(data, output);
+						const obj = this.getObjectById(data, output);
 						const targetId = obj?.id ?? output;
 						let targetParameter = "in";
 						edges.push(createEdge(task.id, "outputs", targetId, targetParameter, "input"));
@@ -242,8 +245,8 @@ export class FlowManager {
 		nodes.forEach((node) => {
 			console.log(node);
 			dagreGraph.setNode(node.id, {
-				width: (nodeDimensions.get(node.data.config.type)?.width ?? nodeWidth) + node.data.config.name.length * 10,
-				height: (nodeDimensions.get(node.data.config.type)?.height ?? nodeHeight),
+				width: (nodeDimensions.get(node.data.type)?.width ?? nodeWidth) + node.data.config.name.length * 10,
+				height: (nodeDimensions.get(node.data.type)?.height ?? nodeHeight),
 			});
 		});
 
@@ -263,11 +266,93 @@ export class FlowManager {
 		});
 	}
 
-	static convertToYaml(flow: FlowConfig): string {
+	static replaceCredentialIdWithName(config: BaseConfig, credentials: CredentialConfig[]): void {
+		if (config.credential) {
+			const cred = credentials.find((c) => c.id === config.credential);
+			if (cred) {
+				config.credential = cred.name;
+			}
+		}
+	}
+
+	static replaceCredentialNameWithId(config: BaseConfig, credentials: CredentialConfig[]): void {
+		if (config.credential) {
+			const cred = credentials.find((c) => c.name === config.credential);
+			if (cred) {
+				config.credential = cred.id;
+			}
+		}
+	}
+
+	static convertToYaml(flow: FlowConfig, credentials: CredentialConfig[], documentRepositories: DocumentRepositoryConfig[]): string {
 		const flowCopy = _.cloneDeep(flow);
 		flowCopy.orgId = undefined;
 		flowCopy.id = undefined;
+		// We want to get object names to replace ids in references
 		for (const task of flowCopy.tasks ?? []) {
+			if (task.defaultChannel) {
+				const channel = flow.channels?.find((c) => c.id === task.defaultChannel);
+				if (channel) {
+					task.defaultChannel = channel.name;
+				}
+			}
+			if (task.documentation) {
+				task.documentation = task.documentation.map((d) => {
+					const doc = flow.documentation?.find((doc) => doc.id === d);
+					if (doc) {
+						return doc.name;
+					}
+					return d;
+				});
+			}
+			if (task.inputs) {
+				for (const input in task.inputs) {
+					if (Array.isArray(task.inputs[input])) {
+						task.inputs[input] = task.inputs[input].map((i) => {
+							const obj = this.getObjectById({ flow }, i);
+							if (obj) {
+								return obj.name;
+							}
+							return i;
+						});
+					} else {
+						const obj = this.getObjectById({ flow }, task.inputs[input] as string);
+						if (obj) {
+							task.inputs[input] = obj.name;
+						}
+					}
+				}
+			}
+			if (task.outputs) {
+				task.outputs = task.outputs.map((o) => {
+					const obj = this.getObjectById({ flow }, o);
+					if (obj) {
+						return obj.name;
+					}
+					return o;
+				});
+			}
+		}
+
+		for (const documentation of flowCopy.documentation ?? []) {
+			if (documentation.repository) {
+				const repo = documentRepositories.find((r) => r.id === documentation.repository);
+				if (repo) {
+					documentation.repository = repo.name;
+				}
+			}
+		}
+		for (const tool of flowCopy.tools ?? []) {
+			if (tool.channel) {
+				const channel = flow.channels?.find((c) => c.id === tool.channel);
+				if (channel) {
+					tool.channel = channel.name;
+				}
+			}
+		}
+
+		for (const task of flowCopy.tasks ?? []) {
+			this.replaceCredentialIdWithName(task, credentials);
 			task.flowId = undefined;
 			task.orgId = undefined;
 			task.id = undefined;
@@ -279,93 +364,308 @@ export class FlowManager {
 			}
 		}
 		for (const channel of flowCopy.channels ?? []) {
+			this.replaceCredentialIdWithName(channel, credentials);
 			channel.flowId = undefined;
 			channel.orgId = undefined;
 			channel.id = undefined;
 		}
 		for (const documentation of flowCopy.documentation ?? []) {
+			this.replaceCredentialIdWithName(documentation, credentials);
 			documentation.flowId = undefined;
 			documentation.orgId = undefined;
 			documentation.id = undefined;
 		}
 		for (const resource of flowCopy.resources ?? []) {
+			this.replaceCredentialIdWithName(resource, credentials);
 			resource.flowId = undefined;
 			resource.orgId = undefined;
 			resource.id = undefined;
 		}
 		for (const tool of flowCopy.tools ?? []) {
+			this.replaceCredentialIdWithName(tool, credentials);
 			tool.flowId = undefined;
 			tool.orgId = undefined;
 			tool.id = undefined;
 		}
 		for (const tracker of flowCopy.trackers ?? []) {
+			this.replaceCredentialIdWithName(tracker, credentials);
 			tracker.flowId = undefined;
 			tracker.orgId = undefined;
 			tracker.id = undefined;
 		}
 
-		return YAML.stringify(flowCopy, {
+		const obj = {
+			flows: [flowCopy]
+		}
+
+		return YAML.stringify(obj, {
 			keepUndefined: false,
 		});
 	}
-	static convertFromYaml(yaml: string): FlowConfig {
+	static convertFromYaml(yaml: string, currentOrgId: string, existingFlows: FlowConfig[], credentials: CredentialConfig[], documentRepositories: DocumentRepositoryConfig[]): FlowConfig | undefined {
 		const data = YAML.parse(yaml, {
 			merge: true,
 			schema: "core",
 			prettyErrors: true,
-		}) as FlowConfig;
-		return data;
-	}
+		}) as { flows: FlowConfig[] };
 
-	static getObjectTypeByName(data: FlowData, name: string, type: string): BaseConfig | undefined {
-		if (type === "channel") {
-			return data.flow.channels?.find((c) => c.name === name || c.id === name);
-		} else if (type === "documentation") {
-			return data.flow.documentation?.find((d) => d.name === name || d.id === name);
-		} else if (type === "resource") {
-			return data.flow.resources?.find((r) => r.name === name || r.id === name);
-		} else if (type === "task") {
-			return data.flow.tasks?.find((t) => t.name === name || t.id === name);
-		} else if (type === "tool") {
-			return data.flow.tools?.find((t) => t.name === name || t.id === name);
-		} else if (type === "tracker") {
-			return data.flow.trackers?.find((t) => t.name === name || t.id === name);
+
+		if (data.flows.length > 0) {
+			// We should add ids to all of the flow resources with uuidv4
+			// and we should change name to id in all references
+			const flow = data.flows[0];
+			if (existingFlows.find((f) => f.name === flow.name)) {
+				console.error(`Flow with name ${flow.name} already exists`);
+				return undefined;
+			}
+			flow.id = flow.id ?? uuidv4();
+			flow.orgId = currentOrgId;
+			if (flow.channels) {
+				for (const channel of flow.channels) {
+					channel.id = channel.id ?? uuidv4();
+					this.replaceCredentialNameWithId(channel, credentials);
+				}
+			}
+			if (flow.documentation) {
+				for (const doc of flow.documentation) {
+					doc.id = doc.id ?? uuidv4();
+					doc.flowId = flow.id;
+					doc.orgId = currentOrgId;
+					this.replaceCredentialNameWithId(doc, credentials);
+					if (doc.repository) {
+						const repo = documentRepositories.find((r) => r.name === doc.repository);
+						if (repo) {
+							doc.repository = repo.id;
+						}
+					}
+				}
+			}
+			if (flow.resources) {
+				for (const resource of flow.resources) {
+					resource.id = resource.id ?? uuidv4();
+					resource.flowId = flow.id;
+					resource.orgId = currentOrgId;
+					this.replaceCredentialNameWithId(resource, credentials);
+				}
+			}
+			if (flow.tools) {
+				for (const tool of flow.tools) {
+					tool.id = tool.id ?? uuidv4();
+					tool.flowId = flow.id;
+					tool.orgId = currentOrgId;
+					this.replaceCredentialNameWithId(tool, credentials);
+					if (tool.channel) {
+						const channel = flow.channels?.find((c) => c.name === tool.channel);
+						if (channel) {
+							tool.channel = channel.id;
+						}
+					}
+				}
+			}
+			if (flow.trackers) {
+				for (const tracker of flow.trackers) {
+					tracker.id = tracker.id ?? uuidv4();
+					tracker.flowId = flow.id;
+					tracker.orgId = currentOrgId;
+					this.replaceCredentialNameWithId(tracker, credentials);
+				}
+			}
+			if (flow.tasks) {
+				for (const task of flow.tasks) {
+					task.id = task.id ?? uuidv4();
+					task.flowId = flow.id;
+					task.orgId = currentOrgId;
+					this.replaceCredentialNameWithId(task, credentials);
+					if (task.defaultChannel) {
+						const channel = flow.channels?.find((c) => c.name === task.defaultChannel);
+						if (channel) {
+							task.defaultChannel = channel.id;
+						}
+					}
+					if (task.documentation) {
+						task.documentation = task.documentation.map((d) => {
+							const doc = flow.documentation?.find((doc) => doc.name === d);
+							if (doc) {
+								return doc.id;
+							}
+							return d;
+						});
+					}
+					if (task.inputs) {
+						for (const input in task.inputs) {
+							if (Array.isArray(task.inputs[input])) {
+								task.inputs[input] = task.inputs[input].map((i) => {
+									const obj = this.getObjectByName({flow}, i);
+									if (obj) {
+										return obj.id;
+									}
+									return i;
+								});
+							} else {
+								const obj = this.getObjectByName({flow}, task.inputs[input] as string);
+								if (obj) {
+									task.inputs[input] = obj.id;
+								}
+							}
+						}
+					}
+					if (task.outputs) {
+						task.outputs = task.outputs.map((o) => {
+							const obj = this.getObjectByName({flow}, o);
+							if (obj) {
+								return obj.id;
+							}
+							return o;
+						});
+					}
+					if (task.tools) {
+						for (const tool of task.tools) {
+							const obj = this.getObjectByName({flow}, tool.id);
+							if (obj) {
+								tool.id = obj.id;
+							}
+						}
+					}
+					if (task.triggers) {
+						task.triggers = task.triggers.map((t) => {
+							const obj = this.getObjectByName({flow}, t);
+							if (obj) {
+								return obj.id;
+							}
+							return t;
+						});
+					}
+					if (task.subtasks) {
+						task.subtasks = task.subtasks.map((s) => {
+							const obj = this.getObjectByName({flow}, s.name);
+							if (obj) {
+								s.id = obj.id;
+							}
+							return s;
+						});
+					}
+					if (task.tracker) {
+						const obj = this.getObjectByName({flow}, task.tracker);
+						if (obj) {
+							task.tracker = obj.id;
+						}
+					}
+				}
+			}
+			return flow;
 		}
 	}
 
-	static getObjectByName(data: FlowData, name: string): BaseConfig | undefined {
+	static getObjectType(config: BaseConfig): ObjectType {
+		if (channelTypes.includes(config.type as ChannelType)) {
+			return "channel";
+		}
+		if (documentationTypes.includes(config.type as DocumentationType)) {
+			return "documentation";
+		}
+		if (resourceTypes.includes(config.type as ResourceType)) {
+			return "resource";
+		}
+		if (taskTypes.includes(config.type as TaskType)) {
+			return "task";
+		}
+		if (toolTypes.includes(config.type as ToolType)) {
+			return "tool";
+		}
+		if (trackerTypes.includes(config.type as TrackerType)) {
+			return "tracker";
+		}
+	}
+
+	static getObjectTypeByName(data: FlowData, name: string, type: string): BaseConfig | undefined {
+
+		if (type === "channel") {
+			return data.flow.channels?.find((c) => c.name === name);
+		} else if (type === "documentation") {
+			return data.flow.documentation?.find((d) => d.name === name);
+		} else if (type === "resource") {
+			return data.flow.resources?.find((r) => r.name === name);
+		} else if (type === "task") {
+			return data.flow.tasks?.find((t) => t.name === name);
+		} else if (type === "tool") {
+			return data.flow.tools?.find((t) => t.name === name);
+		} else if (type === "tracker") {
+			return data.flow.trackers?.find((t) => t.name === name);
+		}
+	}
+
+	static getObjectById(data: FlowData, id: string): BaseConfig | undefined {
 		if (data.flow.channels) {
-			const channel = data.flow.channels.find((c) => c.name === name || c.id === name);
+			const channel = data.flow.channels.find((c) => c.id === id);
 			if (channel) {
 				return channel;
 			}
 		}
 		if (data.flow.documentation) {
-			const documentation = data.flow.documentation.find((d) => d.name === name || d.id === name);
+			const documentation = data.flow.documentation.find((d) => d.id === id);
 			if (documentation) {
 				return documentation;
 			}
 		}
 		if (data.flow.resources) {
-			const resource = data.flow.resources.find((r) => r.name === name || r.id === name);
+			const resource = data.flow.resources.find((r) => r.id === id);
 			if (resource) {
 				return resource;
 			}
 		}
 		if (data.flow.tasks) {
-			const task = data.flow.tasks.find((t) => t.name === name || t.id === name);
+			const task = data.flow.tasks.find((t) => t.id === id);
 			if (task) {
 				return task;
 			}
 		}
 		if (data.flow.tools) {
-			const tool = data.flow.tools.find((t) => t.name === name || t.id === name);
+			const tool = data.flow.tools.find((t) => t.id === id);
 			if (tool) {
 				return tool;
 			}
 		}
 		if (data.flow.trackers) {
-			const tracker = data.flow.trackers.find((t) => t.name === name || t.id === name);
+			const tracker = data.flow.trackers.find((t) => t.id === id);
+			if (tracker) {
+				return tracker;
+			}
+		}
+	}
+
+	static getObjectByName(data: FlowData, name: string): BaseConfig | undefined {
+		if (data.flow.channels) {
+			const channel = data.flow.channels.find((c) => c.name === name);
+			if (channel) {
+				return channel;
+			}
+		}
+		if (data.flow.documentation) {
+			const documentation = data.flow.documentation.find((d) => d.name === name);
+			if (documentation) {
+				return documentation;
+			}
+		}
+		if (data.flow.resources) {
+			const resource = data.flow.resources.find((r) => r.name === name);
+			if (resource) {
+				return resource;
+			}
+		}
+		if (data.flow.tasks) {
+			const task = data.flow.tasks.find((t) => t.name === name);
+			if (task) {
+				return task;
+			}
+		}
+		if (data.flow.tools) {
+			const tool = data.flow.tools.find((t) => t.name === name);
+			if (tool) {
+				return tool;
+			}
+		}
+		if (data.flow.trackers) {
+			const tracker = data.flow.trackers.find((t) => t.name === name);
 			if (tracker) {
 				return tracker;
 			}
@@ -376,52 +676,37 @@ export class FlowManager {
 
 
 	static addObject<T extends BaseConfig>(data: FlowData, obj: T, objectType: ObjectType) {
+		while (this.getObjectTypeByName(data, obj.name, objectType) !== undefined) {
+			obj.name = incrementString(obj.name);
+		}
 		if (objectType === "channel") {
 			if (!data.flow.channels) {
 				data.flow.channels = [];
-			}
-			while (data.flow.channels.find((c) => c.name === obj.name)) {
-				obj.name = incrementString(obj.name);
 			}
 			data.flow.channels.push(obj as ChannelConfig);
 		} else if (objectType === "documentation") {
 			if (!data.flow.documentation) {
 				data.flow.documentation = [];
 			}
-			while (data.flow.documentation.find((d) => d.name === obj.name)) {
-				obj.name = incrementString(obj.name);
-			}
 			data.flow.documentation.push(obj as DocumentationConfig);
 		} else if (objectType === "resource") {
 			if (!data.flow.resources) {
 				data.flow.resources = [];
-			}
-			while (data.flow.resources.find((r) => r.name === obj.name)) {
-				obj.name = incrementString(obj.name);
 			}
 			data.flow.resources.push(obj as ResourceConfig);
 		} else if (objectType === "task") {
 			if (!data.flow.tasks) {
 				data.flow.tasks = [];
 			}
-			while (data.flow.tasks.find((t) => t.name === obj.name)) {
-				obj.name = incrementString(obj.name);
-			}
 			data.flow.tasks.push(obj as TaskConfig);
 		} else if (objectType === "tool") {
 			if (!data.flow.tools) {
 				data.flow.tools = [];
 			}
-			while (data.flow.tools.find((t) => t.name === obj.name)) {
-				obj.name = incrementString(obj.name);
-			}
 			data.flow.tools.push(obj as ToolConfig);
 		} else if (objectType === "tracker") {
 			if (!data.flow.trackers) {
 				data.flow.trackers = [];
-			}
-			while (data.flow.trackers.find((t) => t.name === obj.name)) {
-				obj.name = incrementString(obj.name);
 			}
 			data.flow.trackers.push(obj as TrackerConfig);
 		} else {
@@ -466,32 +751,31 @@ export class FlowManager {
 	}
 
 	static updateObject(data: FlowData, obj: BaseConfig, objectType: ObjectType) {
-		let found: BaseConfig | undefined = undefined;
-		switch (objectType) {
-			case "channel":
-				found = data.flow.channels?.find((c) => c.name === obj.name || c.id === obj.id);
-				break;
-			case "documentation":
-				found = data.flow.documentation?.find((d) => d.name === obj.name || d.id === obj.id);
-				break;
-			case "resource":
-				found = data.flow.resources?.find((r) => r.name === obj.name || r.id === obj.id);
-				break;
-			case "task":
-				found = data.flow.tasks?.find((t) => t.name === obj.name || t.id === obj.id);
-				break;
-			case "tool":
-				found = data.flow.tools?.find((t) => t.name === obj.name || t.id === obj.id);
-				break;
-			case "tracker":
-				found = data.flow.trackers?.find((t) => t.name === obj.name || t.id === obj.id);
-				break;
-			default:
-				console.error(`updateObject() unknown object type ${obj.type}`);
-				break;
-		}
+		const found = this.getObjectById(data, obj.id);
+
 		if (found) {
-			Object.assign(found, obj);
+			_.mergeWith(found, obj, (objValue, srcValue) => {
+				if (_.isArray(objValue) && _.isArray(srcValue)) {
+					let newValue = objValue;
+					for (const val in srcValue) {
+						if (objValue.includes(val)) {
+							continue;
+						} else {
+							newValue.push(val);
+						}
+					}
+					for (const val in objValue) {
+						if (srcValue.includes(val)) {
+							continue;
+						} else {
+							newValue = newValue.filter((v) => v !== val);
+						}
+					}
+					return newValue;
+				}
+			});
+		} else {
+			console.error(`updateObject() object not found ${obj.type}: ${obj.name}`)
 		}
 	}
 
@@ -854,8 +1138,8 @@ export class FlowManager {
 		console.log("Removing task connection");
 		console.log(`sourceId: ${sourceId}, targetId: ${targetId}, parameter: ${parameter}`);
 		console.log(task);
-		const sourceObj = this.getObjectByName(data, sourceId);
-		const targetObj = this.getObjectByName(data, targetId);
+		const sourceObj = this.getObjectById(data, sourceId);
+		const targetObj = this.getObjectById(data, targetId);
 
 		if (parameter === "defaultChannel") {
 			task.defaultChannel = undefined;
@@ -868,7 +1152,7 @@ export class FlowManager {
 				delete task.inputs[sourceId];
 			}
 		} else if (parameter === "outputs") {
-			task.outputs = task.outputs?.filter((o) => o !== targetId && o !== targetObj?.name);
+			task.outputs = task.outputs?.filter((o) => o !== targetId);
 		} else if (parameter === "tools") {
 			let name = sourceId;
 			if (sourceObj) {
@@ -921,7 +1205,7 @@ export class FlowManager {
 		parameter: string
 	): boolean {
 		if (parameter === "output") {
-			const obj = this.getObjectTypeByName(flow, targetId, "resource");
+			const obj = this.getObjectById(flow, targetId);
 			if (obj) {
 				toolReference.output = targetId;
 				return true;
@@ -965,45 +1249,49 @@ export class FlowManager {
 		}
 	}
 
-	static renameNode(data: FlowData, oldName: string, newName: string) {
-		if (data.flow.channels) {
-			const channel = data.flow.channels.find((c) => c.name === oldName || c.id === oldName);
+	static renameNode(data: FlowData, oldName: string, newName: string, objectType: ObjectType) {
+		while (this.getObjectTypeByName(data, newName, objectType) !== undefined) {
+			newName = incrementString(newName);
+			console.log(`Renaming ${oldName} to ${newName}`);
+		}
+		if (objectType === "channel" && data.flow.channels) {
+			const channel = data.flow.channels.find((c) => c.name === oldName);
 			if (channel) {
 				channel.name = newName;
 				this.updateTaskRefs(data, "channel", oldName, newName);
 				this.updateToolRefs(data, oldName, newName);
 			}
 		}
-		if (data.flow.documentation) {
-			const documentation = data.flow.documentation.find((d) => d.name === oldName || d.id === oldName);
+		if (objectType === "documentation" && data.flow.documentation) {
+			const documentation = data.flow.documentation.find((d) => d.name === oldName);
 			if (documentation) {
 				documentation.name = newName;
 				this.updateTaskRefs(data, "documentation", oldName, newName);
 			}
 		}
-		if (data.flow.resources) {
-			const resource = data.flow.resources.find((r) => r.name === oldName || r.id === oldName);
+		if (objectType === "resource" && data.flow.resources) {
+			const resource = data.flow.resources.find((r) => r.name === oldName);
 			if (resource) {
 				resource.name = newName;
 				this.updateTaskRefs(data, "resource", oldName, newName);
 			}
 		}
-		if (data.flow.tasks) {
-			const task = data.flow.tasks.find((t) => t.name === oldName || t.id === oldName);
+		if (objectType === "task" && data.flow.tasks) {
+			const task = data.flow.tasks.find((t) => t.name === oldName);
 			if (task) {
 				task.name = newName;
 				this.updateTaskRefs(data, "task", oldName, newName);
 			}
 		}
-		if (data.flow.tools) {
-			const tool = data.flow.tools.find((t) => t.name === oldName || t.id === oldName);
+		if (objectType === "tool" && data.flow.tools) {
+			const tool = data.flow.tools.find((t) => t.name === oldName);
 			if (tool) {
 				tool.name = newName;
 				this.updateTaskRefs(data, "tool", oldName, newName);
 			}
 		}
-		if (data.flow.trackers) {
-			const tracker = data.flow.trackers.find((t) => t.name === oldName || t.id === oldName);
+		if (objectType === "tracker" && data.flow.trackers) {
+			const tracker = data.flow.trackers.find((t) => t.name === oldName);
 			if (tracker) {
 				tracker.name = newName;
 				this.updateTaskRefs(data, "tracker", oldName, newName);

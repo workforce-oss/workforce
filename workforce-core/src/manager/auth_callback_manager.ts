@@ -1,5 +1,5 @@
 import bodyParser from "body-parser";
-import { RequestHandler } from "express";
+import { Application, RequestHandler } from "express";
 import expressWs from "express-ws";
 import { IncomingHttpHeaders } from "http";
 import { Subject } from "rxjs";
@@ -9,7 +9,7 @@ import { BrokerMode, SubjectFactory } from "./impl/subject_factory.js";
 
 export class AuthCallBackManager {
     private static _instance: AuthCallBackManager;
-    private app?: expressWs.Application;
+    private app?: expressWs.WithWebsocketMethod & Application;
     private hookRegistrationEventSubject?: Subject<AuthHookRegistrationEvent>;
     private hookCallbackEventSubject?: Subject<AuthHookCallbackEvent>;
 
@@ -47,7 +47,7 @@ export class AuthCallBackManager {
         return AuthCallBackManager._instance;
     }
 
-    public manage(app: expressWs.Application): void {
+    public manage(app: expressWs.WithWebsocketMethod & Application): void {
         if (this.app && this.app === app) {
             this.logger.debug("Already managing app");
             return;

@@ -1,0 +1,37 @@
+{
+  "title": "OrgUserRelation",
+  "type": "object",
+  "description": "A relation between an organization and a user",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The unique identifier for the org-user relation",
+      "readOnly": true
+    },
+    "orgId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The unique identifier for the organization the user belongs to"
+    },
+    "userId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The unique identifier for the user"
+    },
+    "role": {
+      "type": "string",
+      "enum": [
+        "admin",
+        "maintainer",
+        "developer",
+        "reporter"
+      ]
+    }
+  },
+  "required": [
+    "orgId",
+    "userId",
+    "role"
+  ]
+}

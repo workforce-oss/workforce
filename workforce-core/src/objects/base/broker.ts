@@ -10,10 +10,13 @@ import { CustomMetrics } from "../../metrics/api.js";
 import { BrokerMode } from "../../manager/impl/subject_factory.js";
 import { FunctionDocuments, FunctionParameters } from "../../util/openapi.js";
 import { ObjectType } from "./factory/types.js";
+import { AsyncMap } from "../../manager/impl/cache/async_map.js";
+import { MapFactory } from "../../manager/impl/map_factory.js";
 
 export abstract class BaseBroker<TConfig extends BaseConfig, T extends BaseObject<TConfig>, TObjectEvent> {
 	config: BrokerConfig;
 	objects = new Map<string, T>();
+	configCache?: AsyncMap<TConfig>;
 	abstract logger: Logger;
 	abstract objectType: ObjectType;
 
@@ -22,10 +25,19 @@ export abstract class BaseBroker<TConfig extends BaseConfig, T extends BaseObjec
 
 	constructor(config: BrokerConfig) {
 		this.config = config;
+		MapFactory.for<TConfig>("config_cache", "objects").then((m) => {
+			this.configCache = m;
+		}).catch(e => {
+			Logger.getInstance("Broker Constructor").warn("error building config cache", e);
+		})
 	}
 
 	public getObject(objectId: string): T | undefined {
 		return this.objects.get(objectId);
+	}
+
+	public async getObjectConfig(objectId: string): Promise<TConfig | undefined> {
+		return this.configCache?.get(objectId);
 	}
 
 	public getObjectSchema(objectId: string, isToolOutput?: boolean): Promise<FunctionDocuments | Record<string, FunctionParameters> | undefined> {
@@ -65,19 +77,19 @@ export abstract class BaseBroker<TConfig extends BaseConfig, T extends BaseObjec
 		}
 	}
 
-	public register(object: T): Promise<void> {
+	public async register(object: T): Promise<void> {
 		this.logger.info(
 			`register() Registering ${object.config.type} ${object.config.name} with id ${object.config.id}`
 		);
 		if (!object.config.id) {
 			throw new Error("BaseBroker.register() object.config.id is required");
 		}
-		// if (this.objects.has(object.config.id)) {
-		// 	this.logger.warn(
-		// 		`register() ${object.config.type} ${object.config.name} with id ${object.config.id} already registered. Replacing.`
-		// 	);
-		// 	await this.remove(object.config.id);
-		// }
+		if (this.objects.has(object.config.id)) {
+			this.logger.warn(
+				`register() ${object.config.type} ${object.config.name} with id ${object.config.id} already registered. Replacing.`
+			);
+			await this.remove(object.config.id);
+		}
 		this.objects.set(object.config.id, object);
 		return Promise.resolve();
 	}

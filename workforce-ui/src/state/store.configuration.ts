@@ -31,10 +31,10 @@ export const configurationStore = create<ConfigurationState>((set) => ({
         session: undefined,
         userId: "",
     },
-    config: window.location.origin === "http://localhost:8085" ? {
+    config: window.location.origin === "http://localhost:8084" ? {
         apiBasePath: "/workforce-api",
-        apiBaseUrl: "http://localhost:8085",
-        authIssuerUri: "http://localhost:8085/insecure",
+        apiBaseUrl: "http://localhost:8084",
+        authIssuerUri: "http://localhost:8084/insecure",
         clientId: "workforce-ui",
     } : {
         apiBasePath: "/workforce-api",

@@ -44,17 +44,17 @@
         },
         "workforce-vscode.chatScriptUrl": {
           "type": "string",
-          "default": "http://localhost:8085/embedded-chat/static/js/main.js",
+          "default": "http://localhost:8084/embedded-chat/static/js/main.js",
           "description": "The URL for the chat script"
         },
         "workforce-vscode.authIssuerUrl": {
           "type": "string",
-          "default": "http://localhost:8085/insecure",
+          "default": "http://localhost:8084/insecure",
           "description": "The URL for the auth issuer"
         },
         "workforce-vscode.socketUrl": {
           "type": "string",
-          "default": "http://localhost:8085/vscode-server/socket",
+          "default": "http://localhost:8084/vscode-server/socket",
           "description": "The URL for the socket server"
         }
       }

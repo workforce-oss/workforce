@@ -1,7 +1,7 @@
 import * as fs from "fs";
-import { Issuer, TokenSet, generators } from "openid-client";
 import * as http from "http";
 import open from "open";
+import * as oauth2 from 'openid-client';
 
 export type AuthConfig = {
   auth?: {
@@ -92,43 +92,59 @@ export class Auth {
 
 
 
-export async function oauth2_login(issuerUri: string, oauth2ClientId: string): Promise<TokenSet> {
+export async function oauth2_login(issuerUri: string, oauth2ClientId: string): Promise<oauth2.TokenEndpointResponse> {
   // Initiliaze issuer configuration, discover or configure manually
-  const issuer = await Issuer.discover(
-    issuerUri
+  const config = await oauth2.discovery(
+    new URL(issuerUri),
+    oauth2ClientId,
+    undefined,
+    undefined,
+    {
+      execute: [
+        oauth2.allowInsecureRequests
+      ]
+    }
   );
 
-  const client = new issuer.Client({
-    client_id: oauth2ClientId,
-    // fixed port 6363, could be dynamic, our webserver will be launched on this port
-    redirect_uris: ["http://localhost:6363"],
-    response_types: ["code"],
-    token_endpoint_auth_method: "none",
 
-  });
-
-  // Generate code challenge
-  const code_verifier = generators.codeVerifier();
-  const code_challenge = generators.codeChallenge(code_verifier);
+  const code_verifier = oauth2.randomPKCECodeVerifier();
+  const code_challenge = await oauth2.calculatePKCECodeChallenge(code_verifier);
   const state = Math.random().toString(36).substring(7);
 
+
+  // const client = new issuer.Client({
+  //   client_id: oauth2ClientId,
+  //   // fixed port 6363, could be dynamic, our webserver will be launched on this port
+  //   redirect_uris: ["http://localhost:6363"],
+  //   response_types: ["code"],
+  //   token_endpoint_auth_method: "none",
+
+  // });
+
   // Generate authorization url, that we will open for the user
-  const authorizationUrl = await client.authorizationUrl({
+  const authorizationUrl = oauth2.buildAuthorizationUrl(config, {
+    redirect_uri: "http://localhost:6363",
     scope: "openid",
     code_challenge,
     code_challenge_method: "S256",
-    audience: "https://api/",
+    audience: "workforce-cli",
     state
   });
 
-  let params
+  let tokenResponse: oauth2.TokenEndpointResponse | undefined = undefined;
 
   // Very simple webserver, using Nodes standard http module
   const server = http.createServer((req, res) => {
     // In here when the server gets a request
     if (req.url?.startsWith('/?')) {
       // The parameters could be parsed manually, but the openid-client offers a function for it
-      params = client.callbackParams(req);
+      oauth2.authorizationCodeGrant(
+        config,
+        new URL(req.url, "http://localhost:6363"),
+        {
+          pkceCodeVerifier: code_verifier,
+          expectedState: state,
+        }).then(p => tokenResponse = p)
       res.end('You can close this browser now.')
     } else {
       res.end('Unsupported')
@@ -139,22 +155,27 @@ export async function oauth2_login(issuerUri: string, oauth2ClientId: string): P
 
 
   // Open authorization url in preferred browser, works cross-platform
-  await open(authorizationUrl)
+  await open(authorizationUrl.toString())
 
   // Recheck every 500ms if we received any parameters
   // This is a simple example without a timeout
-  while (params === undefined) {
+  while (tokenResponse === undefined) {
     await new Promise(resolve => setTimeout(resolve, 500));
   }
 
-  const tokenSet = await client.callback('http://localhost:6363', params, { code_verifier, state });
+  // const tokenSet = await client.callback('http://localhost:6363', params, { code_verifier, state })
+  //   .catch(e => {
+  //     console.warn("error validating token", e)
+  //   });
+
+
 
   // we don't need the server anymore, stop listening
   server.close()
 
-  console.log(tokenSet)
-  if (!tokenSet.access_token) {
+  console.log(tokenResponse)
+  if (!(tokenResponse as oauth2.TokenEndpointResponse).access_token) {
     throw new Error("No access token received")
   }
-  return tokenSet;
+  return tokenResponse;
 }

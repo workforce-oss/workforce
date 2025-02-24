@@ -25,6 +25,7 @@ export function capitalize(input: string) {
 }
 
 export function createEdge(sourceId: string, sourceParameter: string, targetId: string, targetParameter, type: 'input' | 'taskInput' | 'output'): Edge {
+    console.log(`createEdge: sourceId=${sourceId}, sourceParameter=${sourceParameter}, targetId=${targetId}, targetParameter=${targetParameter}, type=${type}`);
     return {
         id: `reactflow__edge-${sourceId}${createHandleId(sourceId, sourceParameter, 'output')}-${targetId}${createHandleId(targetId, targetParameter, type)}`,
         type: 'custom',

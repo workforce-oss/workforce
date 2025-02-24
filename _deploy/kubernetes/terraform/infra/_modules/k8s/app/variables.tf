@@ -46,6 +46,13 @@ variable additional_labels {
     default = {}
 }
 
+variable image_pull_policy {
+    type = string
+    description = "Pull Policy for images"
+
+    default = "IfNotPresent"
+}
+
 variable http_port {
     type        = number
     description = "The ports the application listens on."

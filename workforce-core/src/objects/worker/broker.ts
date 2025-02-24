@@ -242,10 +242,22 @@ export class WorkerBroker extends BaseBroker<WorkerConfig, Worker, object> {
 							// remove any pipes
 							workerToken = workerToken.replace(/\|/g, "");
 
-							let channelMessageData = undefined;
+							const channelMessageData: Record<string, string> = {};
 							if (request.input[ChannelMessageDataKey]) {
-								channelMessageData = jsonParse<Record<string, string>>(request.input[ChannelMessageDataKey] as string);
+								
+								const parsed = jsonParse<Record<string, string>>(request.input[ChannelMessageDataKey] as string);
+								if (parsed) {
+									Object.assign(channelMessageData, parsed)
+								}
 							}
+
+							const realtimeSessionData = await worker.startRealtimeSession(request);
+
+							Object.assign(channelMessageData, {
+								...realtimeSessionData,
+								...channelMessageData
+							});
+
 
 							await BrokerManager.channelBroker
 								.establishSession(channel.config.id!, request.taskExecutionId, channelMessageData)

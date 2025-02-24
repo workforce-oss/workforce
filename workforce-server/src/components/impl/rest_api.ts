@@ -1,4 +1,4 @@
-import { Request, RequestHandler, Response, Router } from "express";
+import { Application, Request, RequestHandler, Response, Router } from "express";
 import { AuthOptions, auth } from "express-oauth2-jwt-bearer";
 import { ParamsDictionary } from "express-serve-static-core";
 import expressWs from "express-ws";
@@ -17,7 +17,7 @@ export class RestApiComponent extends BaseComponent {
         super(componentName);
     }
 
-    async init(app: expressWs.Application): Promise<void> {
+    async init(app: expressWs.WithWebsocketMethod & Application): Promise<void> {
         if (Configuration.EnableLocalAuth) {
             const authCache = await MapFactory.for<Record<string, string>>(
                 "auth_cache",
@@ -178,7 +178,7 @@ export class RestApiComponent extends BaseComponent {
     wsRoutes(authOptions?: AuthOptions): Record<string, expressWs.WebsocketRequestHandler> {
         return {
             "/watch/task-executions":
-                async (ws: WebSocket, req: Request) => {
+                async (ws: WebSocket, req: any) => {
                     await this.watchTaskExecutions(ws, req, authOptions);
                 }
         }

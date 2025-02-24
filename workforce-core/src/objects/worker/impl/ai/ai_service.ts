@@ -33,4 +33,13 @@ export interface AIService {
         channelMessageId?: string,
         username?: string
     }): Promise<ChatMessage>;
+
+    realtimeSession?: (args: {
+        taskExecutionId: string,
+        systemMessage: string,
+        functions?: FunctionDocument[],
+        explainFunctions?: boolean,
+        modelOverride?: string,
+        username?: string
+    }) => Promise<{sessionId: string, token: string, baseUrl: string, workerId: string, model: string}>;
 }

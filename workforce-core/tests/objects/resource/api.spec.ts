@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import { Sequelize } from "sequelize-typescript";
 import { ResourceDb } from "../../../src/objects/resource/db.js";
 import { ResourceConfig } from "../../../src/objects/resource/model.js";
-import express from "express";
+import express, { Application } from "express";
 import expressWs from "express-ws";
 import { auth } from "express-oauth2-jwt-bearer";
 import { ResourceRouter } from "../../../src/objects/resource/api.js";
@@ -20,7 +20,7 @@ import {
 } from "../../helpers/db.js";
 
 describe("Resource API", () => {
-	const { app, getWss, applyTo } = expressWs(express());
+	const app = expressWs(express() as unknown as expressWs.Application).app as unknown as Application & expressWs.WithWebsocketMethod;
 
 	let sequelize: Sequelize;
 	let orgId: string;

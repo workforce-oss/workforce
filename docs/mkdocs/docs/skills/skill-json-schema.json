@@ -1,0 +1,23 @@
+{
+  "title": "Skill",
+  "description": "A skill is a capability that a worker can have and is used to match workers to tasks.",
+  "type": "object",
+  "properties": {
+    "orgId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The unique identifier for the organization the object belongs to"
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "name",
+    "description",
+    "orgId"
+  ]
+}

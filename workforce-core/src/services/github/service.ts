@@ -437,7 +437,7 @@ export class GithubService {
         if (!project) {
             throw new Error(`Failed to get project ${projectName}`);
         }
-        const items = project.items?.nodes?.map(node => node as ProjectV2Item);
+        const items = project.items?.nodes?.map(node => node!);
         if (!items) {
             throw new Error(`Failed to get items for project ${projectName}`);
         }

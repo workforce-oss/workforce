@@ -1,7 +1,7 @@
 import { Delete, Edit } from "@mui/icons-material";
 import { SvgIcon } from "@mui/material";
 import { useState } from "react";
-import { FlowConfig } from "workforce-core/model";
+import { CredentialConfig, DocumentRepositoryConfig, FlowConfig } from "workforce-core/model";
 import { shallow } from "zustand/shallow";
 import { MetaState, flowStates, metaStore } from "../../../state/store.meta";
 import { ActivateButton } from "./ActivateButton";
@@ -21,8 +21,8 @@ const metaSelector = (state: MetaState) => ({
 	selectedFlow: state.selectedFlow,
 });
 
-export const FlowHeader = (props: { flow: FlowConfig }) => {
-	const { flow } = props;
+export const FlowHeader = (props: { flow: FlowConfig, credentials: CredentialConfig[], documentRepositories: DocumentRepositoryConfig[] }) => {
+	const { flow, credentials, documentRepositories } = props;
 	const { renameFlow, selectFlow, deleteFlow, selectedFlow } = metaStore(metaSelector, shallow);
 	const [edittingFlow, setEdittingFlow] = useState(null);
 	const [edittingFlowName, setEdittingFlowName] = useState("");
@@ -81,7 +81,7 @@ export const FlowHeader = (props: { flow: FlowConfig }) => {
 						<SvgIcon component={Edit} />
 					</button>
 					<ActivateButton id={flow.id} />
-					<ExportButton id={flow.id} />
+					<ExportButton id={flow.id} credentials={credentials} documentRepositories={documentRepositories} />
 					<SaveButton id={flow.id} />
 					<button
 						onClick={() => {

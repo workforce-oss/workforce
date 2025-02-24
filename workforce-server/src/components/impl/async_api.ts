@@ -3,13 +3,14 @@ import { BaseComponent } from "../base.js";
 import { AuthCallBackManager, ChannelDb, ChannelMessageDb, ChannelSessionDb, Configuration, CredentialDb, DocumentDb, DocumentRelationDb, DocumentRepositoryDb, DocumentationDb, FlowDb, OrgDb, OrgUserRelationDb, Outbox, ResourceDb, ResourceVersionDb, ResourceWriteDb, SkillDb, SpaceDb, SpaceUserRelationDb, TaskDb, TaskExecutionDb, TaskExecutionUserDb, TicketRequestDb, ToolDb, ToolRequestDb, ToolStateDb, TrackerDb, UserDb, WebhookRouteDb, WebhookRouteManager, WorkRequestDb, WorkerChatMessageDb, WorkerChatSessionDb, WorkerDb, WorkforceClient } from "workforce-core";
 import { WorkforceComponent } from "../model.js";
 import { ModelCtor, Sequelize } from "sequelize-typescript";
+import { Application } from "express";
 
 export class AsyncApiComponent extends BaseComponent {
     constructor(componentName: WorkforceComponent) {
         super(componentName);
     }
 
-    async init(app: expressWs.Application, additionalWsHandlers?: Record<string, WebsocketRequestHandler>): Promise<void> {
+    async init(app: expressWs.WithWebsocketMethod & Application, additionalWsHandlers?: Record<string, WebsocketRequestHandler>): Promise<void> {
         (await WebhookRouteManager.getInstance()).manage(app, additionalWsHandlers);
         (await AuthCallBackManager.getInstance()).manage(app);
         this.logger.info(`${this.componentName} is ready`);

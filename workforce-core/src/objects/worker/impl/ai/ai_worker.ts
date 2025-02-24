@@ -30,7 +30,46 @@ export class AIWorker extends Worker {
 		return AIWorkerMetadata.defaultConfig(orgId);
 	}
 
+	public async startRealtimeSession(workRequest: WorkRequest): Promise<{
+		workerId?: string,
+		realtime_token?: string,
+		realtime_base_url?: string,
+		model?: string,
+	}> {
+		if (this.aiService.realtimeSession) {
+			this.externalInference = true;
+			const functions: FunctionDocument[] = [];
+			const toolSchemas = await this.loadTools(workRequest.tools?.map(t => t.id ?? "") ?? []);
+			for (const functionList of Object.values(toolSchemas)) {
+				functions.push(...functionList)
+			}
+			if (workRequest.documentation) {
+				functions.push(DocumentRepository.functionSchema())
+			}
 
+			const task = BrokerManager.taskBroker.getObject(workRequest.taskId);
+			if (task?.config.subtasks) {
+				const subTaskFunctions = await task.getSubtaskFunctionSchema();
+				if (subTaskFunctions) {
+					functions.push(...subTaskFunctions)
+				}
+			}
+
+			const realtimeSession = await this.aiService.realtimeSession({
+				systemMessage: workRequest.input.systemMessage as string,
+				taskExecutionId: workRequest.taskExecutionId,
+				functions,
+			})
+
+			return {
+				model: realtimeSession.model,
+				workerId: realtimeSession.workerId,
+				realtime_base_url: realtimeSession.baseUrl,
+				realtime_token: realtimeSession.token
+			}
+		}
+		return {};
+	}
 	public async inference(
 		args: {
 			chatSession: ChatSession;

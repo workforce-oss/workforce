@@ -43,6 +43,7 @@
 		"rxjs": "^7.8.1",
 		"workforce-ui-core": "^0.1.0",
         "workforce-api-client": "^0.1.0",
+		"workforce-ui-openai-webrtc": "^0.1.0",
 		"zundo": "^2.0.0-beta.18",
 		"zustand": "^4.3.8"
 	},

@@ -38,7 +38,7 @@ export class ExcalidrawTool extends OpenAPIChannelTool {
                 reject(new Error(`Timeout waiting for response for request ${requestId}`));
             }, 60000);
 
-            const subscription = BrokerManager.channelBroker?.subscribeToSession(channelId!, taskExecutionId!, workerId!, ["tool_response"], (message) => {
+            const subscription = BrokerManager.channelBroker?.subscribeToSession(channelId!, taskExecutionId!, workerId!, ["tool-response"], (message) => {
                 this.logger.debug(`Received message: ${JSON.stringify(message)}`);
                 const toolCalls = message.toolCalls;
                 if (!toolCalls) {

@@ -1,14 +1,17 @@
 import { useRef, useState } from "react";
 import { ChatInputComponent } from "./ChatInputComponent";
 import { ChatOutputComponent } from "./ChatOutputComponent";
-import { ArrowDownIcon, ArrowUpIcon, CubeTransparentIcon } from "@heroicons/react/24/outline";
+import { ArrowDownIcon, ArrowUpIcon, CubeTransparentIcon, MicrophoneIcon, SpeakerWaveIcon, SpeakerXMarkIcon } from "@heroicons/react/24/outline";
 import { ChatBoxMessage } from "workforce-ui-core";
+import { OpenAIVoiceInterface } from "workforce-ui-openai-webrtc";
+import { AudioVisualizationAvatar } from "./avatar/AudioVisualizationAvatar";
 
 export interface ChatBoxProps {
 	sessionId: string;
 	onMessageInput: (message: string) => void
 	messages: ChatBoxMessage[];
 	localSenderId: string;
+	voiceService?: OpenAIVoiceInterface;
 	voiceEnabled?: boolean;
 	draggingEnabled?: boolean;
 	mode?: ChatBoxMode;
@@ -18,7 +21,10 @@ export type ChatBoxMode = "default" | "webview";
 
 
 export const ChatBoxComponent = (props: ChatBoxProps) => {
-	const { mode, sessionId, messages, onMessageInput, localSenderId, voiceEnabled, draggingEnabled } = props;
+	const { mode, sessionId, messages, onMessageInput, localSenderId, voiceService, voiceEnabled, draggingEnabled } = props;
+
+	const [speechEnabled, setSpeechEnabled] = useState(true)
+	const [microphoneEnabled, setMicrophoneEnabled] = useState(true)
 
 	const [expanded, setExpanded] = useState(false);
 	const [mousePressed, setMousePressed] = useState(false);
@@ -66,8 +72,8 @@ export const ChatBoxComponent = (props: ChatBoxProps) => {
 								zIndex: 2147483647,
 							}
 						}
-						width={`calc(90vw - 20px)`} 
-						height={"calc(15vh - 20px)"} 
+						width={`calc(90vw - 20px)`}
+						height={"calc(15vh - 20px)"}
 						borderRadius={10}
 						mode="webview"
 						onMessageInput={onMessageInput} />
@@ -177,6 +183,73 @@ export const ChatBoxComponent = (props: ChatBoxProps) => {
 
 						}}
 					>{expanded ? <ArrowUpIcon /> : <ArrowDownIcon />}</button>
+					{voiceEnabled && (
+						<button
+							style={{
+								position: "absolute",
+								top: 120,
+								left: voiceOffset,
+								width: "30px",
+								height: "30px",
+								display: "flex",
+								alignItems: "center",
+								justifyContent: "center",
+								borderRadius: 10,
+								padding: 2,
+								cursor: "pointer",
+								backdropFilter: "blur(2px)",
+								border: "1px solid rgba(0, 0, 0, 0.28)",
+								boxShadow: "rgba(0, 0, 0, 0.25) 1px 4px 4px",
+								background: !microphoneEnabled ? "red" : "green",
+
+							}}
+							onClick={() => {
+								if (microphoneEnabled) {
+									voiceService?.muteMicrophone();
+								} else {
+									voiceService?.unMuteMicrophone();
+								}
+								setMicrophoneEnabled(!microphoneEnabled);
+
+							}}
+						>
+							<MicrophoneIcon />
+						</button>
+					)}
+					{voiceEnabled &&
+						<button
+							style={{
+								position: "absolute",
+								top: 80,
+								left: voiceOffset,
+								width: "30px",
+								height: "30px",
+								display: "flex",
+								alignItems: "center",
+								justifyContent: "center",
+								cursor: "pointer",
+								borderRadius: 10,
+								padding: 2,
+								backdropFilter: "blur(2px)",
+								border: "1px solid rgba(0, 0, 0, 0.28)",
+								boxShadow: "rgba(0, 0, 0, 0.25) 1px 4px 4px",
+							}}
+							onClick={() => {
+								if (speechEnabled) {
+									voiceService?.unMuteOutput();
+								} else {
+									voiceService?.unMuteOutput();
+								}
+								setSpeechEnabled(!speechEnabled);
+							}}
+						>
+							{speechEnabled ? <SpeakerWaveIcon /> : <SpeakerXMarkIcon />}
+						</button>
+					}
+
+					{voiceEnabled &&
+						<AudioVisualizationAvatar width={110} height={150} stream={voiceService?.outputStream} />
+					}
 
 					<div style={{
 						position: "absolute",

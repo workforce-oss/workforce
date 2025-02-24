@@ -48,7 +48,7 @@ export class GithubBoardTracker extends Tracker<TrackerConfig> {
         return GithubBoardTrackerMetadata.defaultConfig(orgId);
     }
 
-    public async refresh(): Promise<void> { /* eslint-disable @typescript-eslint/no-unsafe-argument,@typescript-eslint/no-unsafe-member-access,@typescript-eslint/no-unsafe-assignment */
+    public async refresh(): Promise<void> {  
         if (!this.config.variables?.org_name || !this.config.variables?.project_name) {
             this.logger.error("refresh() missing org_name or project_name");
             return;

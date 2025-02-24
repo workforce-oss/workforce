@@ -62,28 +62,28 @@ function validateTask(flow: FlowConfig, task: TaskConfig): VariableSchemaValidat
 		}
 	}
 	for (const documentation of task.documentation ?? []) {
-		if (!flow.documentation?.find(d => d.name === documentation)) {
+		if (!flow.documentation?.find(d => d.name === documentation || d.id === documentation)) {
 			errors.push({
 				message: `Task ${task.name} has documentation ${documentation} which is not defined in the flow`,
 			});
 		}
 	}
 	for (const output of task.outputs ?? []) {
-		if (!(flow.resources?.find(r => r.name === output) || flow.channels?.find(c => c.name === output) || flow.trackers?.find(t => t.name === output))) {
+		if (!(flow.resources?.find(r => r.name === output || r.id == output) || flow.channels?.find(c => c.name === output || c.id === output) || flow.trackers?.find(t => t.name === output || t.id === output))) {
 			errors.push({
 				message: `Task ${task.name} has output ${output} which is not defined in the flow`,
 			});
 		}
 	}
 	for (const tool of task.tools ?? []) {
-		if (!flow.tools?.find(t => t.name === tool.name)) {
+		if (!flow.tools?.find(t => t.name === tool.name || t.id === tool.id)) {
 			errors.push({
 				message: `Task ${task.name} has tool ${tool.name} which is not defined in the flow`,
 			});
 		}
 	}
 	for (const trigger of task.triggers ?? []) {
-		if (!flow.channels?.find(c => c.name === trigger) && !flow.resources?.find(r => r.name === trigger)) {
+		if (!flow.channels?.find(c => c.name === trigger || c.id === trigger) && !flow.resources?.find(r => r.name === trigger || r.id === trigger)) {
 			errors.push({
 				message: `Task ${task.name} has trigger ${trigger} which is not defined in the flow`,
 			});
@@ -91,13 +91,13 @@ function validateTask(flow: FlowConfig, task: TaskConfig): VariableSchemaValidat
 	}
 	//TODO: Make subtasks implicit based on inputs
 	for (const subtask of task.subtasks ?? []) {
-		if (!flow.tasks?.find(t => t.name === subtask.name)) {
+		if (!flow.tasks?.find(t => t.name === subtask.name || t.id === subtask.id)) {
 			errors.push({
 				message: `Task ${task.name} has subtask ${subtask.name} which is not defined in the flow`,
 			});
 		}
 	}
-	if (task.tracker && !flow.trackers?.find(t => t.name === task.tracker)) {
+	if (task.tracker && !flow.trackers?.find(t => t.name === task.tracker || t.id === task.tracker)) {
 		errors.push({
 			message: `Task ${task.name} has tracker ${task.tracker} which is not defined in the flow`,
 		});
@@ -108,7 +108,7 @@ function validateTask(flow: FlowConfig, task: TaskConfig): VariableSchemaValidat
 
 function validateTool(flow: FlowConfig, tool: ToolConfig) {
 	const errors: VariableSchemaValidationError[] = [];
-	if (tool.channel && !flow.channels?.find(c => c.name === tool.channel)) {
+	if (tool.channel && !flow.channels?.find(c => c.name === tool.channel || c.id === tool.channel)) {
 		errors.push({
 			message: `Tool ${tool.name} has channel ${tool.channel} which is not defined in the flow`,
 		});

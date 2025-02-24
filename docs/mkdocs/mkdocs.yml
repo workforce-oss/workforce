@@ -1,13 +1,41 @@
 site_name: Workforce Docs
-theme: readthedocs
-plugins:
-  - search
-  - mermaid2
+theme: 
+  name: readthedocs
+  palette: 
+    - media: "(prefers-color-scheme)"
+      toggle:
+        icon: material/brightness-auto
+        name: Switch to light mode
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default 
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to system preference
+# plugins:
+#   - search
+#   - mermaid2
+#   - swagger-ui-tag:
+#       syntaxHighlightTheme: "obsidian"
+docs_dir: docs
 nav:
 - Home: index.md
+- API:
+  - Identity API: ./api/identity-api.md
+  - Workforce API: ./api/workforce-api.md
+  - Flow Subresource API: ./api/flow-subresource-api.md
+  - Flow Schema: ./api/flow-json-schema.md
 - Flows: 
-  - Overview: flows/flow.md
-  - Objects: flows/objects.md
+  - Overview: ./flows/flow.md
+  - Objects: ./flows/objects.md
 - Tasks:
   - Overview: flows/tasks/task.md
   - 'Simple Task': flows/tasks/simple-task.md

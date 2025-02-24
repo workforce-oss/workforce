@@ -99,6 +99,7 @@ export class HumanWorkerSocketAPI extends WebsocketAPI {
 			console.log("Auth failed");
 			return;
 		}
+		super.handleMessages(data);
 		console.log("HumanWorkerSocketAPI.handleMessages() writing to eventSubject");
 		this.eventSubject?.next(data);
 	}

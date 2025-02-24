@@ -33,6 +33,9 @@ type VsCodeSpec struct {
 
 	// TaskExecutionId is the Task Execution ID
 	TaskExecutionId string `json:"taskExecutionId,omitempty"`
+
+	// WorkspaceId is the Workspace ID
+	WorkspaceId string `json:"workspaceId,omitempty"`
 }
 
 // VsCodeStatus defines the observed state of VsCode

@@ -1,9 +1,10 @@
-import { ExpandMore } from "@mui/icons-material";
+import { ExpandMore, Save } from "@mui/icons-material";
 import {
 	Accordion,
 	AccordionDetails,
 	AccordionSummary,
 	Grid,
+	IconButton,
 	Typography
 } from "@mui/material";
 import { useEffect, useState } from "react";
@@ -45,21 +46,35 @@ export const CredentialComponent = (props: { config: CredentialConfig; }) => {
 			<AccordionSummary expandIcon={<ExpandMore />}>
 				<Grid container spacing={2}>
 					<Grid item xs={6}>
-						
-							<b>{config.name}</b>
+
+						<b>{config.name}</b>
 					</Grid>
 
-					<Grid item xs={6}>
+					<Grid item xs={4}>
 						<Typography color="text.secondary">{config.type}</Typography>
 					</Grid>
+					<Grid item xs={2}>
+						{expanded && (
+							<IconButton
+								onClick={() => {
+									updateCredential({
+										...details,
+									});
+								}}
+							>
+								<Save />
+							</IconButton>
+						)}
+					</Grid>
 				</Grid>
+
 			</AccordionSummary>
 			<AccordionDetails>
 				<SchemaVariableListComponent
 					config={details}
 					objectType="credential"
 					onPropertyChange={(name, newValue) => {
-						updateCredential({
+						setDetails({
 							...details,
 							variables: {
 								...details.variables,
@@ -67,7 +82,7 @@ export const CredentialComponent = (props: { config: CredentialConfig; }) => {
 							},
 						});
 					}}
-					onResize={(e) => {}}
+					onResize={(e) => { }}
 					readOnly={false}
 				/>
 			</AccordionDetails>

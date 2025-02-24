@@ -63,6 +63,7 @@ export const channelTypes = [
     "slack-channel",
     "native-channel",
     "discord-channel",
+    "custom-channel",
 ] as const;
 
 export interface ChannelConfig extends BaseConfig {

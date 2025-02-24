@@ -24,6 +24,7 @@ module "apps" {
   app_name                                 = each.key
   additional_labels                        = each.value.additional_labels
   app_image                                = each.value.image
+  image_pull_policy                        = each.value.image_pull_policy
   http_port                                = each.value.http_port
   http_supports_websockets                 = each.value.http_supports_websockets
   namespace                                = each.value.namespace

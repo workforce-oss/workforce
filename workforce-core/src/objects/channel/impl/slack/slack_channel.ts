@@ -302,7 +302,7 @@ export class SlackChannel extends Channel {
                         this.logger.error(`SlackChannel.message() error=${error}`);
                     });
                 } else {
-                    this.sendMessageToChannel(message, webClient, threadId).catch((error) => {
+                    this.sendMessageToSlack(message, webClient, threadId).catch((error) => {
                         this.logger.error(`SlackChannel.message() error=${error}`);
                     });
                 }
@@ -329,14 +329,14 @@ export class SlackChannel extends Channel {
                 this.dataCache.messageBuffers.set(message.messageId, message.message).catch((error) => {
                     this.logger.error(`SlackChannel.message() error=${error}`);
                 });
-                this.sendMessageToChannel(message, webClient, threadId).catch((error) => {
+                this.sendMessageToSlack(message, webClient, threadId).catch((error) => {
                     this.logger.error(`SlackChannel.message() error=${error}`);
                 });
             }
         }
     }
 
-    private async sendMessageToChannel(message: MessageRequest, webClient: WebClient, threadId?: string): Promise<void> {
+    private async sendMessageToSlack(message: MessageRequest, webClient: WebClient, threadId?: string): Promise<void> {
         const response = await webClient.chat.postMessage({
             channel: this.channelId!,
             text: this.formatMessage(message.message),

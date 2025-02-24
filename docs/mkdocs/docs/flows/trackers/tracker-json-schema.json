@@ -1,0 +1,73 @@
+{
+  "title": "Tracker",
+  "description": "A tracker is a system that can be used to track the progress of a task execution.",
+  "allOf": [
+    {
+      "$ref": "#/$defs/object"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "github-board-tracker",
+            "trello-tracker"
+          ]
+        },
+        "webhooksEnabled": {
+          "type": "boolean",
+          "description": "Whether or not webhooks are enabled for this tracker."
+        },
+        "pollingInterval": {
+          "type": "number",
+          "description": "The interval in seconds to poll for updates if webhooks are not enabled"
+        },
+        "variables": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "type",
+        "webhooksEnabled",
+        "pollingInterval",
+        "variables"
+      ]
+    }
+  ],
+  "$defs": {
+    "object": {
+      "type": "object",
+      "title": "Object",
+      "description": "An object is a base object that all other objects inherit from.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The unique identifier for the object",
+          "readOnly": true
+        },
+        "orgId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The unique identifier for the organization the object belongs to.",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "credential": {
+          "type": "string",
+          "description": "The name of the credential to use for this object."
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ]
+    }
+  }
+}

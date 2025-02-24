@@ -1,0 +1,84 @@
+{
+  "title": "Worker",
+  "description": "A worker is an integration to an endpoint that, when given the current context of a task execution, will provide text outputs or tool operations.",
+  "allOf": [
+    {
+      "$ref": "#/$defs/object"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "channelUserConfig": {
+          "type": "object",
+          "description": "A map of channel types to channel user credential names",
+          "properties": {
+            "slack-channel": {
+              "type": "string"
+            },
+            "native-channel": {
+              "type": "string"
+            },
+            "discord-channel": {
+              "type": "string"
+            }
+          }
+        },
+        "skills": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The list of skills the worker has."
+        },
+        "wipLimit": {
+          "type": "number",
+          "description": "The number of tasks a worker can have in progress at a time."
+        },
+        "variables": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "channelUserConfig",
+        "skills",
+        "wipLimit",
+        "variables"
+      ]
+    }
+  ],
+  "$defs": {
+    "object": {
+      "type": "object",
+      "title": "Object",
+      "description": "An object is a base object that all other objects inherit from.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The unique identifier for the object",
+          "readOnly": true
+        },
+        "orgId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The unique identifier for the organization the object belongs to.",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "credential": {
+          "type": "string",
+          "description": "The name of the credential to use for this object."
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ]
+    }
+  }
+}

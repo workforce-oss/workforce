@@ -13,6 +13,13 @@ export interface NativeChannelMessage {
     file_names?: string[];
 }
 
+export interface NativeChannelWebRTCSessionMessage {
+    senderId: string,
+    messageId: string,
+    threadId: string,
+    
+}
+
 export interface NativeChannelToolCall {
     toolRequestId?: string;
     toolType?: string;

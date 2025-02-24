@@ -26,7 +26,11 @@ module "base" {
     KEYCLOAK_ADMIN_PASSWORD  = data.kubernetes_secret.keycloak_credentials.data["password"]
   }
 
-  workforce_admin_secret_data = var.workforce_admin_secret_data
+  workforce_admin_secret_data = {
+    ADMIN_EMAIL = "admin@robot.dev"
+    ADMIN_USERNAME = "admin"
+    ADMIN_PASSWORD = random_password.admin_password.result
+  }
 }
 
 module "base_gcp" {
@@ -35,4 +39,9 @@ module "base_gcp" {
   source = "../_base_gcp"
   gke_app_roles = var.gke_app_roles
   gke_project_id = var.project_id
+}
+
+resource random_password admin_password {
+  length = 32
+  special = false
 }

@@ -143,7 +143,9 @@ export const documentRepositoryStore = create<DocumentRepositoryState>()(
         },
         hydrateDocuments: (documentRepository: DocumentRepositoryConfig) => {
             WorkforceAPIClient.DocumentRepositoryAPI
-                .listDocuments(documentRepository.id)
+                .listDocuments(documentRepository.id, {
+                    orgId: documentRepository.orgId,
+                })
                 .then((response: DocumentData[]) => {
                     set({
                         documents: [...response]

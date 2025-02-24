@@ -18,10 +18,10 @@
         "commander": "^11.0.0",
         "figlet": "^1.6.0",
         "open": "^9.1.0",
-        "openid-client": "^5.5.0",
+        "openid-client": "^6.1.7",
         "ts-node": "^10.9.1",
-        "workforce-core": "0.1.0",
         "workforce-api-client": "0.1.0",
+        "workforce-core": "0.1.0",
         "yaml": "^2.3.1"
     },
     "devDependencies": {

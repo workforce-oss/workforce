@@ -153,8 +153,13 @@ export const TaskExecutionRouter: Router = (() => {
                     return;
                 }
 
-
-                await BrokerManager.workerBroker.removeTaskExecution(found.id);
+                try {
+                    await BrokerManager.workerBroker.removeTaskExecution(found.id).catch((e: Error) => {
+                        Logger.getInstance("task-execution-api").warn("task execution not removed from worker", e)
+                    })
+                } catch (e) {
+                    Logger.getInstance("task-execution-api").warn("error removing task execution", e)
+                }
 
                 await found.destroy();
                 const routeManager = await WebhookRouteManager.getInstance();

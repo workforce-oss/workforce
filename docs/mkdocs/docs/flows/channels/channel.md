@@ -52,7 +52,7 @@ task:
     message: robot-dev-slack # <--- Add the input if you want to use it in a variable
 ```
 
-- **Tasks** can be assigned a **default channel**. This allows the worker to send messages to the channel without the **task** using the channel an **input**. For example, a task to gather design details from an architect may be triggered by a **tracker**. The **worker** can then use the **default channel** to communicate with the architect.
+- **Tasks** can be assigned a **default channel**. This allows the worker to send messages to the channel without the **task** explicitly defining the channel an **input**. For example, a task to gather design details from an architect may be triggered by a **tracker**. The **worker** can then use the **default channel** to communicate with the architect.
 
 ```yaml
 channel:

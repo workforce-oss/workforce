@@ -4,6 +4,7 @@ WORKDIR /app
 
 COPY workforce-ui/package.json ./workforce-ui/
 COPY workforce-ui-embedded-chat/package.json ./workforce-ui-embedded-chat/
+COPY workforce-ui-openai-webrtc/package.json ./workforce-ui-openai-webrtc/
 COPY excelsior/package.json ./excelsior/
 
 RUN yarn install

@@ -1,4 +1,4 @@
-import express from "express";
+import express, { RequestHandler } from "express";
 import multer, { memoryStorage } from "multer";
 import { deleteFile, downloadFile, listFiles, listRepositories, uploadFileRaw,  uploadFile as uploadFileStream } from "./api.js";
 import { MessagingService } from "./service/messaging_service.js";
@@ -18,7 +18,7 @@ export function initStorageService(api: express.Router, storageService: StorageS
             fieldNameSize: 256,
             fields: 10,
         }
-    });
+    }) as any;
 
     
     //Public Endpoints

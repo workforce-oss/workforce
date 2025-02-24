@@ -726,7 +726,7 @@
                 "type": "oauth2",
                 "flows": {
                     "clientCredentials": {
-                        "tokenUrl": "https://localhost:8085/insecure/token",
+                        "tokenUrl": "https://localhost:8084/insecure/token",
                         "scopes": {}
                     }
                 }

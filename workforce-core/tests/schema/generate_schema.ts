@@ -21,7 +21,7 @@ describe("Generate API Schema", () => {
             },
             servers: [
                 {
-                    url: "https://localhost:8085/workforce-api/",
+                    url: "https://localhost:8084/workforce-api/",
                 }
             ],
             security: [
@@ -37,8 +37,8 @@ describe("Generate API Schema", () => {
                         type: "oauth2",
                         flows: {
                             authorizationCode: {
-                                authorizationUrl: "http://localhost:8085/insecure/authorize",
-                                tokenUrl: "http://localhost:8085/token",
+                                authorizationUrl: "http://localhost:8084/insecure/authorize",
+                                tokenUrl: "http://localhost:8084/token",
                                 scopes: {
                                     openid: ""
                                 },
@@ -69,6 +69,7 @@ describe("Generate API Schema", () => {
         baseComponentSchemas.object = {
             type: "object",
             title: "Object",
+            description: "An object is a base object that all other objects inherit from.",
             properties: {
                 id: { type: "string", format: "uuid", description: "The unique identifier for the object", readOnly: true },
                 orgId: { type: "string", format: "uuid", description: "The unique identifier for the organization the object belongs to.", readOnly: true },
@@ -83,7 +84,8 @@ describe("Generate API Schema", () => {
         // Add the base credential schema
         baseComponentSchemas.credential_object = {
             type: "object",
-            title: "Credential",
+            title: "Credential Object",
+            description: "A credential object is a base object that all other credential objects inherit from.",
             properties: {
                 id: { type: "string", format: "uuid", description: "The unique identifier for the object", readOnly: true },
                 orgId: { type: "string", format: "uuid", description: "The unique identifier for the organization the object belongs to.", readOnly: true },
@@ -98,6 +100,7 @@ describe("Generate API Schema", () => {
         baseComponentSchemas.tool_reference = {
             type: "object",
             title: "Tool Reference",
+            description: "A tool reference is a reference to a tool that can be used in a task.",
             properties: {
                 name: { type: "string" },
                 id: { type: "string", format: "uuid" },
@@ -111,6 +114,7 @@ describe("Generate API Schema", () => {
         baseComponentSchemas.subtask = {
             type: "object",
             title: "Subtask",
+            description: "A subtask is a reference to a task that can be performed as part of a larger task. Subtasks provide their own context and can be useful for creating large, complex tasks without overloading the context window.",
             properties: {
                 name: { type: "string" },
                 id: { type: "string", format: "uuid" },
@@ -196,7 +200,7 @@ describe("Generate API Schema", () => {
             }
 
             if (componentVariableSchemas[objectType]) {
-               for (const subtype of subtypes) {
+                for (const subtype of subtypes) {
                     variableSchemas[`${snakeify(subtype)}_variables`] = componentVariableSchemas[objectType][`${snakeify(subtype)}_variables`];
                 }
             }
@@ -235,7 +239,7 @@ describe("Generate API Schema", () => {
         const identityComponentSchemas = _.cloneDeep(componentTypeSchemas);
         const orgResourceComponentSchemas = _.cloneDeep(componentTypeSchemas);
         const flowResourceComponentSchemas = _.cloneDeep(componentTypeSchemas);
-        
+
 
         identityComponentSchemas.user = userSchema();
         identityComponentSchemas.org = orgSchema();
@@ -253,7 +257,7 @@ describe("Generate API Schema", () => {
         flowResourceComponentSchemas.tool = toolSchema();
         flowResourceComponentSchemas.tracker = trackerSchema();
 
-        identityApiSchema.components.schemas = { 
+        identityApiSchema.components.schemas = {
             ...identityComponentSchemas
         }
 
@@ -272,31 +276,144 @@ describe("Generate API Schema", () => {
             ...baseComponentSchemas,
         }
 
+        const standaloneBaseSchemas = {
+            object: baseComponentSchemas.object,
+        }
+
+        const standaloneTaskSchemas = {
+            subtask: baseComponentSchemas.subtask,
+            tool_reference: baseComponentSchemas.tool_reference,
+        }
+
+        const standaloneChannelSchema = channelSchema("json-schema") as Record<string, any>;
+        standaloneChannelSchema.title = "Channel";
+        standaloneChannelSchema.allOf[1].properties.variables = { type: "object" };
+
+        const standaloneDocumentationSchema = documentationSchema("json-schema") as Record<string, any>;
+        standaloneDocumentationSchema.title = "Documentation";
+        standaloneDocumentationSchema.allOf[1].properties.variables = { type: "object" };
+
+        const standaloneResourceSchema = resourceSchema("json-schema") as Record<string, any>;
+        standaloneResourceSchema.title = "Resource";
+        standaloneResourceSchema.allOf[1].properties.variables = { type: "object" };
+
+        const standaloneTaskSchema = taskSchema("json-schema") as Record<string, any>;
+        standaloneTaskSchema.title = "Task";
+        standaloneTaskSchema.allOf[1].properties.variables = { type: "object" };
+
+        const standaloneToolSchema = toolSchema("json-schema") as Record<string, any>;
+        standaloneToolSchema.title = "Tool";
+        standaloneToolSchema.allOf[1].properties.variables = { type: "object" };
+
+        const standaloneTrackerSchema = trackerSchema("json-schema") as Record<string, any>;
+        standaloneTrackerSchema.title = "Tracker";
+        standaloneTrackerSchema.allOf[1].properties.variables = { type: "object" };
+
+        const standaloneCredentialSchema = credentialSchema([], true, "json-schema") as Record<string, any>;
+        standaloneCredentialSchema.title = "Credential";
+        standaloneCredentialSchema.allOf[1].properties.variables = { type: "object" };
+
+        const standaloneWorkerSchema = workerSchema("json-schema") as Record<string, any>;
+        standaloneWorkerSchema.title = "Worker";
+        standaloneWorkerSchema.allOf[1].properties.variables = { type: "object" };
+
+        const standaloneDocumentRepositorySchema = documentRepositorySchema("json-schema") as Record<string, any>;
+        standaloneDocumentRepositorySchema.title = "DocumentRepository";
+        standaloneDocumentRepositorySchema.allOf[1].properties.variables = { type: "object" };
+
+        const standaloneSkillSchema = skillSchema() as Record<string, any>;
+        standaloneSkillSchema.title = "Skill";
+
+        const standaloneUserSchema = userSchema() as Record<string, any>;
+        standaloneUserSchema.title = "User";
+
+        const standaloneOrgSchema = orgSchema() as Record<string, any>;
+        standaloneOrgSchema.title = "Org";
+
+        const standaloneOrgUserSchema = orgUserSchema() as Record<string, any>;
+        standaloneOrgUserSchema.title = "OrgUserRelation";
+
         const flowJsonSchema = flowSchema("json-schema") as Record<string, any>;
         flowJsonSchema["title"] = "Flow";
         flowJsonSchema["$defs"] = {
-            channel: channelSchema("json-schema"),
-            documentation: documentationSchema("json-schema"),
-            resource: resourceSchema("json-schema"),
-            task: taskSchema("json-schema"),
-            tool: toolSchema("json-schema"),
-            tracker: trackerSchema("json-schema"),
-            ...variableJsonSchemas,
-            ...baseComponentJsonSchemas,
+            channel: standaloneChannelSchema,
+            documentation: standaloneDocumentationSchema,
+            resource: standaloneResourceSchema,
+            task: standaloneTaskSchema,
+            tool: standaloneToolSchema,
+            tracker: standaloneTrackerSchema,
+            ...standaloneBaseSchemas,
+            ...standaloneTaskSchemas,
             // ...credentialJsonSchemas,
         }
+        fs.writeFileSync("flow-json-schema.json", JSON.stringify(flowJsonSchema, null, 2));
+
+        standaloneChannelSchema["$defs"] = {
+            ...standaloneBaseSchemas
+        }
+        fs.writeFileSync("channel-json-schema.json", JSON.stringify(standaloneChannelSchema, null, 2));
+
+        standaloneDocumentationSchema["$defs"] = {
+            ...standaloneBaseSchemas,
+        }
+        fs.writeFileSync("documentation-json-schema.json", JSON.stringify(standaloneDocumentationSchema, null, 2));
+
+        standaloneResourceSchema["$defs"] = {
+            ...standaloneBaseSchemas,
+        }
+        fs.writeFileSync("resource-json-schema.json", JSON.stringify(standaloneResourceSchema, null, 2));
+
+        standaloneTaskSchema["$defs"] = {
+            ...standaloneBaseSchemas,
+            ...standaloneTaskSchemas,
+        }
+
+        fs.writeFileSync("task-json-schema.json", JSON.stringify(standaloneTaskSchema, null, 2));
+
+        standaloneToolSchema["$defs"] = {
+            ...standaloneBaseSchemas,
+        }
+        fs.writeFileSync("tool-json-schema.json", JSON.stringify(standaloneToolSchema, null, 2));
+
+        standaloneTrackerSchema["$defs"] = {
+            ...standaloneBaseSchemas
+        }
+        fs.writeFileSync("tracker-json-schema.json", JSON.stringify(standaloneTrackerSchema, null, 2));
+
+        standaloneCredentialSchema["$defs"] = {
+            credential_object: baseComponentJsonSchemas.credential_object,
+        }
+        fs.writeFileSync("credential-json-schema.json", JSON.stringify(standaloneCredentialSchema, null, 2));
+
+        standaloneWorkerSchema["$defs"] = {
+            ...standaloneBaseSchemas
+        }
+        fs.writeFileSync("worker-json-schema.json", JSON.stringify(standaloneWorkerSchema, null, 2));
+
+        standaloneDocumentRepositorySchema["$defs"] = {
+            ...standaloneBaseSchemas,
+        }
+        fs.writeFileSync("document-repository-json-schema.json", JSON.stringify(standaloneDocumentRepositorySchema, null, 2));
+
+        fs.writeFileSync("skill-json-schema.json", JSON.stringify(standaloneSkillSchema, null, 2));
+
+        fs.writeFileSync("user-json-schema.json", JSON.stringify(standaloneUserSchema, null, 2));
+        fs.writeFileSync("org-json-schema.json", JSON.stringify(standaloneOrgSchema, null, 2));
+        fs.writeFileSync("org-user-json-schema.json", JSON.stringify(standaloneOrgUserSchema, null, 2));
+
 
 
         // write the schema to a file
         fs.writeFileSync("identity-api-schema.json", JSON.stringify(identityApiSchema, null, 2));
         fs.writeFileSync("org-resource-api-schema.json", JSON.stringify(orgResourceApiSchema, null, 2));
         fs.writeFileSync("flow-resource-api-schema.json", JSON.stringify(flowResourceApiSchema, null, 2));
-        fs.writeFileSync("flow-json-schema.json", JSON.stringify(flowJsonSchema, null, 2));
     });
 });
 
 function userSchema() {
     return {
+        title: "User",
+        description: "A user is an identity that can access the system. Password can only be set and will never be returned by the api.",
         type: "object",
         properties: {
             id: { type: "string", format: "uuid", description: "The unique identifier for the user", readOnly: true },
@@ -305,7 +422,7 @@ function userSchema() {
             firstName: { type: "string" },
             lastName: { type: "string" },
             username: { type: "string" },
-            password: { type: "string", format: "password", description: "The password for the user. Required on create for certain identity providers. Can be part of an update." },
+            password: { type: "string", format: "password", description: "The password for the user. Required on create for certain identity providers. Can be part of an update. Will never be returned by the api." },
 
         },
         required: ["email", "firstName", "lastName", "username"],
@@ -314,6 +431,8 @@ function userSchema() {
 
 function orgSchema() {
     return {
+        title: "Org",
+        description: "An organization is a logical grouping of resources and users.",
         type: "object",
         properties: {
             id: { type: "string", format: "uuid", description: "The unique identifier for the organization", readOnly: true },
@@ -328,6 +447,7 @@ function orgSchema() {
 
 function orgUserSchema() {
     return {
+        title: "Org User Relation",
         type: "object",
         description: "A relation between an organization and a user",
         properties: {
@@ -342,6 +462,8 @@ function orgUserSchema() {
 
 function flowSchema(type: "json-schema" | "openapi" = "openapi") {
     return type === "openapi" ? {
+        title: "Flow",
+        description: "A flow is a collection of objects and their relationship that define a process.",
         allOf: [
             { $ref: `${specRef(type)}/object` },
             {
@@ -358,8 +480,9 @@ function flowSchema(type: "json-schema" | "openapi" = "openapi") {
                 required: ["status"],
             },
         ],
-    }: {
+    } : {
         title: "Flow",
+        description: "A flow is a collection of objects and their relationship that define a process.",
         type: "object",
         properties: {
             id: { type: "string", format: "uuid", description: "The unique identifier for the object", readOnly: true },
@@ -380,6 +503,8 @@ function flowSchema(type: "json-schema" | "openapi" = "openapi") {
 
 function skillSchema() {
     return {
+        title: "Skill",
+        description: "A skill is a capability that a worker can have and is used to match workers to tasks.",
         type: "object",
         properties: {
             orgId: { type: "string", format: "uuid", description: "The unique identifier for the organization the object belongs to" },
@@ -392,8 +517,10 @@ function skillSchema() {
 }
 
 function channelSchema(type: "json-schema" | "openapi" = "openapi") {
-    const subtypes = ConfigFactory.getSubtypesForType("channel").filter((subtype) => !subtype.startsWith("mock"));
+    const subtypes = ConfigFactory.getSubtypesForType("channel").filter((subtype) => !subtype.startsWith("mock") && !subtype.startsWith("custom"));
     const schema = {
+        title: "Channel",
+        description: "A channel is a communication channel that can be used to communicate with workers.",
         allOf: [
             { $ref: `${specRef(type)}/object` },
             {
@@ -416,6 +543,8 @@ function channelSchema(type: "json-schema" | "openapi" = "openapi") {
 function documentRepositorySchema(type: "json-schema" | "openapi" = "openapi") {
     const subtypes = ConfigFactory.getSubtypesForType("document_repository").filter((subtype) => !subtype.startsWith("mock"));
     const schema = {
+        title: "Document Repository",
+        description: "A document repository is a repository that contains documents that can be used in tasks.",
         allOf: [
             { $ref: `${specRef(type)}/object` },
             {
@@ -430,15 +559,14 @@ function documentRepositorySchema(type: "json-schema" | "openapi" = "openapi") {
         ],
     } as Record<string, any>;
 
-    if (type === "json-schema") {
-        schema.title = "DocumentRepository";
-    }
     return schema;
 }
 
 function documentationSchema(type: "json-schema" | "openapi" = "openapi") {
     const subtypes = ConfigFactory.getSubtypesForType("documentation").filter((subtype) => !subtype.startsWith("mock"));
     const schema = {
+        title: "Documentation",
+        description: "Documentation defines the specific documents from a repository that are made available to a task.",
         allOf: [
             { $ref: `${specRef(type)}/object` },
             {
@@ -454,15 +582,14 @@ function documentationSchema(type: "json-schema" | "openapi" = "openapi") {
         ],
     } as Record<string, any>;
 
-    if (type === "json-schema") {
-        schema.title = "Documentation";
-    }
     return schema;
 }
 
 function resourceSchema(type: "json-schema" | "openapi" = "openapi") {
     const subtypes = ConfigFactory.getSubtypesForType("resource").filter((subtype) => !subtype.startsWith("mock"));
     const schema = {
+        title: "Resource",
+        description: "A resource is an external, versionable static resource that can be retrieved or created. It can be used as both and input and output for tasks.",
         allOf: [
             { $ref: `${specRef(type)}/object` },
             {
@@ -476,16 +603,14 @@ function resourceSchema(type: "json-schema" | "openapi" = "openapi") {
             },
         ],
     } as Record<string, any>;
-
-    if (type === "json-schema") {
-        schema.title = "Resource";
-    }
     return schema;
 }
 
 function taskSchema(type: "json-schema" | "openapi" = "openapi") {
     const subtypes = ConfigFactory.getSubtypesForType("task").filter((subtype) => !subtype.startsWith("mock"));
     const schema = {
+        title: "Task",
+        description: "A task is a unit of work that can be assigned to a worker. It should be a complete definition of all requirements in terms of tooling, integrations, and instructions.",
         allOf: [
             { $ref: `${specRef(type)}/object` },
             {
@@ -519,16 +644,14 @@ function taskSchema(type: "json-schema" | "openapi" = "openapi") {
         ]
     } as Record<string, any>;
 
-    if (type === "json-schema") {
-        schema.title = "Task";
-    }
-
     return schema;
 }
 
 function toolSchema(type: "json-schema" | "openapi" = "openapi") {
     const subtypes = ConfigFactory.getSubtypesForType("tool").filter((subtype) => !subtype.startsWith("mock"));
     const schema = {
+        title: "Tool",
+        description: "A tool is an external integration that a worker may use during execution of a task.",
         allOf: [
             { $ref: `${specRef(type)}/object` },
             {
@@ -543,16 +666,14 @@ function toolSchema(type: "json-schema" | "openapi" = "openapi") {
         ],
     } as Record<string, any>;
 
-    if (type === "json-schema") {
-        schema.title = "Tool";
-    }
-
     return schema;
 }
 
 function trackerSchema(type: "json-schema" | "openapi" = "openapi") {
     const subtypes = ConfigFactory.getSubtypesForType("tracker").filter((subtype) => !subtype.startsWith("mock"));
     const schema = {
+        title: "Tracker",
+        description: "A tracker is a system that can be used to track the progress of a task execution.",
         allOf: [
             { $ref: `${specRef(type)}/object` },
             {
@@ -568,20 +689,18 @@ function trackerSchema(type: "json-schema" | "openapi" = "openapi") {
         ],
     } as Record<string, any>;
 
-    if (type === "json-schema") {
-        schema.title = "Tracker";
-    }
-
     return schema;
 }
 
 function workerSchema(type: "json-schema" | "openapi" = "openapi") {
     const subtypes = ConfigFactory.getSubtypesForType("worker").filter((subtype) => !subtype.startsWith("mock"));
     const channelUserConfig = {} as Record<string, any>;
-    for (const channelType of channelTypes.filter((channelType) => !channelType.startsWith("mock"))) {
+    for (const channelType of channelTypes.filter((channelType) => !channelType.startsWith("mock") && !channelType.startsWith("custom"))) {
         channelUserConfig[channelType] = { type: "string" };
     }
     const schema = {
+        title: "Worker",
+        description: "A worker is an integration to an endpoint that, when given the current context of a task execution, will provide text outputs or tool operations.",
         allOf: [
             { $ref: `${specRef(type)}/object` },
             {
@@ -603,21 +722,19 @@ function workerSchema(type: "json-schema" | "openapi" = "openapi") {
         ],
     } as Record<string, any>;
 
-    if (type === "json-schema") {
-        schema.title = "Worker";
-    }
-
     return schema;
 }
 
 function credentialSchema(subtypes: string[], root?: boolean, type: "json-schema" | "openapi" = "openapi", title?: string) {
     const schema = {
+        title: title || "Credential",
+        description: "A secure storage mechanism for sensitive variables used in integrations. Values are stored with row-level encryption and are always encrypted in transit.",
         allOf: [
             { $ref: `${specRef(type)}/credential_object` },
             {
                 type: "object",
                 properties: {
-                    type: { type: "string", enum: root ? objectTypes : subtypes },
+                    type: { type: "string"},
                     variables: credentialsRef(subtypes, type),
                 },
                 required: ["type", "variables"],
@@ -625,10 +742,9 @@ function credentialSchema(subtypes: string[], root?: boolean, type: "json-schema
         ],
     } as Record<string, any>;
 
-    if (type === "json-schema") {
-        schema.title = title || "Credential";
-    }
-
+    if (!root) {   
+        schema.allOf[1].properties.type.enum = subtypes;
+    } 
     return schema;
 
 }
@@ -705,12 +821,23 @@ const createRestEndpoint = (resource: string, objectType: string, operations?: s
             paths[`${basePath}/${resource}`] = {};
         }
         paths[`${basePath}/${resource}`]["post"] = {
-                summary: `${objectType !== "org_user_relation" ? "Upsert" : "Create"} ${a} ${objectType} ${(isFlowObject || isOrgObject && objectType !== "org_user_relation") ? `(names are unique per ${isFlowObject ? "flow" : "org"})` : ""}`,
-                tags: [...baseTags, resource],
-                parameters: [
-                    ...baseParams,
-                ],
-                requestBody: {
+            summary: `${objectType !== "org_user_relation" ? "Upsert" : "Create"} ${a} ${objectType} ${(isFlowObject || isOrgObject && objectType !== "org_user_relation") ? `(names are unique per ${isFlowObject ? "flow" : "org"})` : ""}`,
+            tags: [...baseTags, resource],
+            parameters: [
+                ...baseParams,
+            ],
+            requestBody: {
+                content: {
+                    "application/json": {
+                        schema: {
+                            $ref: `#/components/schemas/${objectType}`,
+                        },
+                    },
+                },
+            },
+            responses: {
+                200: {
+                    description: `The created ${objectType}`,
                     content: {
                         "application/json": {
                             schema: {
@@ -719,18 +846,7 @@ const createRestEndpoint = (resource: string, objectType: string, operations?: s
                         },
                     },
                 },
-                responses: {
-                    200: {
-                        description: `The created ${objectType}`,
-                        content: {
-                            "application/json": {
-                                schema: {
-                                    $ref: `#/components/schemas/${objectType}`,
-                                },
-                            },
-                        },
-                    },
-                },
+            },
         };
     }
 
@@ -762,7 +878,7 @@ const createRestEndpoint = (resource: string, objectType: string, operations?: s
         } as any;
     }
 
-   
+
     if (operations.includes("read")) {
         if (!paths[`${basePath}/${resource}/{id}`]) {
             paths[`${basePath}/${resource}/{id}`] = {};

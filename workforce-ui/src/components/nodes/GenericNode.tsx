@@ -97,7 +97,7 @@ export const GenericNode = <T extends BaseConfig>({
 	const [credentialList, setCredentialList] = useState<CredentialConfig[]>([]);
 
 	const [node, setNode] = useState<Node<CustomNodeData<T>>>(nodes.find((n: Node<CustomNodeData<T>>) => n.id === data.config.id));
-
+	const [nodeName, setNodeName] = useState(node.data.config.name);
 	const hasAdvanced = useMemo(() => {
 		const schema = VariablesSchemaFactory.for(data.config, objectType);
 		let adv = false;
@@ -142,6 +142,12 @@ export const GenericNode = <T extends BaseConfig>({
 
 	const handleKeyDown = (e) => {
 		if (e.key === "Enter") {
+			if (nodeName === "") {
+				setNodeName(node.data.config.name);
+				setUpdatingName(false);
+				return;
+			}
+			renameNode(node.id, nodeName, objectType);
 			setUpdatingName(false);
 		}
 	};
@@ -160,7 +166,7 @@ export const GenericNode = <T extends BaseConfig>({
 
 	useEffect(() => {
 		if (credentialList.length > 0 && node?.data.config.credential === undefined) {
-			updateNodeCredential(data.config.id, credentialList[0].name as string);
+			updateNodeCredential(data.config.id, credentialList[0].id as string);
 		}
 	}, [credentialList]);
 
@@ -193,21 +199,24 @@ export const GenericNode = <T extends BaseConfig>({
 						<input
 							className="text-black nodrag"
 							type="text"
-							value={node.data.config.name}
+							value={nodeName}
 							onChange={(e) => {
-								if (e.target.value === "") {
-									return;
-								}
-								renameNode(node.id, e.target.value);
+								setNodeName(e.target.value);
 							}}
 							onBlur={() => {
-								setUpdatingName(false);
+									if (nodeName === "") {
+										setNodeName(node.data.config.name);
+										setUpdatingName(false);
+										return;
+									}
+									renameNode(node.id, nodeName, objectType);
+     								setUpdatingName(false);
 							}}
 							onKeyDown={handleKeyDown}
 							autoFocus
 						></input>
 					) : (
-						<div className="ml-2 truncate text-lg font-bold">{node.data.config.name}</div>
+						<div className="ml-2 truncate text-lg font-bold">{nodeName}</div>
 					)}
 					{objectType !== "credential" && !readOnly ? (
 						<button
@@ -272,7 +281,7 @@ export const GenericNode = <T extends BaseConfig>({
 									<div className={"flex flex-row flex-start items-center ml-8"}>
 										<div className={"text-sm truncate"}>Integration</div>
 										<select
-											value={node.data.config.credential ?? ((credentialList.length > 0) ? credentialList[0].name : "")}
+											value={node.data.config.credential ?? ((credentialList.length > 0) ? credentialList[0].id : "")}
 											onChange={(e) => {
 												updateNodeCredential(node.id, e.target.value as string);
 											}}

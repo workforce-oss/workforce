@@ -1,0 +1,73 @@
+{
+  "title": "DocumentRepository",
+  "description": "A document repository is a repository that contains documents that can be used in tasks.",
+  "allOf": [
+    {
+      "$ref": "#/$defs/object"
+    },
+    {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "internal-document-repository",
+            "git-document-repository"
+          ]
+        },
+        "documentChunkStrategy": {
+          "type": "string",
+          "enum": [
+            "none",
+            "sentence",
+            "paragraph",
+            "section"
+          ],
+          "description": "The strategy to use for chunking documents."
+        },
+        "variables": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "type",
+        "variables"
+      ]
+    }
+  ],
+  "$defs": {
+    "object": {
+      "type": "object",
+      "title": "Object",
+      "description": "An object is a base object that all other objects inherit from.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The unique identifier for the object",
+          "readOnly": true
+        },
+        "orgId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The unique identifier for the organization the object belongs to.",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "credential": {
+          "type": "string",
+          "description": "The name of the credential to use for this object."
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ]
+    }
+  }
+}

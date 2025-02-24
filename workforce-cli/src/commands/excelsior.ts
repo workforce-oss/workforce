@@ -13,7 +13,7 @@ export async function excelsiorLinks(options: {
     const authConfig = Auth.config();
     let orgId = options.orgId || authConfig.orgId;
 
-    const excelsiorHost = "http://localhost:8085/excelsior";
+    const excelsiorHost = "http://localhost:8084/excelsior";
 
     if (!orgId) {
         console.error("Org ID is required. Please provide an org ID or set a default org.");

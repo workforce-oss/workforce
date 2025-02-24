@@ -37,7 +37,7 @@ export type RFState = {
 	updateNodeVariables: (nodeId: string, variables: Record<string, any>) => void;
 	updateNodeCredential: (nodeId: string, credential: string) => void;
 	updateNodeData: (nodeId: string, data: any) => void;
-	renameNode: (nodeId: string, name: string) => void;
+	renameNode: (nodeId: string, name: string, nodeType: ObjectType) => void;
 	addInputToTask: (nodeId: string, name: string) => void;
 	removeInputFromTask: (nodeId: string, name: string) => void;
 	updateInputForTask: (nodeId: string, oldName: string, newName: string) => void;
@@ -210,7 +210,7 @@ export const flowState = (flowData: FlowData) => {
 			},
 			updateNodeVariables: (nodeId: string, variables: Record<string, any>) => {
 				const node = get().nodes.find((node) => node.id === nodeId);
-				const config = FlowManager.getObjectByName(get().flowData, (node.data.config as BaseConfig).name);
+				const config = FlowManager.getObjectById(get().flowData, (node.data.config as BaseConfig).id);
 				const clonedConfig = _.cloneDeep(config);
 				if (node) {
 					const cloned = _.cloneDeep(node);
@@ -227,7 +227,7 @@ export const flowState = (flowData: FlowData) => {
 			},
 			updateNodeCredential: (nodeId: string, credential: string) => {
 				const node = get().nodes.find((node) => node.id === nodeId);
-				const config = FlowManager.getObjectByName(get().flowData, (node.data.config as BaseConfig).name);
+				const config = FlowManager.getObjectById(get().flowData, (node.data.config as BaseConfig).id);
 				const clonedConfig = _.cloneDeep(config);
 				if (node) {
 					const cloned = _.cloneDeep(node);
@@ -260,14 +260,14 @@ export const flowState = (flowData: FlowData) => {
 					});
 				}
 			},
-			renameNode: (nodeId: string, name: string) => {
+			renameNode: (nodeId: string, name: string, nodeType: ObjectType) => {
 				const node = get().nodes.find((node) => node.id === nodeId);
 				const flow = _.cloneDeep(get().flowData);
 				if (node) {
 					const cloned = _.cloneDeep(node);
 					const oldName = (cloned.data.config as BaseConfig).name;
 					(cloned.data.config as BaseConfig).name = name;
-					FlowManager.renameNode(flow, oldName, name);
+					FlowManager.renameNode(flow, oldName, name, nodeType);
 					
 					const index = get().nodes.findIndex((node) => node.id === nodeId);
 
@@ -281,7 +281,7 @@ export const flowState = (flowData: FlowData) => {
 			addInputToTask: (nodeId: string, name: string) => {
 				const node = get().nodes.find((node) => node.id === nodeId);
 
-				const config = FlowManager.getObjectByName(get().flowData, (node.data.config as BaseConfig).name);
+				const config = FlowManager.getObjectById(get().flowData, (node.data.config as BaseConfig).id);
 				const clonedConfig = _.cloneDeep(config) as TaskConfig;
 
 				if (node && node.data.type === "task") {
@@ -314,7 +314,7 @@ export const flowState = (flowData: FlowData) => {
 				const node = get().nodes.find((node) => node.id === nodeId);
 
 				const flow = _.cloneDeep(get().flowData);
-				const config = FlowManager.getObjectByName(get().flowData, (node.data.config as BaseConfig).name);
+				const config = FlowManager.getObjectById(get().flowData, (node.data.config as BaseConfig).id);
 				const clonedConfig = _.cloneDeep(config) as TaskConfig;
 
 				if (node && node.data.type === "task") {
@@ -356,6 +356,8 @@ export const flowState = (flowData: FlowData) => {
 								sourceParam = "ticket";
 							} else if (sourceNode.data.type === "tool") {
 								sourceParam = "output";
+							} else if (sourceNode.data.type === "task") {
+								sourceParam = "subtasks";
 							}
 
 							edgeChanges.push(
@@ -417,7 +419,10 @@ export const flowState = (flowData: FlowData) => {
 								sourceParam = "ticket";
 							} else if (sourceNode.data.type === "tool") {
 								sourceParam = "output";
+							} else if (sourceNode.data.type === "task") {
+								sourceParam = "subtasks";
 							}
+							FlowManager.removeConnection(flow, sourceId, sourceParam, cloned.data.config.id, name);
 							edgeChanges.push({
 								type: "remove",
 								id: createEdge(sourceId, sourceParam, cloned.data.config.id, name, "taskInput").id,

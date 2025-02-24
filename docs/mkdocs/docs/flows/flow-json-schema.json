@@ -1,0 +1,439 @@
+{
+  "title": "Flow",
+  "description": "A flow is a collection of objects and their relationship that define a process.",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The unique identifier for the object",
+      "readOnly": true
+    },
+    "orgId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The unique identifier for the organization the object belongs to.",
+      "readOnly": true
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive"
+      ]
+    },
+    "channels": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/channel"
+      }
+    },
+    "documentation": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/documentation"
+      }
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/resource"
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/task"
+      }
+    },
+    "tools": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/tool"
+      }
+    },
+    "trackers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/tracker"
+      }
+    }
+  },
+  "required": [
+    "name",
+    "description",
+    "status"
+  ],
+  "$defs": {
+    "channel": {
+      "title": "Channel",
+      "description": "A channel is a communication channel that can be used to communicate with workers.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/object"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "slack-channel",
+                "native-channel",
+                "discord-channel"
+              ]
+            },
+            "variables": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "type",
+            "variables"
+          ]
+        }
+      ]
+    },
+    "documentation": {
+      "title": "Documentation",
+      "description": "Documentation defines the specific documents from a repository that are made available to a task.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/object"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "default-documentation"
+              ]
+            },
+            "repository": {
+              "type": "string",
+              "description": "The name of the document repository to use."
+            },
+            "documents": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The list of documents from the repository to use. Null or Empty means all"
+            },
+            "variables": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "type",
+            "repository",
+            "variables"
+          ]
+        }
+      ]
+    },
+    "resource": {
+      "title": "Resource",
+      "description": "A resource is an external, versionable static resource that can be retrieved or created. It can be used as both and input and output for tasks.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/object"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "api-resource",
+                "github-repo-resource",
+                "raw-text-resource",
+                "github-pull-request-resource"
+              ]
+            },
+            "example": {
+              "type": "string",
+              "description": "An example value of an output for the resource."
+            },
+            "variables": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "type",
+            "variables"
+          ]
+        }
+      ]
+    },
+    "task": {
+      "title": "Task",
+      "description": "A task is a unit of work that can be assigned to a worker. It should be a complete definition of all requirements in terms of tooling, integrations, and instructions.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/object"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "simple-task",
+                "structured-task"
+              ]
+            },
+            "requiredSkills": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The list of skills needed for this task."
+            },
+            "defaultChannel": {
+              "type": "string",
+              "description": "The default channel to use for communication."
+            },
+            "tracker": {
+              "type": "string",
+              "description": "The Name of the tracker to use for execution."
+            },
+            "documentation": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The list of documentation names to use."
+            },
+            "tools": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/tool_reference"
+              },
+              "description": "The list of tools needed for this task."
+            },
+            "triggers": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The list of channels or resources to trigger the task."
+            },
+            "inputs": {
+              "type": "object",
+              "description": "The map of inputs for this task. Keys can be used in task templates using handlebars syntax. I.E., and input of message may map to a channel name, and then in the task template, you can use {{message}}",
+              "additionalProperties": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              }
+            },
+            "outputs": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The list of outputs for this task."
+            },
+            "subtasks": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/subtask"
+              },
+              "description": "The list of subtasks for this task."
+            },
+            "costLimit": {
+              "type": "number",
+              "description": "The cost limit for each execution of this task."
+            },
+            "variables": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "type",
+            "requiredSkills",
+            "defaultChannel",
+            "tracker",
+            "documentation",
+            "tools",
+            "triggers",
+            "inputs",
+            "outputs",
+            "subtasks",
+            "costLimit",
+            "variables"
+          ]
+        }
+      ]
+    },
+    "tool": {
+      "title": "Tool",
+      "description": "A tool is an external integration that a worker may use during execution of a task.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/object"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "web-service-tool",
+                "template-tool",
+                "openapi-tool",
+                "openapi-channel-tool",
+                "excalidraw-tool",
+                "google-drive-tool",
+                "google-slides-tool",
+                "coding-tool",
+                "trello-ticket-tool",
+                "github-board-ticket-tool",
+                "message-channel-tool"
+              ]
+            },
+            "channel": {
+              "type": "string",
+              "description": "The channel for the tool to use for dynamic user interaction"
+            },
+            "variables": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "type",
+            "channel",
+            "variables"
+          ]
+        }
+      ]
+    },
+    "tracker": {
+      "title": "Tracker",
+      "description": "A tracker is a system that can be used to track the progress of a task execution.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/object"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "github-board-tracker",
+                "trello-tracker"
+              ]
+            },
+            "webhooksEnabled": {
+              "type": "boolean",
+              "description": "Whether or not webhooks are enabled for this tracker."
+            },
+            "pollingInterval": {
+              "type": "number",
+              "description": "The interval in seconds to poll for updates if webhooks are not enabled"
+            },
+            "variables": {
+              "type": "object"
+            }
+          },
+          "required": [
+            "type",
+            "webhooksEnabled",
+            "pollingInterval",
+            "variables"
+          ]
+        }
+      ]
+    },
+    "object": {
+      "type": "object",
+      "title": "Object",
+      "description": "An object is a base object that all other objects inherit from.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The unique identifier for the object",
+          "readOnly": true
+        },
+        "orgId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The unique identifier for the organization the object belongs to.",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "credential": {
+          "type": "string",
+          "description": "The name of the credential to use for this object."
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ]
+    },
+    "subtask": {
+      "type": "object",
+      "title": "Subtask",
+      "description": "A subtask is a reference to a task that can be performed as part of a larger task. Subtasks provide their own context and can be useful for creating large, complex tasks without overloading the context window.",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "async": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "tool_reference": {
+      "type": "object",
+      "title": "Tool Reference",
+      "description": "A tool reference is a reference to a tool that can be used in a task.",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "output": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  }
+}

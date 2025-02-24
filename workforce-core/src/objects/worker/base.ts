@@ -36,6 +36,18 @@ export abstract class Worker extends BaseObject<WorkerConfig> {
 
     private defaultCostLimit = 1.00;
 
+    protected externalInference = false;
+
+    public startRealtimeSession(workRequest: WorkRequest): Promise<{
+        realtime_token?: string,
+        realtime_base_url?: string,
+        workerId?: string,
+        model?: string,
+    }> {
+        this.logger.debug(`starting realtimeSession for ${workRequest.taskExecutionId}`)
+        return Promise.resolve({});
+    }
+
 
     constructor(config: WorkerConfig, onFailure: (objectId: string, error: string) => void) {
         super(config, onFailure);
@@ -129,7 +141,7 @@ export abstract class Worker extends BaseObject<WorkerConfig> {
         }
     }
 
-    private async startSession(workRequest: WorkRequest): Promise<void> {
+    protected async startSession(workRequest: WorkRequest): Promise<ChatSession> {
         this.logger.debug(`startSession() Work request ${workRequest.taskExecutionId} starting chat session`);
 
         this.logger.debug(`startSession() Initializing tool sessions for tools: ${workRequest.tools?.map((tool) => tool.id).join(", ")}`)
@@ -161,7 +173,7 @@ export abstract class Worker extends BaseObject<WorkerConfig> {
         });
         if (existingChatSession) {
             this.logger.debug(`startSession() Chat session ${existingChatSession.id} already exists`);
-            return;
+            return existingChatSession.toModel();
         }
 
         const chatSessionDb = await WorkerChatSessionDb.create({
@@ -195,6 +207,8 @@ export abstract class Worker extends BaseObject<WorkerConfig> {
         if (!promptMessageDb) {
             throw new Error(`newChatSession() Chat session ${chatSessionDb.id} error creating prompt message`);
         }
+
+        return chatSessionDb.toModel();
     }
 
     private async handleInboundMessage(chatMessage: ChatMessage): Promise<void> {
@@ -423,9 +437,6 @@ export abstract class Worker extends BaseObject<WorkerConfig> {
         });
     }
 
-
-
-
     public handleInferenceError(
         error: Error | string,
         chatSession: ChatSession,
@@ -585,6 +596,8 @@ export abstract class Worker extends BaseObject<WorkerConfig> {
             messageType: "message",
             username: this.config.name,
             final,
+            //TODO: Remove, this is tech debt to solve a UI bug
+            toolCalls: message.text ? null : message.toolCalls,
             ignoreResponse: message.done !== true || message.cancelled === true,
             image: message.image,
         });
@@ -630,23 +643,42 @@ export abstract class Worker extends BaseObject<WorkerConfig> {
                     channelId ?? workRequest.channelId!,
                     workRequest.taskExecutionId,
                     workRequest.workerId,
-                    ["message", "chat-message"],
+                    ["message", "chat-message", "tool-call"],
                     (message: MessageRequest) => {
                         this.logger.debug(
                             `listenForSessionMessages() Chat session ${workRequest.taskExecutionId
                             } message received: ${JSON.stringify(message, null, 2)}`
                         );
-                        if (message.message === "") {
+                        if (message.message === "" && ((message.toolCalls?.length ?? 0) === 0)) {
                             this.logger.debug(
                                 `listenForSessionMessages() Chat session ${workRequest.taskExecutionId} ignoring empty message`
                             );
                             return;
                         }
                         this.logger.debug(`listenForSessionMessages() senderId=${message.senderId} workerId=${workRequest.workerId}`)
+
                         if (message.senderId === workRequest.workerId) {
-                            this.logger.debug(
-                                `listenForSessionMessages() Chat session ${workRequest.taskExecutionId} ignoring own message`
-                            );
+                            if (this.externalInference) {
+                                const workerMessage: ChatMessage = {
+                                    id: message.messageId,
+                                    sessionId: chatSessionDb?.id ?? workRequest.taskExecutionId,
+                                    senderId: message.senderId,
+                                    text: message.message,
+                                    role: "worker",
+                                    timestamp: new Date().getTime(),
+                                }
+                                if (message.toolCalls) {
+                                    workerMessage.toolCalls = message.toolCalls
+                                }
+                                this.inboundMessages.next(workerMessage)
+                                this.logger.debug(
+                                    `listenForSessionMessage() Chat session ${workRequest.taskExecutionId} forwarding external worker message to output stream`
+                                )
+                            } else {
+                                this.logger.debug(
+                                    `listenForSessionMessages() Chat session ${workRequest.taskExecutionId} ignoring own message`
+                                );
+                            }
                             return;
                         }
 
@@ -988,7 +1020,7 @@ export abstract class Worker extends BaseObject<WorkerConfig> {
                         humanState: response.human_state,
                         image: response.image,
                     }],
-                    messageType: "tool_response",
+                    messageType: "tool-response",
                     final: false,
                     timestamp: Date.now(),
                     senderId: this.config.id!,

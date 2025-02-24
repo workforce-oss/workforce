@@ -24,6 +24,7 @@ export abstract class WebsocketAPI {
 	private preauthQueue: any[] = [];
 	protected currentAuthToken?: string;
 	private unAuthorizedCallBack?: () => void;
+	protected callbacks: Map<string, ((data: any) => void)[]> = new Map();
 
 
 	constructor(args: WebsocketApiCreationArgs) {
@@ -110,14 +111,31 @@ export abstract class WebsocketAPI {
 		this.socket?.close();
 	}
 
-	public abstract handleMessages(data: any): Promise<void>;
+	public async handleMessages(data: any): Promise<void> {
+		console.log(`attempting to pass ${data.type} to callback.  Payload: ${JSON.stringify(data)}`)
+		if (this.callbacks.has(data.type)) {
+			console.log(`callback found for ${data.type}`)
+			this.callbacks.get(data.type)?.forEach((callback) => {
+				console.log(`executing callback for ${data.type}`)
+				callback(data);
+			});
+			this.callbacks.delete(data.type);
+		}
+	}
 
-	public async send(data: any): Promise<void> {
+	public async send(data: any, callback?: {messageType: string, callback: (data: any) => void}): Promise<void> {
 		while (!this.socket || this.socket.readyState !== WebSocket.OPEN) {
 			await new Promise((resolve) => setTimeout(resolve, 100));
 		}
 		if (!this.socket) {
 			throw new Error("Socket not connected");
+		}
+		if (callback) {
+			console.log(`registering callback for ${callback.messageType}`)
+			if (!this.callbacks.has(callback.messageType)) {
+				this.callbacks.set(callback.messageType, []);
+			}
+			this.callbacks.get(callback.messageType)?.push(callback.callback);
 		}
 		if (!this.authed) {
 			this.preauthQueue.push(data);

@@ -121,9 +121,14 @@ export class CredentialHelper {
       },
     });
     if (!credential) {
-      throw new Error(
-        `Credential for ${model.type}/${model.name}: ${model.credential} not found.`
-      );
+      const credentialById = await CredentialDb.findByPk(model.credential);
+      if (credentialById) {
+        return;
+      } else {
+        throw new Error(
+          `Credential for ${model.type}/${model.name}: ${model.credential} not found.`
+        );
+      }
     }
     model.credential = credential.id;
   }

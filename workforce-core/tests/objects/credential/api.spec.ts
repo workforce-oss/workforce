@@ -1,6 +1,6 @@
 import { expect } from "chai";
 import { randomUUID } from "crypto";
-import express from "express";
+import express, { Application } from "express";
 import { auth } from "express-oauth2-jwt-bearer";
 import expressWs from "express-ws";
 import * as fs from "fs";
@@ -20,7 +20,7 @@ import { CredentialDb } from "../../../src/objects/credential/db.js";
 
 
 describe("Credential API", () => {
-    const { app, getWss, applyTo } = expressWs(express());
+    const app = expressWs(express() as unknown as expressWs.Application).app as unknown as Application & expressWs.WithWebsocketMethod;
 
     let sequelize: Sequelize;
     let orgId: string;

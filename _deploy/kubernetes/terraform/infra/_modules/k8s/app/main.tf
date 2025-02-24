@@ -52,7 +52,7 @@ resource "kubernetes_deployment" "deployment" {
         container {
           name              = "app"
           image             = var.app_image
-          image_pull_policy = "IfNotPresent"
+          image_pull_policy = var.image_pull_policy
           resources {
             limits = {
               # cpu    = var.cpu_limit

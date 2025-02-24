@@ -170,7 +170,13 @@ export function activate(context: vscode.ExtensionContext) {
 		channel.appendLine('Chat disabled');
 	}
 
-	resumeTask(stateProvider, scmProvider, channel);
+	const messageItems: vscode.MessageItem[] = [{ title: 'Continue Task' }, { title: 'Cancel', isCloseAffordance: true }];
+	vscode.window.showInformationMessage('Ongoing Workforce task detected, would you like to continue?', {modal: true}, ...messageItems).then((selected) => {
+		channel.appendLine(`Selected: ${selected?.title}`);
+		if (selected?.title === 'Continue Task') {
+			resumeTask(stateProvider, scmProvider, channel);
+		}
+	});
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
@@ -183,10 +189,16 @@ async function resumeTask(stateProvider: WorkforceStateProvider, scmProvider: Gi
 			return;
 		}
 		if (task.repoUrl && task.taskExecutionId) {
-			beginTask(task.repoUrl, scmProvider, channel).then(() => {
-				channel.appendLine(`Task execution started: taskExecution=${task.taskExecutionId} repo=${task.repoUrl} channel=${task.channelId} org=${task.orgId}`);
-			}).catch((error) => {
-				channel.appendLine(error);
+			const messageItems: vscode.MessageItem[] = [{ title: 'Continue Task' }, { title: 'Cancel', isCloseAffordance: true }];
+			vscode.window.showInformationMessage('Ongoing Workforce task detected, would you like to continue?', {modal: true}, ...messageItems).then((selected) => {
+				channel.appendLine(`Selected: ${selected?.title}`);
+				if (selected?.title === 'Continue Task') {
+					beginTask(task.repoUrl!, scmProvider, channel).then(() => {
+						channel.appendLine(`Task execution started: taskExecution=${task.taskExecutionId} repo=${task.repoUrl} channel=${task.channelId} org=${task.orgId}`);
+					}).catch((error) => {
+						channel.appendLine(error);
+					});
+				}
 			});
 		}
 	}).catch((error) => {

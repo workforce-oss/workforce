@@ -15,6 +15,7 @@ scratch.json
 _deploy/kubernetes/terraform/**/terraform.*.tfvars
 .terraform/
 terraform.tfstate*
+backend.tf*
 
 examples/backup
 # Keys

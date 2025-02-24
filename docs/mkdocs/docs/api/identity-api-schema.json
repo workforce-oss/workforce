@@ -1,0 +1,502 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Workforce API",
+    "version": "0.1.0"
+  },
+  "servers": [
+    {
+      "url": "https://localhost:8084/workforce-api/"
+    }
+  ],
+  "security": [
+    {
+      "oauth2": []
+    }
+  ],
+  "paths": {
+    "/users": {
+      "post": {
+        "summary": "Upsert a user ",
+        "tags": [
+          "users"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/user"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The created user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "summary": "Get a user by ID",
+        "tags": [
+          "users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a user by ID",
+        "tags": [
+          "users"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The deleted user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/user"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orgs": {
+      "post": {
+        "summary": "Upsert an org ",
+        "tags": [
+          "orgs"
+        ],
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/org"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The created org",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/org"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all orgs",
+        "tags": [
+          "orgs"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "A list of orgs",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/org"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orgs/{id}": {
+      "get": {
+        "summary": "Get an org by ID",
+        "tags": [
+          "orgs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The org",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/org"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an org by ID",
+        "tags": [
+          "orgs"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The deleted org",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/org"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orgs/{orgId}/org-users": {
+      "post": {
+        "summary": "Create an org_user_relation ",
+        "tags": [
+          "org-users"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/org_user_relation"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The created org_user_relation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/org_user_relation"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "summary": "Get all org_user_relations",
+        "tags": [
+          "org-users"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "A list of org_user_relations",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/org_user_relation"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orgs/{orgId}/org-users/{id}": {
+      "get": {
+        "summary": "Get an org_user_relation by ID",
+        "tags": [
+          "org-users"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The org_user_relation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/org_user_relation"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete an org_user_relation by ID",
+        "tags": [
+          "org-users"
+        ],
+        "parameters": [
+          {
+            "name": "orgId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The deleted org_user_relation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/org_user_relation"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "user": {
+        "title": "User",
+        "description": "A user is an identity that can access the system. Password can only be set and will never be returned by the api.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The unique identifier for the user",
+            "readOnly": true
+          },
+          "idpId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The unique identifier for the identity provider the user belongs to"
+          },
+          "email": {
+            "type": "string",
+            "format": "email"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "format": "password",
+            "description": "The password for the user. Required on create for certain identity providers. Can be part of an update. Will never be returned by the api."
+          }
+        },
+        "required": [
+          "email",
+          "firstName",
+          "lastName",
+          "username"
+        ]
+      },
+      "org": {
+        "title": "Org",
+        "description": "An organization is a logical grouping of resources and users.",
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The unique identifier for the organization",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "inactive"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "company": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "status",
+          "description"
+        ]
+      },
+      "org_user_relation": {
+        "title": "Org User Relation",
+        "type": "object",
+        "description": "A relation between an organization and a user",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The unique identifier for the org-user relation",
+            "readOnly": true
+          },
+          "orgId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The unique identifier for the organization the user belongs to"
+          },
+          "userId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "The unique identifier for the user"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "admin",
+              "maintainer",
+              "developer",
+              "reporter"
+            ]
+          }
+        },
+        "required": [
+          "orgId",
+          "userId",
+          "role"
+        ]
+      }
+    },
+    "securitySchemes": {
+      "oauth2": {
+        "type": "oauth2",
+        "flows": {
+          "authorizationCode": {
+            "authorizationUrl": "http://localhost:8084/insecure/authorize",
+            "tokenUrl": "http://localhost:8084/token",
+            "scopes": {
+              "openid": ""
+            }
+          }
+        }
+      }
+    }
+  }
+}

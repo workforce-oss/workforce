@@ -1,0 +1,1287 @@
+{
+  "title": "Flow",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The unique identifier for the object",
+      "readOnly": true
+    },
+    "orgId": {
+      "type": "string",
+      "format": "uuid",
+      "description": "The unique identifier for the organization the object belongs to.",
+      "readOnly": true
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "active",
+        "inactive"
+      ]
+    },
+    "channels": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/channel"
+      }
+    },
+    "documentation": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/documentation"
+      }
+    },
+    "resources": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/resource"
+      }
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/task"
+      }
+    },
+    "tools": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/tool"
+      }
+    },
+    "trackers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/tracker"
+      }
+    }
+  },
+  "required": [
+    "name",
+    "description",
+    "status"
+  ],
+  "$defs": {
+    "channel": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/object"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "slack-channel",
+                "native-channel",
+                "discord-channel"
+              ]
+            },
+            "variables": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/slack_channel_variables"
+                },
+                {
+                  "$ref": "#/$defs/native_channel_variables"
+                },
+                {
+                  "$ref": "#/$defs/discord_channel_variables"
+                }
+              ]
+            }
+          },
+          "required": [
+            "type",
+            "variables"
+          ]
+        }
+      ],
+      "title": "Channel"
+    },
+    "documentation": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/object"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "default-documentation"
+              ]
+            },
+            "repository": {
+              "type": "string",
+              "description": "The name of the document repository to use."
+            },
+            "documents": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The list of documents from the repository to use. Null or Empty means all"
+            },
+            "variables": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/default_documentation_variables"
+                }
+              ]
+            }
+          },
+          "required": [
+            "type",
+            "repository",
+            "variables"
+          ]
+        }
+      ],
+      "title": "Documentation"
+    },
+    "resource": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/object"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "api-resource",
+                "github-repo-resource",
+                "raw-text-resource",
+                "github-pull-request-resource"
+              ]
+            },
+            "example": {
+              "type": "string",
+              "description": "An example value of an output for the resource."
+            },
+            "variables": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/api_resource_variables"
+                },
+                {
+                  "$ref": "#/$defs/github_repo_resource_variables"
+                },
+                {
+                  "$ref": "#/$defs/raw_text_resource_variables"
+                },
+                {
+                  "$ref": "#/$defs/github_pull_request_resource_variables"
+                }
+              ]
+            }
+          },
+          "required": [
+            "type",
+            "variables"
+          ]
+        }
+      ],
+      "title": "Resource"
+    },
+    "task": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/object"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "simple-task",
+                "structured-task"
+              ]
+            },
+            "requiredSkills": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The list of skills needed for this task."
+            },
+            "defaultChannel": {
+              "type": "string",
+              "description": "The default channel to use for communication."
+            },
+            "tracker": {
+              "type": "string",
+              "description": "The Name of the tracker to use for execution."
+            },
+            "documentation": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The list of documentation names to use."
+            },
+            "tools": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/tool_reference"
+              },
+              "description": "The list of tools needed for this task."
+            },
+            "triggers": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The list of channels or resources to trigger the task."
+            },
+            "inputs": {
+              "type": "object",
+              "description": "The map of inputs for this task. Keys can be used in task templates using handlebars syntax. I.E., and input of message may map to a channel name, and then in the task template, you can use {{message}}",
+              "additionalProperties": {
+                "oneOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "array",
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                ]
+              }
+            },
+            "outputs": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The list of outputs for this task."
+            },
+            "subtasks": {
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/subtask"
+              },
+              "description": "The list of subtasks for this task."
+            },
+            "costLimit": {
+              "type": "number",
+              "description": "The cost limit for each execution of this task."
+            },
+            "variables": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/simple_task_variables"
+                },
+                {
+                  "$ref": "#/$defs/structured_task_variables"
+                }
+              ]
+            }
+          },
+          "required": [
+            "type",
+            "requiredSkills",
+            "defaultChannel",
+            "tracker",
+            "documentation",
+            "tools",
+            "triggers",
+            "inputs",
+            "outputs",
+            "subtasks",
+            "costLimit",
+            "variables"
+          ]
+        }
+      ],
+      "title": "Task"
+    },
+    "tool": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/object"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "web-service-tool",
+                "template-tool",
+                "openapi-tool",
+                "openapi-channel-tool",
+                "excalidraw-tool",
+                "google-drive-tool",
+                "google-slides-tool",
+                "coding-tool",
+                "trello-ticket-tool",
+                "github-board-ticket-tool",
+                "message-channel-tool"
+              ]
+            },
+            "channel": {
+              "type": "string",
+              "description": "The channel for the tool to use for dynamic user interaction"
+            },
+            "variables": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/web_service_tool_variables"
+                },
+                {
+                  "$ref": "#/$defs/template_tool_variables"
+                },
+                {
+                  "$ref": "#/$defs/openapi_tool_variables"
+                },
+                {
+                  "$ref": "#/$defs/openapi_channel_tool_variables"
+                },
+                {
+                  "$ref": "#/$defs/excalidraw_tool_variables"
+                },
+                {
+                  "$ref": "#/$defs/google_drive_tool_variables"
+                },
+                {
+                  "$ref": "#/$defs/google_slides_tool_variables"
+                },
+                {
+                  "$ref": "#/$defs/coding_tool_variables"
+                },
+                {
+                  "$ref": "#/$defs/trello_ticket_tool_variables"
+                },
+                {
+                  "$ref": "#/$defs/github_board_ticket_tool_variables"
+                },
+                {
+                  "$ref": "#/$defs/message_channel_tool_variables"
+                }
+              ]
+            }
+          },
+          "required": [
+            "type",
+            "channel",
+            "variables"
+          ]
+        }
+      ],
+      "title": "Tool"
+    },
+    "tracker": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/object"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "type": "string",
+              "enum": [
+                "github-board-tracker",
+                "trello-tracker"
+              ]
+            },
+            "webhooksEnabled": {
+              "type": "boolean",
+              "description": "Whether or not webhooks are enabled for this tracker."
+            },
+            "pollingInterval": {
+              "type": "number",
+              "description": "The interval in seconds to poll for updates if webhooks are not enabled"
+            },
+            "variables": {
+              "oneOf": [
+                {
+                  "$ref": "#/$defs/github_board_tracker_variables"
+                },
+                {
+                  "$ref": "#/$defs/trello_tracker_variables"
+                }
+              ]
+            }
+          },
+          "required": [
+            "type",
+            "webhooksEnabled",
+            "pollingInterval",
+            "variables"
+          ]
+        }
+      ],
+      "title": "Tracker"
+    },
+    "discord_channel_variables": {
+      "type": "object",
+      "properties": {
+        "channel_id": {
+          "type": "string",
+          "description": "The Discord channel to send messages to",
+          "x-workforce-sensitive": false
+        }
+      },
+      "required": [
+        "channel_id"
+      ],
+      "title": "discord-channel Variables"
+    },
+    "native_channel_variables": {
+      "type": "object",
+      "properties": {
+        "channel_name": {
+          "type": "string",
+          "description": "A unique name for the channel",
+          "x-workforce-sensitive": false
+        },
+        "anonymous_access": {
+          "type": "boolean",
+          "description": "Allow anonymous access to the channel",
+          "x-workforce-sensitive": false
+        },
+        "voice_enabled": {
+          "type": "boolean",
+          "description": "Enable voice input for the channel",
+          "x-workforce-sensitive": false,
+          "x-workforce-advanced": true
+        },
+        "oauth2_issuer_uri": {
+          "type": "string",
+          "description": "Tokens from this issuer will be accepted",
+          "x-workforce-sensitive": false
+        },
+        "oauth2_audience": {
+          "type": "string",
+          "description": "The audience for the token",
+          "x-workforce-sensitive": false
+        },
+        "oauth2_claims": {
+          "type": "string",
+          "description": "A JSON object containing the claims to be verified",
+          "x-workforce-multiline": true,
+          "x-workforce-sensitive": false
+        }
+      },
+      "required": [
+        "channel_name"
+      ],
+      "title": "native-channel Variables"
+    },
+    "slack_channel_variables": {
+      "type": "object",
+      "properties": {
+        "channel_id": {
+          "type": "string",
+          "description": "The Slack channel to send messages to",
+          "x-workforce-sensitive": false
+        }
+      },
+      "required": [
+        "channel_id"
+      ],
+      "title": "slack-channel Variables"
+    },
+    "worker_discord_token_variables": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "description": "channel token",
+          "x-workforce-sensitive": true
+        }
+      },
+      "required": [
+        "token"
+      ],
+      "title": "worker-discord-token Variables"
+    },
+    "worker_native_token_variables": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "description": "channel token",
+          "x-workforce-sensitive": true
+        }
+      },
+      "required": [
+        "token"
+      ],
+      "title": "worker-native-token Variables"
+    },
+    "worker_slack_token_variables": {
+      "type": "object",
+      "properties": {
+        "token": {
+          "type": "string",
+          "description": "channel token",
+          "x-workforce-sensitive": true
+        }
+      },
+      "required": [
+        "token"
+      ],
+      "title": "worker-slack-token Variables"
+    },
+    "default_documentation_variables": {
+      "type": "object",
+      "properties": {
+        "desiredTokens": {
+          "type": "number",
+          "description": "The desired number of tokens to generate.",
+          "default": 512
+        },
+        "maxTokens": {
+          "type": "number",
+          "description": "The maximum number of tokens to generate.",
+          "default": 1024
+        },
+        "retrievalScope": {
+          "type": "string",
+          "description": "The scope of the retrieval.",
+          "default": "section",
+          "enum": [
+            "repository",
+            "document",
+            "section",
+            "chunk"
+          ]
+        },
+        "tokenFillStrategy": {
+          "type": "string",
+          "description": "The strategy for filling tokens.",
+          "default": "default",
+          "enum": [
+            "default",
+            "chunk_first",
+            "fill_section",
+            "fill_document"
+          ]
+        }
+      },
+      "required": [],
+      "title": "default-documentation Variables"
+    },
+    "git_document_repository_variables": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "array",
+          "description": "The name of the model to use for embedding.",
+          "default": "text-embedding-3-small",
+          "enum": [
+            "text-embedding-3-small",
+            "text-embedding-3-large",
+            "text-embedding-ada-002"
+          ]
+        },
+        "repo": {
+          "type": "string",
+          "description": "The name(slug) of the Github repository to use."
+        },
+        "file_regex": {
+          "type": "string",
+          "description": "The regex to use to match the files in the repository."
+        },
+        "owner": {
+          "type": "string",
+          "description": "The name(slug) of owner of the Github repository."
+        },
+        "branch": {
+          "type": "string",
+          "description": "The branch name.",
+          "default": "main"
+        }
+      },
+      "required": [
+        "model",
+        "repo",
+        "file_regex",
+        "owner"
+      ],
+      "title": "git-document-repository Variables"
+    },
+    "internal_document_repository_variables": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "array",
+          "description": "The name of the model to use for embedding.",
+          "default": "text-embedding-3-small",
+          "enum": [
+            "text-embedding-3-small",
+            "text-embedding-3-large",
+            "text-embedding-ada-002"
+          ]
+        }
+      },
+      "required": [
+        "model"
+      ],
+      "title": "internal-document-repository Variables"
+    },
+    "api_resource_variables": {
+      "type": "object",
+      "properties": {
+        "schema_url": {
+          "type": "string",
+          "description": "A URL to a valid OpenAPI schema."
+        },
+        "raw_schema": {
+          "type": "string",
+          "description": "A valid OpenAPI schema.",
+          "x-workforce-multiline": true
+        },
+        "fetch_path": {
+          "type": "string",
+          "description": "The path to use for fetching data from the API."
+        },
+        "fetch_method": {
+          "type": "string",
+          "description": "The HTTP method to use for fetching data from the API.",
+          "enum": [
+            "GET",
+            "POST",
+            "PUT",
+            "PATCH",
+            "DELETE"
+          ]
+        },
+        "webhook_path": {
+          "type": "string",
+          "description": "The path that defines the webhook endpoint."
+        },
+        "create_path": {
+          "type": "string",
+          "description": "The path to use for creating new objects in the API."
+        },
+        "create_method": {
+          "type": "string",
+          "description": "The HTTP method to use for creating new objects in the API.",
+          "enum": [
+            "GET",
+            "POST",
+            "PUT",
+            "PATCH",
+            "DELETE"
+          ]
+        }
+      },
+      "required": [],
+      "title": "api-resource Variables"
+    },
+    "github_pull_request_resource_variables": {
+      "type": "object",
+      "properties": {
+        "repo": {
+          "type": "string",
+          "description": "The name(slug) of the Github repository to use."
+        },
+        "owner": {
+          "type": "string",
+          "description": "The name(slug) of owner of the Github repository."
+        }
+      },
+      "required": [
+        "repo",
+        "owner"
+      ],
+      "title": "github-pull-request-resource Variables"
+    },
+    "github_repo_resource_variables": {
+      "type": "object",
+      "properties": {
+        "repo": {
+          "type": "string",
+          "description": "The name(slug) of the Github repository to use."
+        },
+        "owner": {
+          "type": "string",
+          "description": "The name(slug) of owner of the Github repository."
+        },
+        "branch": {
+          "type": "string",
+          "description": "The branch name.",
+          "default": "main"
+        },
+        "path_template": {
+          "type": "string",
+          "description": "The path template to use to generate the path to the file. This can also just be the name of a particular or directory. Defaults to {{filename}}.",
+          "default": "{{filename}}"
+        },
+        "org_name": {
+          "type": "string",
+          "description": "The name of the Github organization to use for webhooks."
+        },
+        "webhooks_enabled": {
+          "type": "boolean",
+          "description": "Whether to enable webhooks for this resource.",
+          "default": false,
+          "x-workforce-advanced": true
+        }
+      },
+      "required": [
+        "repo",
+        "owner",
+        "org_name"
+      ],
+      "title": "github-repo-resource Variables"
+    },
+    "raw_text_resource_variables": {
+      "type": "object",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "The text to use as the resource.",
+          "x-workforce-multiline": true
+        }
+      },
+      "required": [
+        "text"
+      ],
+      "title": "raw-text-resource Variables"
+    },
+    "simple_task_variables": {
+      "type": "object",
+      "properties": {
+        "purpose": {
+          "type": "string",
+          "description": "The purpose of the task",
+          "x-workforce-multiline": true
+        },
+        "prompt_template": {
+          "type": "string",
+          "description": "The template for the prompt",
+          "x-workforce-multiline": true
+        },
+        "system_message_template": {
+          "type": "string",
+          "description": "Template for a guidance message to steer the model.",
+          "x-workforce-multiline": true
+        }
+      },
+      "required": [
+        "prompt_template"
+      ],
+      "title": "simple-task Variables"
+    },
+    "structured_task_variables": {
+      "type": "object",
+      "properties": {
+        "acceptance_critera": {
+          "type": "string",
+          "description": "The acceptance criteria for the task.",
+          "x-workforce-multiline": true
+        },
+        "instructions": {
+          "type": "string",
+          "description": "Instructions explaining to the worker how to complete the task.",
+          "x-workforce-multiline": true
+        },
+        "context": {
+          "type": "string",
+          "description": "Context that the worker should be aware of when completing the task.",
+          "x-workforce-multiline": true
+        },
+        "definition_of_done": {
+          "type": "string",
+          "description": "A set of conditions that must be met for the task to be considered done.",
+          "x-workforce-multiline": true
+        }
+      },
+      "required": [
+        "acceptance_critera",
+        "instructions",
+        "context"
+      ],
+      "title": "structured-task Variables"
+    },
+    "coding_tool_variables": {
+      "type": "object",
+      "properties": {
+        "index_repo_location": {
+          "type": "string",
+          "description": "A URL to a mono repository without the scheme. Example github.com/my/repo."
+        },
+        "index_repo_branch": {
+          "type": "string",
+          "description": "The branch of the mono repository to use.",
+          "default": "main"
+        },
+        "mode": {
+          "type": "string",
+          "description": "The mode to run the tool in.",
+          "default": "local",
+          "enum": [
+            "local",
+            "remote"
+          ]
+        },
+        "server_url": {
+          "type": "string",
+          "description": "The URL of the local server to run the tool on. Required if mode is local. ",
+          "default": "http://localhost:8084/vscode-extension-server"
+        },
+        "read_only": {
+          "type": "boolean",
+          "description": "Whether the tool is read only.",
+          "default": false
+        }
+      },
+      "required": [
+        "index_repo_location",
+        "mode"
+      ],
+      "title": "coding-tool Variables"
+    },
+    "excalidraw_tool_variables": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "title": "excalidraw-tool Variables"
+    },
+    "github_board_ticket_tool_variables": {
+      "type": "object",
+      "properties": {
+        "purpose": {
+          "type": "string",
+          "description": "The purpose of the tool",
+          "x-workforce-multiline": true
+        },
+        "org_name": {
+          "type": "string",
+          "description": "The name of the Github Organization"
+        },
+        "project_name": {
+          "type": "string",
+          "description": "The name of the Github Project"
+        },
+        "column_name": {
+          "type": "string",
+          "description": "The name of the column where tickets should be placed"
+        }
+      },
+      "required": [
+        "purpose",
+        "org_name",
+        "project_name",
+        "column_name"
+      ],
+      "title": "github-board-ticket-tool Variables"
+    },
+    "google_drive_tool_variables": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "title": "google-drive-tool Variables"
+    },
+    "google_slides_tool_variables": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "title": "google-slides-tool Variables"
+    },
+    "message_channel_tool_variables": {
+      "type": "object",
+      "properties": {},
+      "required": [],
+      "title": "message-channel-tool Variables"
+    },
+    "openapi_channel_tool_variables": {
+      "type": "object",
+      "properties": {
+        "schema_url": {
+          "type": "string",
+          "description": "A URL to a valid OpenAPI schema."
+        },
+        "raw_schema": {
+          "type": "string",
+          "description": "A valid OpenAPI schema.",
+          "x-workforce-multiline": true
+        }
+      },
+      "required": [],
+      "title": "openapi-channel-tool Variables"
+    },
+    "openapi_tool_variables": {
+      "type": "object",
+      "properties": {
+        "schema_url": {
+          "type": "string",
+          "description": "A URL to a valid OpenAPI schema."
+        },
+        "raw_schema": {
+          "type": "string",
+          "description": "A valid OpenAPI schema.",
+          "x-workforce-multiline": true
+        }
+      },
+      "required": [],
+      "title": "openapi-tool Variables"
+    },
+    "template_tool_variables": {
+      "type": "object",
+      "properties": {
+        "template_location": {
+          "type": "string",
+          "description": "The location of the template."
+        },
+        "template_schema_location": {
+          "type": "string",
+          "description": "The location of the template schema."
+        }
+      },
+      "required": [
+        "template_location",
+        "template_schema_location"
+      ],
+      "title": "template-tool Variables"
+    },
+    "trello_ticket_tool_variables": {
+      "type": "object",
+      "properties": {
+        "purpose": {
+          "type": "string",
+          "description": "The purpose of the tool.",
+          "x-workforce-multiline": true
+        },
+        "board_name": {
+          "type": "string",
+          "description": "The name of the Trello Board."
+        },
+        "column_name": {
+          "type": "string",
+          "description": "The name of the column to create the ticket in."
+        },
+        "label": {
+          "type": "string",
+          "description": "The name of the label to apply to the ticket."
+        }
+      },
+      "required": [
+        "purpose",
+        "board_name",
+        "column_name",
+        "label"
+      ],
+      "title": "trello-ticket-tool Variables"
+    },
+    "web_service_tool_variables": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "description": "The URL of the web service."
+        },
+        "method": {
+          "type": "string",
+          "description": "The HTTP method to use. Defaults to GET.",
+          "default": "GET"
+        },
+        "schema_url": {
+          "type": "string",
+          "description": "A URL to a json schema with the request body schema.  Required if method is POST or PUT."
+        },
+        "visualizer_url": {
+          "type": "string",
+          "description": "A URL to a visualizer."
+        },
+        "action_caption_webhook_base_url": {
+          "type": "string",
+          "description": "The base URL to use for action caption webhooks."
+        },
+        "username": {
+          "type": "string",
+          "description": "The username to use for basic authentication."
+        }
+      },
+      "required": [
+        "url",
+        "schema_url"
+      ],
+      "title": "web-service-tool Variables"
+    },
+    "github_board_tracker_variables": {
+      "type": "object",
+      "properties": {
+        "org_name": {
+          "type": "string",
+          "description": "The name of the Github Organization"
+        },
+        "project_name": {
+          "type": "string",
+          "description": "The name of the Github Project"
+        },
+        "to_do_column": {
+          "type": "string",
+          "description": "The name of the column where tickets should be pulled from or placed in.",
+          "default": "Todo"
+        },
+        "in_progress_column": {
+          "type": "string",
+          "description": "The name of the column for tickets that are currently being worked.",
+          "default": "In Progress"
+        },
+        "done_column": {
+          "type": "string",
+          "description": "The column where tickets are put when they are done.",
+          "default": "Done"
+        }
+      },
+      "required": [
+        "org_name",
+        "project_name"
+      ],
+      "title": "github-board-tracker Variables"
+    },
+    "trello_tracker_variables": {
+      "type": "object",
+      "properties": {
+        "board_name": {
+          "type": "string",
+          "description": "The name of the Trello Board"
+        },
+        "to_do_column": {
+          "type": "string",
+          "description": "The name of the column where tickets should be pulled from or placed in.",
+          "default": "To Do"
+        },
+        "in_progress_column": {
+          "type": "string",
+          "description": "The name of the column for tickets that are currently being worked.",
+          "default": "Doing"
+        },
+        "done_column": {
+          "type": "string",
+          "description": "The column where tickets are put when they are done.",
+          "default": "Done"
+        },
+        "label": {
+          "type": "string",
+          "description": "The name of the label to watch."
+        }
+      },
+      "required": [
+        "board_name",
+        "to_do_column",
+        "in_progress_column",
+        "done_column",
+        "label"
+      ],
+      "title": "trello-tracker Variables"
+    },
+    "ai_worker_variables": {
+      "type": "object",
+      "properties": {
+        "model": {
+          "type": "string",
+          "description": "The name of the model to use for inference",
+          "default": "gpt-3.5-turbo",
+          "enum": [
+            "gpt-3.5-turbo",
+            "gpt-3.5-turbo-instruct",
+            "gpt-3.5-turbo-16k",
+            "gpt-4",
+            "gpt-4-32k",
+            "gpt-4-0125-preview",
+            "gpt-4o",
+            "claude-3-5-sonnet-20240620",
+            "claude-3-opus-20240229",
+            "claude-3-haiku-20240307",
+            "llama3-8b-8192",
+            "llama3-70b-8192",
+            "llama2-70b-4096",
+            "mixtral-8x7b-32768",
+            "gemma-7b-it"
+          ]
+        },
+        "temperature": {
+          "type": "number",
+          "description": "The temperature parameter of the model, lower values are more deterministic, higher are more random.",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 1
+        },
+        "max_tokens": {
+          "type": "number",
+          "description": "The maximum number of tokens to generate",
+          "default": 2048,
+          "minimum": 1,
+          "maximum": 128000
+        },
+        "top_p": {
+          "type": "number",
+          "description": "The top P value to use.  Higher values are more deterministic, lower values are more chaotic.",
+          "default": 1,
+          "minimum": 0,
+          "maximum": 1
+        }
+      },
+      "required": [
+        "model"
+      ],
+      "title": "ai-worker Variables"
+    },
+    "human_worker_variables": {
+      "type": "object",
+      "properties": {
+        "user_id": {
+          "type": "string",
+          "description": "The user id of the worker"
+        }
+      },
+      "required": [
+        "user_id"
+      ],
+      "title": "human-worker Variables"
+    },
+    "credential": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/channel_credential"
+        },
+        {
+          "$ref": "#/$defs/channel_user_credential_credential"
+        },
+        {
+          "$ref": "#/$defs/documentation_credential"
+        },
+        {
+          "$ref": "#/$defs/document_repository_credential"
+        },
+        {
+          "$ref": "#/$defs/resource_credential"
+        },
+        {
+          "$ref": "#/$defs/task_credential"
+        },
+        {
+          "$ref": "#/$defs/tool_credential"
+        },
+        {
+          "$ref": "#/$defs/tracker_credential"
+        },
+        {
+          "$ref": "#/$defs/worker_credential"
+        }
+      ]
+    },
+    "object": {
+      "type": "object",
+      "title": "Object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The unique identifier for the object",
+          "readOnly": true
+        },
+        "orgId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The unique identifier for the organization the object belongs to.",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "credential": {
+          "type": "string",
+          "description": "The name of the credential to use for this object."
+        }
+      },
+      "required": [
+        "name",
+        "description"
+      ]
+    },
+    "credential_object": {
+      "type": "object",
+      "title": "Credential",
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The unique identifier for the object",
+          "readOnly": true
+        },
+        "orgId": {
+          "type": "string",
+          "format": "uuid",
+          "description": "The unique identifier for the organization the object belongs to.",
+          "readOnly": true
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "description",
+        "variables"
+      ]
+    },
+    "tool_reference": {
+      "type": "object",
+      "title": "Tool Reference",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "output": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    },
+    "subtask": {
+      "type": "object",
+      "title": "Subtask",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "async": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "name"
+      ]
+    }
+  }
+}

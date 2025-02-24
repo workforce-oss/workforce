@@ -403,7 +403,132 @@
           "status",
           "message"
         ]
-      } 
+      },
+      "WorkforceImageBase": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "url",
+              "base64"
+            ]
+          },
+          "data": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "data"
+        ]
+      },
+      "WorkforceUrlImage": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/WorkforceImageBase"
+          }
+        ]
+      },
+      "WorkforceBase64Image": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/WorkforceImageBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "mediaType": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "mediaType"
+            ]
+          }
+        ]
+      },
+      "WorkforceImage": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/WorkforceUrlImage"
+          },
+          {
+            "$ref": "#/components/schemas/WorkforceBase64Image"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "url": "#/components/schemas/WorkforceUrlImage",
+            "base64": "#/components/schemas/WorkforceBase64Image"
+          }
+        }
+      },
+      "WorkforceFileBase": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "url",
+              "base64"
+            ]
+          },
+          "data": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "data"
+        ]
+      },
+      "WorkforceUrlFile": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/WorkforceFileBase"
+          }
+        ]
+      },
+      "WorkforceBase64File": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/WorkforceFileBase"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "mediaType": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "mediaType"
+            ]
+          }
+        ]
+      },
+      "WorkforceFile": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/WorkforceUrlFile"
+          },
+          {
+            "$ref": "#/components/schemas/WorkforceBase64File"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "url": "#/components/schemas/WorkforceUrlFile",
+            "base64": "#/components/schemas/WorkforceBase64File"
+          }
+        }
+      }
     },
     "responses": {
       "APIResponse": {

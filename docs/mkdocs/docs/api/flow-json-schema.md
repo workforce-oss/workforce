@@ -1,0 +1,260 @@
+# Flow
+
+## Properties
+
+- **`id`** *(string, format: uuid)*: The unique identifier for the object.
+- **`orgId`** *(string, format: uuid)*: The unique identifier for the organization the object belongs to.
+- **`name`** *(string, required)*
+- **`description`** *(string, required)*
+- **`status`** *(string, required)*: Must be one of: `["active", "inactive"]`.
+- **`channels`** *(array)*
+  - **Items**: Refer to *[#/$defs/channel](#%24defs/channel)*.
+- **`documentation`** *(array)*
+  - **Items**: Refer to *[#/$defs/documentation](#%24defs/documentation)*.
+- **`resources`** *(array)*
+  - **Items**: Refer to *[#/$defs/resource](#%24defs/resource)*.
+- **`tasks`** *(array)*
+  - **Items**: Refer to *[#/$defs/task](#%24defs/task)*.
+- **`tools`** *(array)*
+  - **Items**: Refer to *[#/$defs/tool](#%24defs/tool)*.
+- **`trackers`** *(array)*
+  - **Items**: Refer to *[#/$defs/tracker](#%24defs/tracker)*.
+## Definitions
+
+- <a id="%24defs/channel"></a>**`channel`**
+  - **All of**
+    - : Refer to *[#/$defs/object](#%24defs/object)*.
+    - *object*
+      - **`type`** *(string, required)*: Must be one of: `["slack-channel", "native-channel", "discord-channel"]`.
+      - **`variables`**
+        - **One of**
+          - : Refer to *[#/$defs/slack_channel_variables](#%24defs/slack_channel_variables)*.
+          - : Refer to *[#/$defs/native_channel_variables](#%24defs/native_channel_variables)*.
+          - : Refer to *[#/$defs/discord_channel_variables](#%24defs/discord_channel_variables)*.
+- <a id="%24defs/documentation"></a>**`documentation`**
+  - **All of**
+    - : Refer to *[#/$defs/object](#%24defs/object)*.
+    - *object*
+      - **`type`** *(string, required)*: Must be one of: `["default-documentation"]`.
+      - **`repository`** *(string, required)*: The name of the document repository to use.
+      - **`documents`** *(array)*: The list of documents from the repository to use. Null or Empty means all.
+        - **Items** *(string)*
+      - **`variables`**
+        - **One of**
+          - : Refer to *[#/$defs/default_documentation_variables](#%24defs/default_documentation_variables)*.
+- <a id="%24defs/resource"></a>**`resource`**
+  - **All of**
+    - : Refer to *[#/$defs/object](#%24defs/object)*.
+    - *object*
+      - **`type`** *(string, required)*: Must be one of: `["api-resource", "github-repo-resource", "raw-text-resource", "github-pull-request-resource"]`.
+      - **`example`** *(string)*: An example value of an output for the resource.
+      - **`variables`**
+        - **One of**
+          - : Refer to *[#/$defs/api_resource_variables](#%24defs/api_resource_variables)*.
+          - : Refer to *[#/$defs/github_repo_resource_variables](#%24defs/github_repo_resource_variables)*.
+          - : Refer to *[#/$defs/raw_text_resource_variables](#%24defs/raw_text_resource_variables)*.
+          - : Refer to *[#/$defs/github_pull_request_resource_variables](#%24defs/github_pull_request_resource_variables)*.
+- <a id="%24defs/task"></a>**`task`**
+  - **All of**
+    - : Refer to *[#/$defs/object](#%24defs/object)*.
+    - *object*
+      - **`type`** *(string, required)*: Must be one of: `["simple-task", "structured-task"]`.
+      - **`requiredSkills`** *(array, required)*: The list of skills needed for this task.
+        - **Items** *(string)*
+      - **`defaultChannel`** *(string, required)*: The default channel to use for communication.
+      - **`tracker`** *(string, required)*: The Name of the tracker to use for execution.
+      - **`documentation`** *(array, required)*: The list of documentation names to use.
+        - **Items** *(string)*
+      - **`tools`** *(array, required)*: The list of tools needed for this task.
+        - **Items**: Refer to *[#/$defs/tool_reference](#%24defs/tool_reference)*.
+      - **`triggers`** *(array, required)*: The list of channels or resources to trigger the task.
+        - **Items** *(string)*
+      - **`inputs`** *(object, required)*: The map of inputs for this task. Keys can be used in task templates using handlebars syntax. I.E., and input of message may map to a channel name, and then in the task template, you can use {{message}}. Can contain additional properties.
+        - **Additional properties**
+          - **One of**
+            - *string*
+            - *array*
+              - **Items** *(string)*
+      - **`outputs`** *(array, required)*: The list of outputs for this task.
+        - **Items** *(string)*
+      - **`subtasks`** *(array, required)*: The list of subtasks for this task.
+        - **Items**: Refer to *[#/$defs/subtask](#%24defs/subtask)*.
+      - **`costLimit`** *(number, required)*: The cost limit for each execution of this task.
+      - **`variables`**
+        - **One of**
+          - : Refer to *[#/$defs/simple_task_variables](#%24defs/simple_task_variables)*.
+          - : Refer to *[#/$defs/structured_task_variables](#%24defs/structured_task_variables)*.
+- <a id="%24defs/tool"></a>**`tool`**
+  - **All of**
+    - : Refer to *[#/$defs/object](#%24defs/object)*.
+    - *object*
+      - **`type`** *(string, required)*: Must be one of: `["web-service-tool", "template-tool", "openapi-tool", "openapi-channel-tool", "excalidraw-tool", "google-drive-tool", "google-slides-tool", "coding-tool", "trello-ticket-tool", "github-board-ticket-tool", "message-channel-tool"]`.
+      - **`channel`** *(string, required)*: The channel for the tool to use for dynamic user interaction.
+      - **`variables`**
+        - **One of**
+          - : Refer to *[#/$defs/web_service_tool_variables](#%24defs/web_service_tool_variables)*.
+          - : Refer to *[#/$defs/template_tool_variables](#%24defs/template_tool_variables)*.
+          - : Refer to *[#/$defs/openapi_tool_variables](#%24defs/openapi_tool_variables)*.
+          - : Refer to *[#/$defs/openapi_channel_tool_variables](#%24defs/openapi_channel_tool_variables)*.
+          - : Refer to *[#/$defs/excalidraw_tool_variables](#%24defs/excalidraw_tool_variables)*.
+          - : Refer to *[#/$defs/google_drive_tool_variables](#%24defs/google_drive_tool_variables)*.
+          - : Refer to *[#/$defs/google_slides_tool_variables](#%24defs/google_slides_tool_variables)*.
+          - : Refer to *[#/$defs/coding_tool_variables](#%24defs/coding_tool_variables)*.
+          - : Refer to *[#/$defs/trello_ticket_tool_variables](#%24defs/trello_ticket_tool_variables)*.
+          - : Refer to *[#/$defs/github_board_ticket_tool_variables](#%24defs/github_board_ticket_tool_variables)*.
+          - : Refer to *[#/$defs/message_channel_tool_variables](#%24defs/message_channel_tool_variables)*.
+- <a id="%24defs/tracker"></a>**`tracker`**
+  - **All of**
+    - : Refer to *[#/$defs/object](#%24defs/object)*.
+    - *object*
+      - **`type`** *(string, required)*: Must be one of: `["github-board-tracker", "trello-tracker"]`.
+      - **`webhooksEnabled`** *(boolean, required)*: Whether or not webhooks are enabled for this tracker.
+      - **`pollingInterval`** *(number, required)*: The interval in seconds to poll for updates if webhooks are not enabled.
+      - **`variables`**
+        - **One of**
+          - : Refer to *[#/$defs/github_board_tracker_variables](#%24defs/github_board_tracker_variables)*.
+          - : Refer to *[#/$defs/trello_tracker_variables](#%24defs/trello_tracker_variables)*.
+- <a id="%24defs/discord_channel_variables"></a>**`discord_channel_variables`** *(object)*
+  - **`channel_id`** *(string, required)*: The Discord channel to send messages to.
+- <a id="%24defs/native_channel_variables"></a>**`native_channel_variables`** *(object)*
+  - **`channel_name`** *(string, required)*: A unique name for the channel.
+  - **`anonymous_access`** *(boolean)*: Allow anonymous access to the channel.
+  - **`voice_enabled`** *(boolean)*: Enable voice input for the channel.
+  - **`oauth2_issuer_uri`** *(string)*: Tokens from this issuer will be accepted.
+  - **`oauth2_audience`** *(string)*: The audience for the token.
+  - **`oauth2_claims`** *(string)*: A JSON object containing the claims to be verified.
+- <a id="%24defs/slack_channel_variables"></a>**`slack_channel_variables`** *(object)*
+  - **`channel_id`** *(string, required)*: The Slack channel to send messages to.
+- <a id="%24defs/worker_discord_token_variables"></a>**`worker_discord_token_variables`** *(object)*
+  - **`token`** *(string, required)*: channel token.
+- <a id="%24defs/worker_native_token_variables"></a>**`worker_native_token_variables`** *(object)*
+  - **`token`** *(string, required)*: channel token.
+- <a id="%24defs/worker_slack_token_variables"></a>**`worker_slack_token_variables`** *(object)*
+  - **`token`** *(string, required)*: channel token.
+- <a id="%24defs/default_documentation_variables"></a>**`default_documentation_variables`** *(object)*
+  - **`desiredTokens`** *(number)*: The desired number of tokens to generate. Default: `512`.
+  - **`maxTokens`** *(number)*: The maximum number of tokens to generate. Default: `1024`.
+  - **`retrievalScope`** *(string)*: The scope of the retrieval. Must be one of: `["repository", "document", "section", "chunk"]`. Default: `"section"`.
+  - **`tokenFillStrategy`** *(string)*: The strategy for filling tokens. Must be one of: `["default", "chunk_first", "fill_section", "fill_document"]`. Default: `"default"`.
+- <a id="%24defs/git_document_repository_variables"></a>**`git_document_repository_variables`** *(object)*
+  - **`model`** *(array, required)*: The name of the model to use for embedding. Must be one of: `["text-embedding-3-small", "text-embedding-3-large", "text-embedding-ada-002"]`. Default: `"text-embedding-3-small"`.
+  - **`repo`** *(string, required)*: The name(slug) of the Github repository to use.
+  - **`file_regex`** *(string, required)*: The regex to use to match the files in the repository.
+  - **`owner`** *(string, required)*: The name(slug) of owner of the Github repository.
+  - **`branch`** *(string)*: The branch name. Default: `"main"`.
+- <a id="%24defs/internal_document_repository_variables"></a>**`internal_document_repository_variables`** *(object)*
+  - **`model`** *(array, required)*: The name of the model to use for embedding. Must be one of: `["text-embedding-3-small", "text-embedding-3-large", "text-embedding-ada-002"]`. Default: `"text-embedding-3-small"`.
+- <a id="%24defs/api_resource_variables"></a>**`api_resource_variables`** *(object)*
+  - **`schema_url`** *(string)*: A URL to a valid OpenAPI schema.
+  - **`raw_schema`** *(string)*: A valid OpenAPI schema.
+  - **`fetch_path`** *(string)*: The path to use for fetching data from the API.
+  - **`fetch_method`** *(string)*: The HTTP method to use for fetching data from the API. Must be one of: `["GET", "POST", "PUT", "PATCH", "DELETE"]`.
+  - **`webhook_path`** *(string)*: The path that defines the webhook endpoint.
+  - **`create_path`** *(string)*: The path to use for creating new objects in the API.
+  - **`create_method`** *(string)*: The HTTP method to use for creating new objects in the API. Must be one of: `["GET", "POST", "PUT", "PATCH", "DELETE"]`.
+- <a id="%24defs/github_pull_request_resource_variables"></a>**`github_pull_request_resource_variables`** *(object)*
+  - **`repo`** *(string, required)*: The name(slug) of the Github repository to use.
+  - **`owner`** *(string, required)*: The name(slug) of owner of the Github repository.
+- <a id="%24defs/github_repo_resource_variables"></a>**`github_repo_resource_variables`** *(object)*
+  - **`repo`** *(string, required)*: The name(slug) of the Github repository to use.
+  - **`owner`** *(string, required)*: The name(slug) of owner of the Github repository.
+  - **`branch`** *(string)*: The branch name. Default: `"main"`.
+  - **`path_template`** *(string)*: The path template to use to generate the path to the file. This can also just be the name of a particular or directory. Defaults to {{filename}}. Default: `"{{filename}}"`.
+  - **`org_name`** *(string, required)*: The name of the Github organization to use for webhooks.
+  - **`webhooks_enabled`** *(boolean)*: Whether to enable webhooks for this resource. Default: `false`.
+- <a id="%24defs/raw_text_resource_variables"></a>**`raw_text_resource_variables`** *(object)*
+  - **`text`** *(string, required)*: The text to use as the resource.
+- <a id="%24defs/simple_task_variables"></a>**`simple_task_variables`** *(object)*
+  - **`purpose`** *(string)*: The purpose of the task.
+  - **`prompt_template`** *(string, required)*: The template for the prompt.
+  - **`system_message_template`** *(string)*: Template for a guidance message to steer the model.
+- <a id="%24defs/structured_task_variables"></a>**`structured_task_variables`** *(object)*
+  - **`acceptance_critera`** *(string, required)*: The acceptance criteria for the task.
+  - **`instructions`** *(string, required)*: Instructions explaining to the worker how to complete the task.
+  - **`context`** *(string, required)*: Context that the worker should be aware of when completing the task.
+  - **`definition_of_done`** *(string)*: A set of conditions that must be met for the task to be considered done.
+- <a id="%24defs/coding_tool_variables"></a>**`coding_tool_variables`** *(object)*
+  - **`index_repo_location`** *(string, required)*: A URL to a mono repository without the scheme. Example github.com/my/repo.
+  - **`index_repo_branch`** *(string)*: The branch of the mono repository to use. Default: `"main"`.
+  - **`mode`** *(string, required)*: The mode to run the tool in. Must be one of: `["local", "remote"]`. Default: `"local"`.
+  - **`server_url`** *(string)*: The URL of the local server to run the tool on. Required if mode is local. . Default: `"http://localhost:8084/vscode-extension-server"`.
+  - **`read_only`** *(boolean)*: Whether the tool is read only. Default: `false`.
+- <a id="%24defs/excalidraw_tool_variables"></a>**`excalidraw_tool_variables`** *(object)*
+- <a id="%24defs/github_board_ticket_tool_variables"></a>**`github_board_ticket_tool_variables`** *(object)*
+  - **`purpose`** *(string, required)*: The purpose of the tool.
+  - **`org_name`** *(string, required)*: The name of the Github Organization.
+  - **`project_name`** *(string, required)*: The name of the Github Project.
+  - **`column_name`** *(string, required)*: The name of the column where tickets should be placed.
+- <a id="%24defs/google_drive_tool_variables"></a>**`google_drive_tool_variables`** *(object)*
+- <a id="%24defs/google_slides_tool_variables"></a>**`google_slides_tool_variables`** *(object)*
+- <a id="%24defs/message_channel_tool_variables"></a>**`message_channel_tool_variables`** *(object)*
+- <a id="%24defs/openapi_channel_tool_variables"></a>**`openapi_channel_tool_variables`** *(object)*
+  - **`schema_url`** *(string)*: A URL to a valid OpenAPI schema.
+  - **`raw_schema`** *(string)*: A valid OpenAPI schema.
+- <a id="%24defs/openapi_tool_variables"></a>**`openapi_tool_variables`** *(object)*
+  - **`schema_url`** *(string)*: A URL to a valid OpenAPI schema.
+  - **`raw_schema`** *(string)*: A valid OpenAPI schema.
+- <a id="%24defs/template_tool_variables"></a>**`template_tool_variables`** *(object)*
+  - **`template_location`** *(string, required)*: The location of the template.
+  - **`template_schema_location`** *(string, required)*: The location of the template schema.
+- <a id="%24defs/trello_ticket_tool_variables"></a>**`trello_ticket_tool_variables`** *(object)*
+  - **`purpose`** *(string, required)*: The purpose of the tool.
+  - **`board_name`** *(string, required)*: The name of the Trello Board.
+  - **`column_name`** *(string, required)*: The name of the column to create the ticket in.
+  - **`label`** *(string, required)*: The name of the label to apply to the ticket.
+- <a id="%24defs/web_service_tool_variables"></a>**`web_service_tool_variables`** *(object)*
+  - **`url`** *(string, required)*: The URL of the web service.
+  - **`method`** *(string)*: The HTTP method to use. Defaults to GET. Default: `"GET"`.
+  - **`schema_url`** *(string, required)*: A URL to a json schema with the request body schema.  Required if method is POST or PUT.
+  - **`visualizer_url`** *(string)*: A URL to a visualizer.
+  - **`action_caption_webhook_base_url`** *(string)*: The base URL to use for action caption webhooks.
+  - **`username`** *(string)*: The username to use for basic authentication.
+- <a id="%24defs/github_board_tracker_variables"></a>**`github_board_tracker_variables`** *(object)*
+  - **`org_name`** *(string, required)*: The name of the Github Organization.
+  - **`project_name`** *(string, required)*: The name of the Github Project.
+  - **`to_do_column`** *(string)*: The name of the column where tickets should be pulled from or placed in. Default: `"Todo"`.
+  - **`in_progress_column`** *(string)*: The name of the column for tickets that are currently being worked. Default: `"In Progress"`.
+  - **`done_column`** *(string)*: The column where tickets are put when they are done. Default: `"Done"`.
+- <a id="%24defs/trello_tracker_variables"></a>**`trello_tracker_variables`** *(object)*
+  - **`board_name`** *(string, required)*: The name of the Trello Board.
+  - **`to_do_column`** *(string, required)*: The name of the column where tickets should be pulled from or placed in. Default: `"To Do"`.
+  - **`in_progress_column`** *(string, required)*: The name of the column for tickets that are currently being worked. Default: `"Doing"`.
+  - **`done_column`** *(string, required)*: The column where tickets are put when they are done. Default: `"Done"`.
+  - **`label`** *(string, required)*: The name of the label to watch.
+- <a id="%24defs/ai_worker_variables"></a>**`ai_worker_variables`** *(object)*
+  - **`model`** *(string, required)*: The name of the model to use for inference. Must be one of: `["gpt-3.5-turbo", "gpt-3.5-turbo-instruct", "gpt-3.5-turbo-16k", "gpt-4", "gpt-4-32k", "gpt-4-0125-preview", "gpt-4o", "claude-3-5-sonnet-20240620", "claude-3-opus-20240229", "claude-3-haiku-20240307", "llama3-8b-8192", "llama3-70b-8192", "llama2-70b-4096", "mixtral-8x7b-32768", "gemma-7b-it"]`. Default: `"gpt-3.5-turbo"`.
+  - **`temperature`** *(number)*: The temperature parameter of the model, lower values are more deterministic, higher are more random. Minimum: `0`. Maximum: `1`. Default: `0`.
+  - **`max_tokens`** *(number)*: The maximum number of tokens to generate. Minimum: `1`. Maximum: `128000`. Default: `2048`.
+  - **`top_p`** *(number)*: The top P value to use.  Higher values are more deterministic, lower values are more chaotic. Minimum: `0`. Maximum: `1`. Default: `1`.
+- <a id="%24defs/human_worker_variables"></a>**`human_worker_variables`** *(object)*
+  - **`user_id`** *(string, required)*: The user id of the worker.
+- <a id="%24defs/credential"></a>**`credential`**
+  - **One of**
+    - : Refer to *[#/$defs/channel_credential](#%24defs/channel_credential)*.
+    - : Refer to *[#/$defs/channel_user_credential_credential](#%24defs/channel_user_credential_credential)*.
+    - : Refer to *[#/$defs/documentation_credential](#%24defs/documentation_credential)*.
+    - : Refer to *[#/$defs/document_repository_credential](#%24defs/document_repository_credential)*.
+    - : Refer to *[#/$defs/resource_credential](#%24defs/resource_credential)*.
+    - : Refer to *[#/$defs/task_credential](#%24defs/task_credential)*.
+    - : Refer to *[#/$defs/tool_credential](#%24defs/tool_credential)*.
+    - : Refer to *[#/$defs/tracker_credential](#%24defs/tracker_credential)*.
+    - : Refer to *[#/$defs/worker_credential](#%24defs/worker_credential)*.
+- <a id="%24defs/object"></a>**`object`** *(object)*
+  - **`id`** *(string, format: uuid)*: The unique identifier for the object.
+  - **`orgId`** *(string, format: uuid)*: The unique identifier for the organization the object belongs to.
+  - **`name`** *(string, required)*
+  - **`description`** *(string, required)*
+  - **`credential`** *(string)*: The name of the credential to use for this object.
+- <a id="%24defs/credential_object"></a>**`credential_object`** *(object)*
+  - **`id`** *(string, format: uuid)*: The unique identifier for the object.
+  - **`orgId`** *(string, format: uuid)*: The unique identifier for the organization the object belongs to.
+  - **`name`** *(string, required)*
+  - **`description`** *(string, required)*
+- <a id="%24defs/tool_reference"></a>**`tool_reference`** *(object)*
+  - **`name`** *(string, required)*
+  - **`id`** *(string, format: uuid)*
+  - **`output`** *(string)*
+- <a id="%24defs/subtask"></a>**`subtask`** *(object)*
+  - **`name`** *(string, required)*
+  - **`id`** *(string, format: uuid)*
+  - **`async`** *(boolean)*

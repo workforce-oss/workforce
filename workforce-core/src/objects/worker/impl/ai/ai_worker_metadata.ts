@@ -1,7 +1,7 @@
 import { VariablesSchema } from "../../../base/variables_schema.js";
 import { VariableSchemaElement } from "../../../base/variables_schema_model.js";
 import { WorkerConfig } from "../../model.js";
-import { anthropicModels, groqModels, openAIModels } from "./ai_models.js";
+import { anthropicModels, googleModels, groqModels, openAIModels, openAIRealtimeModels } from "./ai_models.js";
 
 export class AIWorkerMetadata {
 	
@@ -15,7 +15,9 @@ export class AIWorkerMetadata {
 			variables: {},
 		};
 		for (const [key, value] of this.variablesSchema()) {
-			config.variables![key] = value.default;
+			if (value.default) {
+				config.variables![key] = value.default;
+			}
 		}
 		return config;
 	}
@@ -31,22 +33,12 @@ export class AIWorkerMetadata {
 			default: "gpt-3.5-turbo",
 			options: [
 				...openAIModels,
+				...openAIRealtimeModels,
 				...anthropicModels,
-				...groqModels
+				...groqModels,
+				...googleModels
 			],
 		});
-		// schema.set("explain_functions", {
-		// 	type: "boolean",
-		// 	description: "Whether or not the model should explain when it calls functions",
-		// 	required: false,
-		// 	default: false,
-		// });
-		// schema.set("critic_enabled", {
-		// 	type: "boolean",
-		// 	description: "Whether or not to use the critic",
-		// 	required: false,
-		// 	default: false,
-		// });
 		schema.set("api_token", {
 			type: "string",
 			description: "The API token",

@@ -30,7 +30,7 @@ export const WorkerChatSessionComponent = (props: { chatSession: ChatSession }) 
             </AccordionSummary>
             <AccordionDetails key="item0">
                 <div style={{ marginTop: 10 }}>
-                    {chatSession.messages.filter(message => message.text || message.toolCalls).map((message) => {
+                    {chatSession.messages?.filter(message => message.text || message.toolCalls)?.map((message) => {
                         return <WorkerChatMessageComponent message={message} key={message.id} />;
                     })}
                 </div>

@@ -22,7 +22,7 @@ RUN yarn workspace server install && yarn workspace server run package
 
 COPY workforce-vscode/ workforce-vscode/
 RUN npm -w workforce-vscode pkg set 'contributes.configuration.properties[workforce-vscode.chatEnabled].default'=false \
-    && npm -w workforce-vscode pkg set 'contributes.configuration.properties[workforce-vscode.socketUrl].default'='http://localhost:8085/vscode-extension-server/socket' \
+    && npm -w workforce-vscode pkg set 'contributes.configuration.properties[workforce-vscode.socketUrl].default'='http://localhost:8084/vscode-extension-server/socket' \
     && npm -w workforce-vscode pkg set 'contributes.configuration.properties[workforce-vscode.authEnabled].default'=false 
 RUN yarn workspace workforce-vscode install && yarn workspace workforce-vscode run extension
 
@@ -85,10 +85,17 @@ RUN apt-get install -y openjdk-17-jdk
 RUN apt-get install -y maven
 
 # oauth2-proxy
-RUN wget https://github.com/oauth2-proxy/oauth2-proxy/releases/download/v7.6.0/oauth2-proxy-v7.6.0.linux-amd64.tar.gz \
-    && tar -xvf oauth2-proxy-v7.6.0.linux-amd64.tar.gz \
-    && mv oauth2-proxy-v7.6.0.linux-amd64/oauth2-proxy /usr/local/bin/oauth2-proxy \
-    && rm -rf oauth2-proxy-v7.6.0.linux-amd64.tar.gz oauth2-proxy-v7.6.0.linux-amd64
+RUN wget https://github.com/oauth2-proxy/oauth2-proxy/releases/download/v7.6.0/oauth2-proxy-v7.6.0.linux-$arch.tar.gz \
+    && tar -xvf oauth2-proxy-v7.6.0.linux-$arch.tar.gz \
+    && mv oauth2-proxy-v7.6.0.linux-$arch/oauth2-proxy /usr/local/bin/oauth2-proxy \
+    && rm -rf oauth2-proxy-v7.6.0.linux-$arch.tar.gz oauth2-proxy-v7.6.0.linux-$arch
+
+# minio client
+RUN curl https://dl.min.io/client/mc/release/linux-$arch/mc \
+  --create-dirs \
+  -o $HOME/minio-binaries/mc
+
+RUN chmod +x $HOME/minio-binaries/mc
 
 # install base extensions
 USER openvscode-server
@@ -130,6 +137,8 @@ COPY --from=builder /app/workforce-vscode/dist/extension.vsix /app/extensions/ex
 
 # Copy the startup script
 COPY vscode-container/startup.sh /startup.sh
+COPY vscode-container/shutdown.sh /shutdown.sh
+
 
 USER openvscode-server
 # Install the extension

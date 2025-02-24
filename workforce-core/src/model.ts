@@ -10,6 +10,7 @@ export {validateFlowSchema} from "./objects/flow/validation.js";
 export type {WorkforceOrg, WorkforceOrgUserRelation, WorkforceUser} from "./identity/model.js";
 
 export { BaseConfig, ToolCall } from "./objects/base/model.js";
+
 export { ChannelConfig, ChannelMessage, MessageRequest, ChannelMessageStatus, ChannelSession, ChannelSessionStatus, ChannelType, channelTypes } from "./objects/channel/model.js";
 export { ChannelUserCredential, ChannelUserCredentialType, channelUserCredentialTypes } from "./objects/channel_user_credential/model.js";
 export { CredentialConfig } from "./objects/credential/model.js";
@@ -26,5 +27,6 @@ export { ToolConfig, ToolRequest, ToolResponse, ToolRequestData, ToolType, toolT
 export { TrackerConfig, TicketCreateRequest, TicketUpdateRequest, TicketData, TicketEvent, TicketRequest, TrackerType, trackerTypes } from "./objects/tracker/model.js";
 export { ChatMessage, ChatSession, ChatRole, WorkerConfig, WorkRequest, WorkResponse, WorkRequestData, Skill, WorkerType, workerTypes } from "./objects/worker/model.js";
 
-
 export { NativeChannelMessage } from "./objects/channel/impl/native/native_channel_model.js";
+
+export type { CustomChannelEvent, CustomChannelMessageEvent, CustomChannelJoinEvent, CustomChannelLeaveEvent, CustomChannelErrorEvent, CustomChannelNewSessionEvent, CustomChannelDestroyEvent } from "./objects/channel/impl/custom/custom_channel_model.js";

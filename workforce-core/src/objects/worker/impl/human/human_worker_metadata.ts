@@ -13,7 +13,9 @@ export class HumanWorkerMetadata {
             variables: {},
         };
         for (const [key, value] of this.variablesSchema()) {
-            config.variables![key] = value.default;
+            if (value.default) {
+                config.variables![key] = value.default;
+            }
         }
         return config;
     }

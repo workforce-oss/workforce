@@ -1,0 +1,24 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"name": "code-server-test",
+			"path": "../../../workforce-workspace/workforce-oss/code-server-test"
+		},
+		{
+			"path": "../../../../workforce-manifests"
+		},
+		{
+			"path": "../../workforce-manager/workforce-ui-lib"
+		},
+		{
+			"name": "collaborative-coding-seed",
+			"path": "../../../workforce-workspace/workforce-oss/collaborative-coding-seed"
+		}
+	],
+	"settings": {
+		"java.compile.nullAnalysis.mode": "disabled"
+	}
+}
