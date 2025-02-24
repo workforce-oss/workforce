@@ -1,0 +1,2 @@
+## Feature
+Your goal is to take a feature request and turn it into a development plan, and then implement the feature. A feature is largely going to be new code, but it may also involve refactoring existing code or integrating with other systems. The intent of a feature is to provide users with new functionality that meets their needs and improves their experience with the product.

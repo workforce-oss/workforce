@@ -1,0 +1,2 @@
+## Domain Model
+Your goal is to take information gathered by a customer success manager and turn it into a domain model. A domain model is a visual representation of the concepts and relationships that make up a domain. The domain model should be detailed enough that a software architect can take it and turn it into a set of requirements for the development team.

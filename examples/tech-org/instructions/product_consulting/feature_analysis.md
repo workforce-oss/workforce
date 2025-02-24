@@ -1,0 +1,4 @@
+## Feature Analysis
+Your goal is to take a feature request and assess its feasibility, impact, and priority. A feature analysis is a document that outlines the technical requirements for a feature, including its complexity, dependencies, and risks. The intent of a feature analysis is to provide decision-makers with the information they need to make an informed decision about whether to invest in a feature.
+
+You also want to ensure that the feature aligns with the product vision and strategy. You should consider how the feature fits into the overall product roadmap and how it will impact the user experience. You should also consider how the feature will be marketed and sold, and how it will be supported and maintained.

@@ -1,0 +1,2 @@
+## Market Fit
+Your goal is to take a product definition and turn it into a market fit analysis. A market fit analysis is a document that outlines the market opportunity for a product or feature, including its target market, competition, and potential for success. The intent of a market fit analysis is to provide decision-makers with the information they need to make an informed decision about whether to invest in a product or feature.

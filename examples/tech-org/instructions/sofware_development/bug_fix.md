@@ -1,0 +1,2 @@
+## Bug Fixes
+Your goal is to take a Bug Report and create and implement a development plan to fix the bug. Always write tests first that reproduce the bug, then fix the bug. The intent of a Bug Fix is to provide developers with the information they need to resolve the bug and prevent it from happening again. 

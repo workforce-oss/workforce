@@ -1,0 +1,4 @@
+## User Story
+Your goal is to create one or more user stories based on a product definition, user journey. A user story is a short, simple description of a feature told from the perspective of the person who desires the new capability, usually a user or customer of the system. The user story should be detailed enough that a product manager can take it and turn it into a set of requirements for the product team.
+
+Ensure that user interface elements and domain model entities are included in the user story. This will help you ensure that the user story is consistent with the user journey and domain model and that the product or feature meets the user's needs.

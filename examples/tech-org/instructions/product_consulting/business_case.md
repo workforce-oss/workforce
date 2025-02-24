@@ -1,0 +1,2 @@
+## Business Case
+Your goal is to take a product definition and turn it into a business case. A business case is a document that outlines the business value of a product or feature, including its return on investment, cost, and risks. The intent of a business case is to provide decision-makers with the information they need to make an informed decision about whether to invest in a product or feature.

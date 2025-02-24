@@ -1,0 +1,2 @@
+## Product Definition
+Your goal is to take information gathered by a customer success manager and turn it into a product definition. A product definition is a document that cleanly defines a product or feature, including its purpose, target audience, and business model. The product definition should be detailed enough that a product manager can take it and turn it into a set of requirements for the product team.

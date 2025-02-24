@@ -1,0 +1,166 @@
+flows:
+- name: Customer Success
+  description: Chat with the customer to understand their needs
+  status: inactive
+
+  channels:
+  - name: Native Channel
+    description: Native Channel
+    type: native-channel
+    variables:
+      channel_name: {{CUSTOMER_SUCCESS_NATIVE_CHANNEL_NAME}}
+      anonymous_access: {{CUSTOMER_SUCCESS_NATIVE_CHANNEL_ANONYMOUS}}
+      oauth2_issuer_uri: {{CUSTOMER_SUCCESS_NATIVE_CHANNEL_OAUTH2_ISSUER_URI}}
+      oauth2_audience: {{CUSTOMER_SUCCESS_NATIVE_CHANNEL_OAUTH2_AUDIENCE}}
+
+  resources:
+  - name: Role
+    description: A Github resource.
+    type: github-repo-resource
+    credential: github-coding-tool
+    variables:
+      branch: {{CUSTOMER_SUCCESS_INSTRUCTION_BRANCH}}
+      path_template: {{CUSTOMER_SUCCESS_INSTRUCTION_ROLE_PATH}}
+      repo: {{CUSTOMER_SUCCESS_INSTRUCTION_REPO}}
+      owner: {{CUSTOMER_SUCCESS_INSTRUCTION_OWNER}}
+      org_name: {{CUSTOMER_SUCCESS_INSTRUCTION_ORG_NAME}}
+  - name: Chat Instructions
+    description: A Github resource.
+    type: github-repo-resource
+    variables:
+      branch: {{CUSTOMER_SUCCESS_INSTRUCTION_BRANCH}}
+      path_template: {{CUSTOMER_SUCCESS_INSTRUCTION_CHAT_PATH}}
+      repo: {{CUSTOMER_SUCCESS_INSTRUCTION_REPO}}
+      owner: {{CUSTOMER_SUCCESS_INSTRUCTION_OWNER}}
+      org_name: {{CUSTOMER_SUCCESS_INSTRUCTION_ORG_NAME}}
+  - name: Feature Instructions
+    description: A Github resource.
+    type: github-repo-resource
+    variables:
+      branch: {{CUSTOMER_SUCCESS_INSTRUCTION_BRANCH}}
+      path_template: {{CUSTOMER_SUCCESS_INSTRUCTION_FEATURE_PATH}}
+      repo: {{CUSTOMER_SUCCESS_INSTRUCTION_REPO}}
+      owner: {{CUSTOMER_SUCCESS_INSTRUCTION_OWNER}}
+      org_name: {{CUSTOMER_SUCCESS_INSTRUCTION_ORG_NAME}}
+  - name: Product Idea Instructions
+    description: A Github resource.
+    type: github-repo-resource
+    variables:
+      branch: {{CUSTOMER_SUCCESS_INSTRUCTION_BRANCH}}
+      path_template: {{CUSTOMER_SUCCESS_INSTRUCTION_PRODUCT_IDEA_PATH}}
+      repo: {{CUSTOMER_SUCCESS_INSTRUCTION_REPO}}
+      owner: {{CUSTOMER_SUCCESS_INSTRUCTION_OWNER}}
+      org_name: {{CUSTOMER_SUCCESS_INSTRUCTION_ORG_NAME}}
+  - name: Bug Instructions
+    description: A Github resource.
+    type: github-repo-resource
+    variables:
+      branch: {{CUSTOMER_SUCCESS_INSTRUCTION_BRANCH}}
+      path_template: {{CUSTOMER_SUCCESS_INSTRUCTION_BUG_REPORT_PATH}}
+      repo: {{CUSTOMER_SUCCESS_INSTRUCTION_REPO}}
+      owner: {{CUSTOMER_SUCCESS_INSTRUCTION_OWNER}}
+      org_name: {{CUSTOMER_SUCCESS_INSTRUCTION_ORG_NAME}}
+  
+  trackers:
+  - name: Feature Requests
+    description: A Github Board Tracker.
+    type: github-board-tracker
+    variables:
+      to_do_column: New Feature
+      in_progress_column: In Progress
+      done_column: Done
+      org_name: {{GITHUB_TRACKER_ORG_NAME}}
+      project_name: {{GITHUB_FEATURE_PROJECT_NAME}}
+  - name: Product Ideas
+    description: A Github Board Tracker.
+    type: github-board-tracker
+    variables:
+      to_do_column: New Idea
+      in_progress_column: In Progress
+      done_column: Done
+      org_name: {{GITHUB_TRACKER_ORG_NAME}}
+      project_name: {{GITHUB_PRODUCT_IDEA_PROJECT_NAME}}
+  - name: Bug Reports
+    description: A Github Board Tracker.
+    type: github-board-tracker
+    variables:
+      to_do_column: New Bug
+      in_progress_column: In Progress
+      done_column: Done
+      org_name: {{GITHUB_TRACKER_ORG_NAME}}
+      project_name: {{GITHUB_BUG_PROJECT_NAME}}
+    
+  tasks:
+  - name: Chat
+    description: Extract Requirements
+    type: simple-task
+    purpose: Extract requirements from the customer.
+    requiredSkills:
+      - conversation
+    inputs:
+      message: Native Channel
+      role: Role
+      chat_instructions: Chat Instructions
+    triggers:
+      - Native Channel
+    subtasks:
+      - Bug Report
+      - Feature Request
+      - Product Idea
+    variables:
+      system_message_template: |-
+        {{role}}
+        {{chat_instructions}}
+      prompt_template: |-
+        {{message}}
+  - name: Feature Request
+    description: Create a feature request
+    type: simple-task
+    requiredSkills:
+      - conversation
+    purpose: Create a feature request from the extracted requirements.
+    inputs:
+      role: Role
+      instructions: Feature Instructions
+      message: Chat
+    system_message_template: |-
+      {{role}}
+      {{instructions}}
+    prompt_template: |-
+      {{message}}
+    outputs:
+      - Feature Requests
+  - name: Product Idea
+    description: Create a product idea
+    type: simple-task
+    requiredSkills:
+      - conversation
+    purpose: Create a product idea from the extracted requirements.
+    inputs:
+      role: Role
+      instructions: Product Idea Instructions
+      message: Chat
+    system_message_template: |-
+      {{role}}
+      {{instructions}}
+    prompt_template: |-
+      {{message}}
+    outputs:
+      - Product Ideas
+  - name: Bug Report
+    description: Create a bug report
+    type: simple-task
+    requiredSkills:
+      - conversation
+    purpose: Create a bug report from the extracted requirements.
+    inputs:
+      role: Role
+      instructions: Bug Instructions
+      message: Chat
+    system_message_template: |-
+      {{role}}
+      {{instructions}}
+    prompt_template: |-
+      {{message}}
+    outputs:
+      - Bug Reports
