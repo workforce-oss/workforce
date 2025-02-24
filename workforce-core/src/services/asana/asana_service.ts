@@ -11,39 +11,63 @@ export class AsanaService {
         })
         this.workspace = workspace;
     }
-    async addTicket(ticket: TicketCreateRequest, projectId: string, statusKey: string, status: string): Promise<void> {
+    async addTicket(ticket: TicketCreateRequest, projectId?: string, status?: string): Promise<void> {
+        if (!projectId) {
+            throw new Error("Project ID not set")
+        }
+        if (!status) {
+            throw new Error("Status not set")
+        }
+        const sectionGid = await this.getSectionGid(projectId, status)
         await this.client.tasks.create({
             workspace: this.workspace,
             name: ticket.input.name,
             projects: [projectId],
             notes: ticket.input.description,
-            custom_fields: {
-                [statusKey]: status
-            }
+            memberships: [{
+                project: projectId,
+                section: sectionGid
+            }],
         })
     }
 
-    async updateTicket(ticket: TicketUpdateRequest, statusKey: string, status: string): Promise<void> {
-        await this.client.tasks.update(ticket.ticketId, {
-            custom_fields: {
-                [statusKey]: status,
-            }
+    async getSectionGid(projectId: string, sectionName: string): Promise<string> {
+        const sections = await this.client.sections.findByProject(projectId, {
+            opt_fields: "name"
+        })
+        const section = sections.find(s => s.name === sectionName)
+        if (!section) {
+            throw new Error(`Section ${sectionName} not found in project ${projectId}`)
+        }
+        return section.gid
+    }
+
+    async updateTicket(ticket: TicketUpdateRequest, projectId?: string, status?: string): Promise<void> {
+        if (!projectId) {
+            throw new Error("Project ID not set")
+        }
+        if (!status) {
+            throw new Error("Status not set")
+        }
+        
+        const sectionGid = await this.getSectionGid(projectId, status)
+        await this.client.sections.addTask(sectionGid, {
+            task: ticket.ticketId,
         })
     }
 
-    async getNewTickets(projectId: string, statusKey: string, statusMapFunc: (status?: string | null) => TicketStatus, lastFetched?: Date): Promise<Ticket[]> {
+    async getNewTickets(projectId: string | undefined, statusMapFunc: (status?: string | null) => TicketStatus, lastFetched?: Date): Promise<Ticket[]> {
+        if (!projectId) {
+            throw new Error("Project ID not set")
+        }
         const results = await this.client.tasks.findAll({
             project: projectId,
             modified_since: lastFetched?.toISOString()
         })
         return results.data.map(task => {
-            const statusField = task.custom_fields.filter(t => t.name == statusKey);
-            if (statusField.length < 1) {
-                return undefined
-            }
             return {
                 ticketId: task.gid,
-                status: statusMapFunc(statusField[0].display_value),
+                status: statusMapFunc(task.memberships[0].section?.name),
                 data: {
                     name: task.name,
                     description: task.notes,

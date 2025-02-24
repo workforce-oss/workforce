@@ -68,7 +68,8 @@ export type TrackerType = typeof trackerTypes[number];
 export const trackerTypes = [
     "mock-tracker",
     "github-board-tracker",
-    "trello-tracker"
+    "trello-tracker",
+    "asana-tracker",
 ] as const
 
 export interface TrackerConfig extends BaseConfig {

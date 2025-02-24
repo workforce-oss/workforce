@@ -1,4 +1,5 @@
 import { VariablesSchema } from "../../base/variables_schema.js";
+import { AsanaTrackerMetadata } from "../impl/asana/asana_tracker_metadata.js";
 import { GithubBoardTrackerMetadata } from "../impl/github_board/github_board_tracker_metadata.js";
 import { MockTrackerMetadata } from "../impl/mock/mock_tracker_metadata.js";
 import { TrelloTrackerMetadata } from "../impl/trello/trello_tracker_metadata.js";
@@ -13,6 +14,8 @@ export class TrackerConfigFactory {
                 return GithubBoardTrackerMetadata.variablesSchema();
             case "trello-tracker":
                 return TrelloTrackerMetadata.variablesSchema();
+            case "asana-tracker":
+                return AsanaTrackerMetadata.variablesSchema();
             default:
                 throw new Error(`TrackerFactory.variablesSchemaFor() unknown tracker type ${config.type as string}`);
         }
@@ -26,6 +29,8 @@ export class TrackerConfigFactory {
                 return GithubBoardTrackerMetadata.defaultConfig(orgId);
             case "trello-tracker":
                 return TrelloTrackerMetadata.defaultConfig(orgId);
+            case "asana-tracker":
+                return AsanaTrackerMetadata.defaultConfig(orgId);
             default:
                 throw new Error(`TrackerFactory.defaultConfigFor() unknown tracker type ${subtype as string}`);
         }
