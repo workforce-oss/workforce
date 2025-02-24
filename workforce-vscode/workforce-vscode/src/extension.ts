@@ -106,7 +106,7 @@ export function activate(context: vscode.ExtensionContext) {
 					// create a popup asking if the user wants to start the task
 					const messageItems: vscode.MessageItem[] = [{ title: 'Start Task' }, { title: 'Cancel', isCloseAffordance: true }];
 					channel.appendLine('Task execution');
-					vscode.window.showInformationMessage('Do you want to start the task?', {modal: true}, ...messageItems).then((selected) => {
+					vscode.window.showInformationMessage('Do you want to start the task?', { modal: true }, ...messageItems).then((selected) => {
 						channel.appendLine(`Selected: ${selected?.title}`);
 						if (selected?.title === 'Start Task') {
 							const queryParts = uri.query.split('&');
@@ -170,12 +170,22 @@ export function activate(context: vscode.ExtensionContext) {
 		channel.appendLine('Chat disabled');
 	}
 
-	const messageItems: vscode.MessageItem[] = [{ title: 'Continue Task' }, { title: 'Cancel', isCloseAffordance: true }];
-	vscode.window.showInformationMessage('Ongoing Workforce task detected, would you like to continue?', {modal: true}, ...messageItems).then((selected) => {
-		channel.appendLine(`Selected: ${selected?.title}`);
-		if (selected?.title === 'Continue Task') {
-			resumeTask(stateProvider, scmProvider, channel);
+	context.subscriptions.push(vscode.commands.registerCommand('workforce.resume', () => {
+		resumeTask(stateProvider, scmProvider, channel);
+	}));
+	stateProvider.getCurrentTask().then((task) => {
+		if (task) {
+			channel.appendLine(`Task found: ${task.taskExecutionId}`);
+			const messageItems: vscode.MessageItem[] = [{ title: 'Continue Task' }, { title: 'Cancel', isCloseAffordance: true }];
+			vscode.window.showInformationMessage('Ongoing Workforce task detected, would you like to continue?', { modal: true }, ...messageItems).then((selected) => {
+				channel.appendLine(`Selected: ${selected?.title}`);
+				if (selected?.title === 'Continue Task') {
+					resumeTask(stateProvider, scmProvider, channel);
+				}
+			});
 		}
+	}).catch((error) => {
+		channel.appendLine(error);
 	});
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
@@ -190,7 +200,7 @@ async function resumeTask(stateProvider: WorkforceStateProvider, scmProvider: Gi
 		}
 		if (task.repoUrl && task.taskExecutionId) {
 			const messageItems: vscode.MessageItem[] = [{ title: 'Continue Task' }, { title: 'Cancel', isCloseAffordance: true }];
-			vscode.window.showInformationMessage('Ongoing Workforce task detected, would you like to continue?', {modal: true}, ...messageItems).then((selected) => {
+			vscode.window.showInformationMessage('Ongoing Workforce task detected, would you like to continue?', { modal: true }, ...messageItems).then((selected) => {
 				channel.appendLine(`Selected: ${selected?.title}`);
 				if (selected?.title === 'Continue Task') {
 					beginTask(task.repoUrl!, scmProvider, channel).then(() => {

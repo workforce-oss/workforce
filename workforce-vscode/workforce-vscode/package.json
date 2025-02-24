@@ -83,6 +83,10 @@
       {
         "command": "workforce.logout",
         "title": "Log out of workforce"
+      },
+      {
+        "command": "workforce.resume",
+        "title": "Resume Workforce Task"
       }
     ]
   },
