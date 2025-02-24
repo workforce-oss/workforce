@@ -1,94 +1,53 @@
+repo_variables: &repo_variables
+  repo: {{INSTRUCTION_REPO}}
+  owner: {{INSTRUCTION_OWNER}}
+  org_name: {{INSTRUCTION_ORG_NAME}}
+  branch: {{INSTRUCTION_BRANCH}}
+
+repo_defaults: &repo_defaults
+  description: A Github resource.
+  type: github-repo-resource
+  credential: github-repo
+
 flows:
 - name: Customer Success
   description: Chat with the customer to understand their needs
   status: inactive
 
   channels:
-  - name: Native Channel
-    description: Native Channel
-    type: native-channel
-    variables:
-      channel_name: {{CUSTOMER_SUCCESS_NATIVE_CHANNEL_NAME}}
-      anonymous_access: {{CUSTOMER_SUCCESS_NATIVE_CHANNEL_ANONYMOUS}}
-      oauth2_issuer_uri: {{CUSTOMER_SUCCESS_NATIVE_CHANNEL_OAUTH2_ISSUER_URI}}
-      oauth2_audience: {{CUSTOMER_SUCCESS_NATIVE_CHANNEL_OAUTH2_AUDIENCE}}
+  - {{!include channels/native_channel.yaml}}
 
   resources:
   - name: Role
-    description: A Github resource.
-    type: github-repo-resource
-    credential: github-coding-tool
+    <<: *repo_defaults
     variables:
-      branch: {{CUSTOMER_SUCCESS_INSTRUCTION_BRANCH}}
       path_template: {{CUSTOMER_SUCCESS_INSTRUCTION_ROLE_PATH}}
-      repo: {{CUSTOMER_SUCCESS_INSTRUCTION_REPO}}
-      owner: {{CUSTOMER_SUCCESS_INSTRUCTION_OWNER}}
-      org_name: {{CUSTOMER_SUCCESS_INSTRUCTION_ORG_NAME}}
+      <<: *repo_variables
   - name: Chat Instructions
-    description: A Github resource.
-    type: github-repo-resource
+    <<: *repo_defaults
     variables:
-      branch: {{CUSTOMER_SUCCESS_INSTRUCTION_BRANCH}}
       path_template: {{CUSTOMER_SUCCESS_INSTRUCTION_CHAT_PATH}}
-      repo: {{CUSTOMER_SUCCESS_INSTRUCTION_REPO}}
-      owner: {{CUSTOMER_SUCCESS_INSTRUCTION_OWNER}}
-      org_name: {{CUSTOMER_SUCCESS_INSTRUCTION_ORG_NAME}}
+      <<: *repo_variables
   - name: Feature Instructions
-    description: A Github resource.
-    type: github-repo-resource
+    <<: *repo_defaults
     variables:
-      branch: {{CUSTOMER_SUCCESS_INSTRUCTION_BRANCH}}
       path_template: {{CUSTOMER_SUCCESS_INSTRUCTION_FEATURE_PATH}}
-      repo: {{CUSTOMER_SUCCESS_INSTRUCTION_REPO}}
-      owner: {{CUSTOMER_SUCCESS_INSTRUCTION_OWNER}}
-      org_name: {{CUSTOMER_SUCCESS_INSTRUCTION_ORG_NAME}}
+      <<: *repo_variables
   - name: Product Idea Instructions
-    description: A Github resource.
-    type: github-repo-resource
+    <<: *repo_defaults
     variables:
-      branch: {{CUSTOMER_SUCCESS_INSTRUCTION_BRANCH}}
       path_template: {{CUSTOMER_SUCCESS_INSTRUCTION_PRODUCT_IDEA_PATH}}
-      repo: {{CUSTOMER_SUCCESS_INSTRUCTION_REPO}}
-      owner: {{CUSTOMER_SUCCESS_INSTRUCTION_OWNER}}
-      org_name: {{CUSTOMER_SUCCESS_INSTRUCTION_ORG_NAME}}
+      <<: *repo_variables
   - name: Bug Instructions
-    description: A Github resource.
-    type: github-repo-resource
+    <<: *repo_defaults
     variables:
-      branch: {{CUSTOMER_SUCCESS_INSTRUCTION_BRANCH}}
       path_template: {{CUSTOMER_SUCCESS_INSTRUCTION_BUG_REPORT_PATH}}
-      repo: {{CUSTOMER_SUCCESS_INSTRUCTION_REPO}}
-      owner: {{CUSTOMER_SUCCESS_INSTRUCTION_OWNER}}
-      org_name: {{CUSTOMER_SUCCESS_INSTRUCTION_ORG_NAME}}
+      <<: *repo_variables
   
   trackers:
-  - name: Feature Requests
-    description: A Github Board Tracker.
-    type: github-board-tracker
-    variables:
-      to_do_column: New Feature
-      in_progress_column: In Progress
-      done_column: Done
-      org_name: {{GITHUB_TRACKER_ORG_NAME}}
-      project_name: {{GITHUB_FEATURE_PROJECT_NAME}}
-  - name: Product Ideas
-    description: A Github Board Tracker.
-    type: github-board-tracker
-    variables:
-      to_do_column: New Idea
-      in_progress_column: In Progress
-      done_column: Done
-      org_name: {{GITHUB_TRACKER_ORG_NAME}}
-      project_name: {{GITHUB_PRODUCT_IDEA_PROJECT_NAME}}
-  - name: Bug Reports
-    description: A Github Board Tracker.
-    type: github-board-tracker
-    variables:
-      to_do_column: New Bug
-      in_progress_column: In Progress
-      done_column: Done
-      org_name: {{GITHUB_TRACKER_ORG_NAME}}
-      project_name: {{GITHUB_BUG_PROJECT_NAME}}
+  - {{!include trackers/feature_requests.yaml}}
+  - {{!include trackers/product_ideas.yaml}}
+  - {{!include trackers/bug_reports.yaml}}
     
   tasks:
   - name: Chat

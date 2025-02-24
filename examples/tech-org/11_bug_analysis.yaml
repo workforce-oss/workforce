@@ -1,0 +1,63 @@
+repo_variables: &repo_variables
+  INSTRUCTION_REPO: {{INSTRUCTION_REPO}}
+  INSTRUCTION_OWNER: {{INSTRUCTION_OWNER}}
+  INSTRUCTION_ORG_NAME: {{INSTRUCTION_ORG_NAME}}
+  INSTRUCTION_BRANCH: {{INSTRUCTION_BRANCH}}
+
+repo_defaults: &repo_defaults
+  description: A Github resource.
+  type: github-repo-resource
+  credential: github-repo
+
+flows:
+- name: Bug Analysis
+  description: Analyze the bug to understand the root cause
+  status: inactive
+
+  channels:
+  - {{!include channels/native_channel.yaml}}
+
+  resources:
+  - name: Role
+    <<: *repo_defaults
+    variables:
+      path_template: {{BUG_ANALYSIS_INSTRUCTION_ROLE_PATH}}
+      <<: *repo_variables
+  - name: Bug Analysis Instructions
+    <<: *repo_defaults
+    variables:
+      path_template: {{BUG_ANALYSIS_INSTRUCTION_PATH}}
+      <<: *repo_variables
+
+  trackers:
+  - {{!include trackers/bug_reports.yaml}}
+  - {{!include trackers/development_tasks.yaml}}
+
+  tools:
+  - {{!include templates/tools/coding_tool_remote.yaml}}
+
+  tasks:
+  - name: Analyze Bug
+    description: Analyze the bug to understand the root cause
+    type: simple-task
+    purpose: Analyze the bug to understand the root cause.
+    costLimit: 2.00
+    requiredSkills:
+      - conversation
+    inputs:
+      role: Role
+      instructions: Bug Analysis Instructions
+      ticket: Bug Reports
+    tools:
+      - name: Coding Tool
+    triggers:
+      - Native Channel
+    outputs:
+      - Development Tasks
+    variables:
+      prompt_template: |-
+        {{ticket}}
+      system_message_template: |-
+        {{role}}
+        {{instructions}}
+  

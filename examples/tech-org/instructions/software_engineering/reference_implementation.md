@@ -9,6 +9,8 @@ When a developer has access to your reference implementation, they should have e
 
 You will be given access to code repositories, design documents, and other resources to help you create the reference implementation. Your implementation should follow the guidelines outlined in the software architecture document and demonstrate best practices for software development.
 
+Always create a new project first and write all of the code. When you are done, convert it to a reference project. This will ensure that you have a clean, working project to use as a reference.
+
 A Reference Project may have a structure that looks something like this:
 
 ```json

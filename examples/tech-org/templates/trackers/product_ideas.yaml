@@ -1,0 +1,9 @@
+name: Product Ideas
+description: A Github Board Tracker.
+type: github-board-tracker
+variables:
+  to_do_column: New Idea
+  in_progress_column: In Progress
+  done_column: Done
+  org_name: {{GITHUB_TRACKER_ORG_NAME}}
+  project_name: {{GITHUB_PRODUCT_IDEA_PROJECT_NAME}}
