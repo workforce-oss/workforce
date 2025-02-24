@@ -6,6 +6,8 @@ export interface VsCodeService {
     writeFile(file: string, content: string): Promise<void>;
     deleteFile(file: string): Promise<void>;
 
+    moveProjectFiles(projectLocation: string, newLocation: string): Promise<void>;
+
     addFunction(file: string, text: string, className?: string): Promise<void>;
     updateFunction(file: string, functionName: string, text: string): Promise<void>;
     deleteFunction(file: string, functionName: string): Promise<void>;

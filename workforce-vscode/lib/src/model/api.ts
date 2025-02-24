@@ -1,4 +1,4 @@
-import { ExecutionPlan, ExecutionStep, MachineState, Project, ProjectFile, ReferenceProject } from "./internal.js"
+import { ExecutionPlan, ExecutionStep, MachineState, Project, ProjectFile, ProjectFileType, ReferenceProject } from "./internal.js"
 
 export const APIHeaderAPIToken = "X-API-Token"
 
@@ -6,6 +6,7 @@ export const requestMessageTypes = [
     "GetProjectRequest",
     "ListProjectsRequest",
     "CreateProjectRequest",
+    "ConvertToReferenceProjectRequest",
     "GetReferenceProjectRequest",
     "GetProjectFileRequest",
     "GetProjectFileFunctionTextRequest",
@@ -21,6 +22,7 @@ export const responseMessageTypes = [
     "GetProjectResponse",
     "ListProjectsResponse",
     "CreateProjectResponse",
+    "ConvertToReferenceProjectResponse",
     "GetReferenceProjectResponse",
     "GetProjectFileResponse",
     "GetProjectFileFunctionTextResponse",
@@ -45,7 +47,7 @@ export type Error = {
 export type SocketMessage = {
     type: MessageType
     correlationId: string
-    payload?: GetRequest | GetProjectFileRequest | GetProjectFileFunctionTextRequest | Project | ExecutionPlan | ExecuteStepRequest | ExecutionStepResponse | ExecutionPlanResponse | GetProjectResponse | ListProjectsResponse | CreateProjectRequest | CreateProjectResponse | GetProjectFileResponse | GetProjectFileFunctionTextResponse | GetReferenceProjectResponse | ListReferenceProjectsResponse | HealthCheckResponse | CommitAndPushRequest | CommitAndPushResponse | CheckOutBranchRequest | CheckOutBranchResponse | Error
+    payload?: GetRequest | GetProjectFileRequest | GetProjectFileFunctionTextRequest | Project | ExecutionPlan | ExecuteStepRequest | ExecutionStepResponse | ExecutionPlanResponse | GetProjectResponse | ListProjectsResponse | CreateProjectRequest | CreateProjectResponse | GetProjectFileResponse | GetProjectFileFunctionTextResponse | GetReferenceProjectResponse | ListReferenceProjectsResponse | HealthCheckResponse | CommitAndPushRequest | CommitAndPushResponse | CheckOutBranchRequest | CheckOutBranchResponse | ConvertToReferenceProjectRequest | ConvertToReferenceProjectResponse | Error
 }
 
 export type GetRequest = {
@@ -82,6 +84,15 @@ export type CreateProjectRequest = {
     project: Project
 }
 
+export type ConvertToReferenceProjectRequest = {
+    existingProjectSlug: string
+    newLocation: string
+    newName: string
+    newDescription: string
+    projectFileTypes: ProjectFileType[]
+}
+
+
 export type CommitAndPushRequest = {
     message: string
     branch: string
@@ -105,6 +116,11 @@ export type CheckOutBranchResponse = {
 export type CreateProjectResponse = {
     project: Project
 }
+
+export type ConvertToReferenceProjectResponse = {
+    referenceProject: ReferenceProject
+}
+
 
 export type GetProjectFileResponse = {
     projectFile: ProjectFile

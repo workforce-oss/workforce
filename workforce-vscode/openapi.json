@@ -287,6 +287,34 @@
                     }
                 }
             }
+        },
+        "/convertToReferenceProject":{
+            "post": {
+                "summary": "Convert to Reference Project",
+                "description": "Convert an existing project to a reference project",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/ConvertToReferenceProjectRequest"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Project Converted to Reference Project",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/ConvertToReferenceProjectResponse"
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "components": {
@@ -686,6 +714,48 @@
                     "result": {
                         "type": "string",
                         "description": "The result of the execution step"
+                    }
+                }
+            },
+            "ConvertToReferenceProjectRequest": {
+                "type": "object",
+                "properties": {
+                    "existingProjectSlug": {
+                        "type": "string",
+                        "description": "The slug of the existing project to convert to a reference project"
+                    },
+                    "newName": {
+                        "type": "string",
+                        "description": "The new name for the reference project"
+                    },
+                    "newDescription": {
+                        "type": "string",
+                        "description": "The new description for the reference project"
+                    },
+                    "newLocation": {
+                        "type": "string",
+                        "description": "The new location for the reference project"
+                    },
+                    "projectFileTypes": {
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/ProjectFileType"
+                        }
+                    }
+                },
+                "required": [
+                    "existingProjectSlug",
+                    "newName",
+                    "newDescription",
+                    "newLocation",
+                    "projectFileTypes"
+                ]
+            },
+            "ConvertToReferenceProjectResponse": {
+                "type": "object",
+                "properties": {
+                    "referenceProject": {
+                        "$ref": "#/components/schemas/ReferenceProject"
                     }
                 }
             },

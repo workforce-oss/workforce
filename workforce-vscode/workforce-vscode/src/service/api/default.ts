@@ -1,14 +1,14 @@
-import { Project, ReferenceProject, ExecutionPlan, ExecuteStepRequest, ExecutionStepResponse, Index, MachineState, ProjectFile, ExecutionPlanResponse, ExecutionStepActionType } from "lib";
+import { Project, ReferenceProject, ExecutionPlan, ExecuteStepRequest, ExecutionStepResponse, Index, MachineState, ProjectFile, ExecutionPlanResponse, ExecutionStepActionType, ProjectFileType } from "lib";
 import { VsCodeService } from "../vscode/_service";
 import { CodingService } from "./_service";
 
 export class DefaultCodingService implements CodingService {
     private VsCodeService: VsCodeService;
     private index: Index;
-    private indexUpdateCallback: (action: ExecutionStepActionType | "create-project", projectFile: ProjectFile | Project, index: Index) => void;
+    private indexUpdateCallback: (action: ExecutionStepActionType | "create-project" | "convert-to-reference-project", projectFile: ProjectFile | Project | ReferenceProject, index: Index) => void;
     private initalDependeniesRan: Set<string> = new Set();
 
-    constructor(VsCodeService: VsCodeService, index: Index, indexUpdateCallback: (action: ExecutionStepActionType | "create-project", projectFile: ProjectFile | Project, index: Index) => void) {
+    constructor(VsCodeService: VsCodeService, index: Index, indexUpdateCallback: (action: ExecutionStepActionType | "create-project" | "convert-to-reference-project", projectFile: ProjectFile | Project | ReferenceProject, index: Index) => void) {
         this.VsCodeService = VsCodeService;
         this.index = index;
         this.indexUpdateCallback = indexUpdateCallback;
@@ -67,6 +67,33 @@ export class DefaultCodingService implements CodingService {
 
         return project;
     }
+
+    async ConvertToReferenceProject(projectSlug: string, name: string, location: string, description: string, projectFileTypes: ProjectFileType[]): Promise<ReferenceProject> {
+        const project = this.index.projects.find(project => project.slug === projectSlug);
+        if (!project) {
+            return Promise.reject(`Project ${projectSlug} not found`);
+        }
+        const referenceProject: ReferenceProject = {
+            name: name,
+            description: description,
+            slug: slugify(name),
+            location: location,
+            projectType: project.projectType,
+            language: project.language,
+            projectFiles: project.projectFiles,
+            projectFileTypes: projectFileTypes,
+        };
+        this.index.referenceProjects.push(referenceProject);
+
+        // move files to new location
+        await this.VsCodeService.moveProjectFiles(project.location, location);
+        // remove project
+        this.index.projects = this.index.projects.filter(project => project.slug !== projectSlug);
+        // update index
+        this.indexUpdateCallback("convert-to-reference-project", referenceProject, this.index);
+        return referenceProject;
+    }
+
     async ListReferenceProjects(): Promise<ReferenceProject[]> {
         return this.index.referenceProjects || [];
     }

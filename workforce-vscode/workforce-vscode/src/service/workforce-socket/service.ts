@@ -1,4 +1,4 @@
-import { CheckOutBranchRequest, CommitAndPushRequest, CreateProjectRequest, ExecuteStepRequest, ExecutionPlan, ExecutionStep, GetProjectFileFunctionTextRequest, GetProjectFileRequest, GetProjectFileResponse, GetProjectResponse, GetRequest, ListProjectsResponse, ListReferenceProjectsResponse, Project, SocketMessage } from "lib";
+import { CheckOutBranchRequest, CommitAndPushRequest, ConvertToReferenceProjectRequest, CreateProjectRequest, ExecuteStepRequest, ExecutionPlan, ExecutionStep, GetProjectFileFunctionTextRequest, GetProjectFileRequest, GetProjectFileResponse, GetProjectResponse, GetRequest, ListProjectsResponse, ListReferenceProjectsResponse, Project, SocketMessage } from "lib";
 import { WebSocket } from "ws";
 import { CodingService } from "../api/_service";
 import * as vscode from 'vscode';
@@ -137,6 +137,18 @@ export class WorkforceSocketService {
                                 type: 'CreateProjectResponse',
                                 payload: {
                                     project
+                                },
+                                correlationId
+                            } as SocketMessage));
+                        }).catch(handleErrors);
+                    }
+                } else if (message.type === 'ConvertToReferenceProjectRequest') {
+                    if (message.payload) {
+                        this.codingService.ConvertToReferenceProject((message.payload! as ConvertToReferenceProjectRequest).existingProjectSlug, (message.payload! as ConvertToReferenceProjectRequest).newName, (message.payload! as ConvertToReferenceProjectRequest).newLocation, (message.payload! as ConvertToReferenceProjectRequest).newDescription, (message.payload! as ConvertToReferenceProjectRequest).projectFileTypes).then(referenceProject => {
+                            this.socket?.send(JSON.stringify({
+                                type: 'ConvertToReferenceProjectResponse',
+                                payload: {
+                                    referenceProject
                                 },
                                 correlationId
                             } as SocketMessage));

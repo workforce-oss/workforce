@@ -138,6 +138,33 @@ export class VsCodeServiceImpl implements VsCodeService {
         // vscode.workspace.updateWorkspaceFolders(workspaceFolders!.length, 0, { uri: vscode.Uri.file(folder) });
     }
 
+    async moveProjectFiles(projectLocation: string, newLocation: string): Promise<void> {
+        if (!projectLocation || !newLocation) {
+            throw new Error('Project location or new location not set');
+        }
+        if (projectLocation === newLocation) {
+            return;
+        }
+        // check if the new location exists
+        try {
+            await vscode.workspace.fs.stat(vscode.Uri.file(this.getPathWithPrefix(newLocation)));
+            // if it exists, throw an error
+            throw new vscode.FileSystemError('Destination already exists');
+        } catch (err) {
+            if (err instanceof vscode.FileSystemError) {
+                // create the directory
+                await vscode.workspace.fs.createDirectory(vscode.Uri.file(this.getPathWithPrefix(newLocation)));
+            } else {
+                throw err;
+            }
+        }
+        const files = await vscode.workspace.fs.readDirectory(vscode.Uri.file(this.getPathWithPrefix(projectLocation)));
+        for (const file of files) {
+            const [name, type] = file;
+            await vscode.workspace.fs.rename(vscode.Uri.file(this.getPathWithPrefix(`${projectLocation}/${name}`)), vscode.Uri.file(this.getPathWithPrefix(`${newLocation}/${name}`)));
+        }
+    }
+
     async getFileContent(file: string): Promise<string> {
         try {
             const document = await vscode.workspace.fs.readFile(vscode.Uri.file(this.getPathWithPrefix(file)));

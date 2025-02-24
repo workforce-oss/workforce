@@ -64,6 +64,9 @@ try {
             await handleRequest(req, res, subject,clients, buffer, "CheckOutBranchRequest", "CheckOutBranchResponse");
         });
 
+        app.post("/convertToReferenceProject", bodyParser.json(), async (req, res) => {
+            await handleRequest(req, res, subject,clients, buffer, "ConvertToReferenceProjectRequest", "ConvertToReferenceProjectResponse");
+        });
         app.get("/api/healthz", async (req, res) => {
             await handleRequest(req, res, subject,clients, buffer, "HealthCheckRequest", "HealthCheckResponse");
         });

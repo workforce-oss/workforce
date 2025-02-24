@@ -25,12 +25,13 @@ export type ProjectFileType = {
 export type Project = {
     name: string    
     slug: string
-    description: string
     location: string
     projectType: string
     language: string
-    referenceProjectLocation: string
+    description: string
+
     projectFiles: ProjectFile[]
+    referenceProjectLocation: string
     caches: string[]
 }
 
@@ -42,8 +43,8 @@ export type ReferenceProject = {
     language: string
     description: string
     
-    projectFileTypes: ProjectFileType[]
     projectFiles: ProjectFile[]
+    projectFileTypes: ProjectFileType[]
     initScript?: string
     dependencyScript?: string
     dependencyFile?: string
