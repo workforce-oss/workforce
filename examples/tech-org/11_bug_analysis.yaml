@@ -9,13 +9,26 @@ repo_defaults: &repo_defaults
   type: github-repo-resource
   credential: github-repo
 
+tracker_variables: &tracker_variables
+  in_progress_column: In Progress
+  done_column: Done
+  org_name: {{GITHUB_TRACKER_ORG_NAME}}
+  project_name: {{GITHUB_BUG_PROJECT_NAME}}
+
 flows:
 - name: Bug Analysis
   description: Analyze the bug to understand the root cause
   status: inactive
 
   channels:
-  - {{!include channels/native_channel.yaml}}
+  - name: Native Channel
+    description: Native Channel
+    type: native-channel
+    variables:
+      channel_name: {{NATIVE_CHANNEL_NAME}}
+      anonymous_access: {{NATIVE_CHANNEL_ANONYMOUS}}
+      oauth2_issuer_uri: {{NATIVE_CHANNEL_OAUTH2_ISSUER_URI}}
+      oauth2_audience: {{NATIVE_CHANNEL_OAUTH2_AUDIENCE}}
 
   resources:
   - name: Role
@@ -28,13 +41,30 @@ flows:
     variables:
       path_template: {{BUG_ANALYSIS_INSTRUCTION_PATH}}
       <<: *repo_variables
-
   trackers:
-  - {{!include trackers/bug_reports.yaml}}
-  - {{!include trackers/development_tasks.yaml}}
-
+  - name: Bug Reports
+    description: A Github Board Tracker.
+    type: github-board-tracker
+    variables:
+      to_do_column: New Bug
+      <<: *tracker_variables
+  - name: Development Tasks
+    description: A Github Board Tracker.
+    type: github-board-tracker
+    variables:
+      to_do_column: New Development Task
+      <<: *tracker_variables
   tools:
-  - {{!include templates/tools/coding_tool_remote.yaml}}
+  - name: Coding Tool
+    description: A tool that interacts with the code
+    type: coding-tool
+    credential: github-coding-tool
+    channel: native-channel
+    variables:
+      mode: remote
+      index_repo_location: {{GITHUB_PROJECT_SEED_REPO_LOCATION}}
+      index_repo_branch: {{GITHUB_PROJECT_SEED_BRANCH}}
+      server_url: {{CODING_TOOL_SERVER_URL}}
 
   tasks:
   - name: Analyze Bug
@@ -47,11 +77,11 @@ flows:
     inputs:
       role: Role
       instructions: Bug Analysis Instructions
-      ticket: Bug Reports
+    tracker: Bug Reports
     tools:
       - name: Coding Tool
     triggers:
-      - Native Channel
+      - Bug Reports
     outputs:
       - Development Tasks
     variables:

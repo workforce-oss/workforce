@@ -9,13 +9,26 @@ repo_defaults: &repo_defaults
   type: github-repo-resource
   credential: github-repo
 
+tracker_variables: &tracker_variables
+  in_progress_column: In Progress
+  done_column: Done
+  org_name: {{GITHUB_TRACKER_ORG_NAME}}
+  project_name: {{GITHUB_BUG_PROJECT_NAME}}
+
 flows:
 - name: Customer Success
   description: Chat with the customer to understand their needs
   status: inactive
 
   channels:
-  - {{!include channels/native_channel.yaml}}
+  - name: Native Channel
+    description: Native Channel
+    type: native-channel
+    variables:
+      channel_name: {{NATIVE_CHANNEL_NAME}}
+      anonymous_access: {{NATIVE_CHANNEL_ANONYMOUS}}
+      oauth2_issuer_uri: {{NATIVE_CHANNEL_OAUTH2_ISSUER_URI}}
+      oauth2_audience: {{NATIVE_CHANNEL_OAUTH2_AUDIENCE}}
 
   resources:
   - name: Role
@@ -45,9 +58,24 @@ flows:
       <<: *repo_variables
   
   trackers:
-  - {{!include trackers/feature_requests.yaml}}
-  - {{!include trackers/product_ideas.yaml}}
-  - {{!include trackers/bug_reports.yaml}}
+  - name: Feature Requests
+    description: A Github Board Tracker.
+    type: github-board-tracker
+    variables:
+      to_do_column: New Feature
+      <<: *tracker_variables
+  - name: Product Ideas
+    description: A Github Board Tracker.
+    type: github-board-tracker
+    variables:
+      to_do_column: New Idea
+      <<: *tracker_variables
+  - name: Bug Reports
+    description: A Github Board Tracker.
+    type: github-board-tracker
+    variables:
+      to_do_column: New Bug
+      <<: *tracker_variables
     
   tasks:
   - name: Chat
@@ -63,9 +91,9 @@ flows:
     triggers:
       - Native Channel
     subtasks:
-      - Bug Report
-      - Feature Request
-      - Product Idea
+      - name: Bug Report
+      - name: Feature Request
+      - name: Product Idea
     variables:
       system_message_template: |-
         {{role}}
@@ -82,13 +110,14 @@ flows:
       role: Role
       instructions: Feature Instructions
       message: Chat
-    system_message_template: |-
-      {{role}}
-      {{instructions}}
-    prompt_template: |-
-      {{message}}
     outputs:
       - Feature Requests
+    variables:
+      system_message_template: |-
+        {{role}}
+        {{instructions}}
+      prompt_template: |-
+        {{message}}
   - name: Product Idea
     description: Create a product idea
     type: simple-task
@@ -99,13 +128,15 @@ flows:
       role: Role
       instructions: Product Idea Instructions
       message: Chat
-    system_message_template: |-
-      {{role}}
-      {{instructions}}
-    prompt_template: |-
-      {{message}}
     outputs:
       - Product Ideas
+    variables:
+      system_message_template: |-
+        {{role}}
+        {{instructions}}
+      prompt_template: |-
+        {{message}}
+
   - name: Bug Report
     description: Create a bug report
     type: simple-task
@@ -116,10 +147,12 @@ flows:
       role: Role
       instructions: Bug Instructions
       message: Chat
-    system_message_template: |-
-      {{role}}
-      {{instructions}}
-    prompt_template: |-
-      {{message}}
     outputs:
       - Bug Reports
+    variables:
+      system_message_template: |-
+        {{role}}
+        {{instructions}}
+      prompt_template: |-
+        {{message}}
+

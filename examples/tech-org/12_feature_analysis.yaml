@@ -1,0 +1,93 @@
+repo_variables: &repo_variables
+  INSTRUCTION_REPO: {{INSTRUCTION_REPO}}
+  INSTRUCTION_OWNER: {{INSTRUCTION_OWNER}}
+  INSTRUCTION_ORG_NAME: {{INSTRUCTION_ORG_NAME}}
+  INSTRUCTION_BRANCH: {{INSTRUCTION_BRANCH}}
+
+repo_defaults: &repo_defaults
+  description: A Github resource.
+  type: github-repo-resource
+  credential: github-repo
+
+tracker_variables: &tracker_variables
+  in_progress_column: In Progress
+  done_column: Done
+  org_name: {{GITHUB_TRACKER_ORG_NAME}}
+  project_name: {{GITHUB_FEATURE_PROJECT_NAME}}
+
+flows:
+- name: Feature Analysis
+  description: Analyze the feature to understand the root cause
+  status: inactive
+
+  channels:
+  - name: Native Channel
+    description: Native Channel
+    type: native-channel
+    variables:
+      channel_name: {{NATIVE_CHANNEL_NAME}}
+      anonymous_access: {{NATIVE_CHANNEL_ANONYMOUS}}
+      oauth2_issuer_uri: {{NATIVE_CHANNEL_OAUTH2_ISSUER_URI}}
+      oauth2_audience: {{NATIVE_CHANNEL_OAUTH2_AUDIENCE}}
+
+  resources:
+  - name: Role
+    <<: *repo_defaults
+    variables:
+      path_template: {{FEATURE_ANALYSIS_INSTRUCTION_ROLE_PATH}}
+      <<: *repo_variables
+  - name: Feature Analysis Instructions
+    <<: *repo_defaults
+    variables:
+      path_template: {{FEATURE_ANALYSIS_INSTRUCTION_PATH}}
+      <<: *repo_variables
+  trackers:
+  - name: Feature Requests
+    description: A Github Board Tracker.
+    type: github-board-tracker
+    variables:
+      to_do_column: New Feature
+      <<: *tracker_variables
+  - name: Development Tasks
+    description: A Github Board Tracker.
+    type: github-board-tracker
+    variables:
+      to_do_column: New Development Task
+      <<: *tracker_variables
+  tools:
+  - name: Coding Tool
+    description: A tool that interacts with the code
+    type: coding-tool
+    credential: github-coding-tool
+    channel: native-channel
+    variables:
+      mode: remote
+      index_repo_location: {{GITHUB_PROJECT_SEED_REPO_LOCATION}}
+      index_repo_branch: {{GITHUB_PROJECT_SEED_BRANCH}}
+      server_url: {{CODING_TOOL_SERVER_URL}}
+
+  tasks:
+  - name: Analyze Feature
+    description: Analyze the feature
+    type: simple-task
+    purpose: Analyze the feature
+    costLimit: 2.00
+    requiredSkills:
+      - conversation
+    inputs:
+      role: Role
+      instructions: Feature Analysis Instructions
+    tracker: Feature Requests
+    tools:
+      - name: Coding Tool
+    triggers:
+      - Feature Reports
+    outputs:
+      - Development Tasks
+    variables:
+      prompt_template: |-
+        {{ticket}}
+      system_message_template: |-
+        {{role}}
+        {{instructions}}
+  
