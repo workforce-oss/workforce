@@ -6,7 +6,6 @@
       "$ref": "#/$defs/object"
     },
     {
-      "title": "channel-properties",
       "type": "object",
       "properties": {
         "type": {
@@ -22,8 +21,7 @@
         }
       },
       "required": [
-        "type",
-        "variables"
+        "type"
       ]
     }
   ],

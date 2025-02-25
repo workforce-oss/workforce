@@ -31,8 +31,7 @@
       },
       "required": [
         "type",
-        "repository",
-        "variables"
+        "repository"
       ]
     }
   ],

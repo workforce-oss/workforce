@@ -154,9 +154,7 @@ export const TaskExecutionRouter: Router = (() => {
                 }
 
                 try {
-                    await BrokerManager.workerBroker.removeTaskExecution(found.id).catch((e: Error) => {
-                        Logger.getInstance("task-execution-api").warn("task execution not removed from worker", e)
-                    })
+                    BrokerManager.workerBroker.removeTaskExecution(found.id);
                 } catch (e) {
                     Logger.getInstance("task-execution-api").warn("error removing task execution", e)
                 }

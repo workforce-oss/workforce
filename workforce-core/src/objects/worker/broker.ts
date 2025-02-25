@@ -22,12 +22,14 @@ export class WorkerBroker extends BaseBroker<WorkerConfig, Worker, object> {
 
 	private workRequestSubject = new Subject<WorkRequest>();
 	private workResponseSubject = new Subject<WorkResponse>();
+	private removeTaskExecutionSubject = new Subject<string>();
 	private flushDaemons = new Map<string, NodeJS.Timeout>();
 
 	constructor(
 		config: BrokerConfig,
 		workRequestSubject?: Subject<WorkRequest>,
-		workResponseSubject?: Subject<WorkResponse>
+		workResponseSubject?: Subject<WorkResponse>,
+		removeTaskExecutionSubject?: Subject<string>,
 	) {
 		super(config);
 
@@ -36,6 +38,10 @@ export class WorkerBroker extends BaseBroker<WorkerConfig, Worker, object> {
 		}
 		if (workResponseSubject) {
 			this.workResponseSubject = workResponseSubject;
+		}
+
+		if (removeTaskExecutionSubject) {
+			this.removeTaskExecutionSubject = removeTaskExecutionSubject;
 		}
 
 		this.workRequestSubject.subscribe({
@@ -47,6 +53,17 @@ export class WorkerBroker extends BaseBroker<WorkerConfig, Worker, object> {
 			},
 			error: (error: Error) => {
 				this.logger.error(`constructor() error handling request error=${error}`);
+			},
+		});
+
+		this.removeTaskExecutionSubject.subscribe({
+			next: (taskExecutionId: string) => {
+				this.executeRemoveTaskExecution(taskExecutionId).catch((error: Error) => {
+					this.logger.error(`constructor() error removing task execution ${taskExecutionId}`, error);
+				});
+			},
+			error: (error: Error) => {
+				this.logger.error(`constructor() error removing task execution error=${error}`);
 			},
 		});
 	}
@@ -63,7 +80,11 @@ export class WorkerBroker extends BaseBroker<WorkerConfig, Worker, object> {
 			channel: SubjectFactory.WORK_RESPONSE,
 			mode,
 		});
-		return new WorkerBroker(config, workRequestSubject, workResponseSubject);
+		const removeTaskExecutionSubject = await SubjectFactory.createSubject<string>({
+			channel: SubjectFactory.REMOVE_TASK_EXECUTION,
+			mode,
+		});
+		return new WorkerBroker(config, workRequestSubject, workResponseSubject, removeTaskExecutionSubject);
 	}
 
 	async register(worker: Worker): Promise<void> {
@@ -244,7 +265,7 @@ export class WorkerBroker extends BaseBroker<WorkerConfig, Worker, object> {
 
 							const channelMessageData: Record<string, string> = {};
 							if (request.input[ChannelMessageDataKey]) {
-								
+
 								const parsed = jsonParse<Record<string, string>>(request.input[ChannelMessageDataKey] as string);
 								if (parsed) {
 									Object.assign(channelMessageData, parsed)
@@ -464,8 +485,8 @@ export class WorkerBroker extends BaseBroker<WorkerConfig, Worker, object> {
 		this.objects.delete(workerId);
 	}
 
-	async removeTaskExecution(taskExecutionId: string): Promise<void> {
-		this.logger.debug(`removeTaskExecution() Removing taskExecution ${taskExecutionId}`);
+	private async executeRemoveTaskExecution(taskExecutionId: string): Promise<void> {
+		this.logger.debug(`executeRemoveTaskExecution() Removing taskExecution ${taskExecutionId}`);
 		const workRequests = await WorkRequestDb.findAll({
 			where: {
 				taskExecutionId: taskExecutionId,
@@ -474,6 +495,10 @@ export class WorkerBroker extends BaseBroker<WorkerConfig, Worker, object> {
 			this.logger.error(`removeTaskExecution() Error finding work requests for taskExecution ${taskExecutionId}`, error);
 		});
 		const deletionPromises = workRequests?.map(async (db) => {
+			if (!this.objects.has(db.workerId)) {
+				this.logger.warn(`removeTaskExecution() Worker ${db.workerId} not found`);
+				return Promise.resolve();
+			}
 			this.objects.get(db.workerId)?.removeTask(taskExecutionId);
 			try {
 				return await db.destroy();
@@ -481,7 +506,14 @@ export class WorkerBroker extends BaseBroker<WorkerConfig, Worker, object> {
 				this.logger.error(`removeTaskExecution() Error removing work request ${taskExecutionId}`, error);
 			}
 		});
-		await Promise.all(deletionPromises ?? []);
+		await Promise.all(deletionPromises ?? []).catch((error: Error) => {
+			this.logger.error(`removeTaskExecution() Error removing work requests for taskExecution ${taskExecutionId}`, error);
+		});
+	}
+
+	removeTaskExecution(taskExecutionId: string): void {
+		this.logger.debug(`removeTaskExecution() Removing taskExecution ${taskExecutionId}`);
+		this.removeTaskExecutionSubject.next(taskExecutionId);
 	}
 
 	async destroy(): Promise<void> {

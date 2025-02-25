@@ -1167,8 +1167,7 @@
               }
             },
             "required": [
-              "type",
-              "variables"
+              "type"
             ]
           }
         ]
@@ -1210,8 +1209,7 @@
             },
             "required": [
               "type",
-              "repository",
-              "variables"
+              "repository"
             ]
           }
         ]
@@ -1257,8 +1255,7 @@
               }
             },
             "required": [
-              "type",
-              "variables"
+              "type"
             ]
           }
         ]
@@ -1364,17 +1361,7 @@
             },
             "required": [
               "type",
-              "requiredSkills",
-              "defaultChannel",
-              "tracker",
-              "documentation",
-              "tools",
-              "triggers",
-              "inputs",
-              "outputs",
-              "subtasks",
-              "costLimit",
-              "variables"
+              "requiredSkills"
             ]
           }
         ]
@@ -1448,9 +1435,7 @@
               }
             },
             "required": [
-              "type",
-              "channel",
-              "variables"
+              "type"
             ]
           }
         ]
@@ -1469,7 +1454,8 @@
                 "type": "string",
                 "enum": [
                   "github-board-tracker",
-                  "trello-tracker"
+                  "trello-tracker",
+                  "asana-tracker"
                 ]
               },
               "webhooksEnabled": {
@@ -1487,15 +1473,15 @@
                   },
                   {
                     "$ref": "#/components/schemas/trello_tracker_variables"
+                  },
+                  {
+                    "$ref": "#/components/schemas/asana_tracker_variables"
                   }
                 ]
               }
             },
             "required": [
-              "type",
-              "webhooksEnabled",
-              "pollingInterval",
-              "variables"
+              "type"
             ]
           }
         ]
@@ -1573,8 +1559,7 @@
               }
             },
             "required": [
-              "type",
-              "variables"
+              "type"
             ]
           }
         ]
@@ -1654,8 +1639,7 @@
               }
             },
             "required": [
-              "type",
-              "variables"
+              "type"
             ]
           }
         ]
@@ -1691,8 +1675,7 @@
               }
             },
             "required": [
-              "type",
-              "variables"
+              "type"
             ]
           }
         ]
@@ -1759,8 +1742,7 @@
               }
             },
             "required": [
-              "type",
-              "variables"
+              "type"
             ]
           }
         ]
@@ -1908,8 +1890,7 @@
               }
             },
             "required": [
-              "type",
-              "variables"
+              "type"
             ]
           }
         ]
@@ -1955,8 +1936,7 @@
               }
             },
             "required": [
-              "type",
-              "variables"
+              "type"
             ]
           }
         ]
@@ -2260,11 +2240,30 @@
               }
             },
             "required": [
-              "type",
-              "variables"
+              "type"
             ]
           }
         ]
+      },
+      "asana_tracker_credential": {
+        "type": "object",
+        "properties": {
+          "client_id": {
+            "type": "string",
+            "description": "The Asana client id",
+            "x-workforce-sensitive": true
+          },
+          "client_secret": {
+            "type": "string",
+            "description": "The Asana client secret",
+            "x-workforce-sensitive": true
+          }
+        },
+        "required": [
+          "client_id",
+          "client_secret"
+        ],
+        "description": "The sensitive variables for the asana-tracker tracker"
       },
       "github_board_tracker_credential": {
         "type": "object",
@@ -2319,12 +2318,16 @@
               "type": {
                 "type": "string",
                 "enum": [
+                  "asana-tracker",
                   "github-board-tracker",
                   "trello-tracker"
                 ]
               },
               "variables": {
                 "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/asana_tracker_credential"
+                  },
                   {
                     "$ref": "#/components/schemas/github_board_tracker_credential"
                   },
@@ -2335,8 +2338,7 @@
               }
             },
             "required": [
-              "type",
-              "variables"
+              "type"
             ]
           }
         ]
@@ -2390,8 +2392,7 @@
               }
             },
             "required": [
-              "type",
-              "variables"
+              "type"
             ]
           }
         ]
@@ -2985,6 +2986,39 @@
         ],
         "title": "web-service-tool Variables"
       },
+      "asana_tracker_variables": {
+        "type": "object",
+        "properties": {
+          "workspace": {
+            "type": "string",
+            "description": "The Asana workspace"
+          },
+          "project_id": {
+            "type": "string",
+            "description": "The Asana project id"
+          },
+          "todo_section": {
+            "type": "string",
+            "description": "The Asana section for todo tickets"
+          },
+          "in_progress_section": {
+            "type": "string",
+            "description": "The Asana section for in progress tickets"
+          },
+          "complete_section": {
+            "type": "string",
+            "description": "The Asana section for completed tickets"
+          }
+        },
+        "required": [
+          "workspace",
+          "project_id",
+          "todo_section",
+          "in_progress_section",
+          "complete_section"
+        ],
+        "title": "asana-tracker Variables"
+      },
       "github_board_tracker_variables": {
         "type": "object",
         "properties": {
@@ -3069,6 +3103,7 @@
               "gpt-4-32k",
               "gpt-4-0125-preview",
               "gpt-4o",
+              "gpt-4o-realtime-preview-2024-12-17",
               "claude-3-5-sonnet-20240620",
               "claude-3-opus-20240229",
               "claude-3-haiku-20240307",
@@ -3076,7 +3111,8 @@
               "llama3-70b-8192",
               "llama2-70b-4096",
               "mixtral-8x7b-32768",
-              "gemma-7b-it"
+              "gemma-7b-it",
+              "gemini-1.5-pro"
             ]
           },
           "temperature": {

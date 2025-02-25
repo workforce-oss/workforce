@@ -17,6 +17,8 @@ export class SubjectFactory {
 
     public static readonly WORK_REQUEST: string = "worker.request";
     public static readonly WORK_RESPONSE: string = "worker.response";
+    public static readonly REMOVE_TASK_EXECUTION: string = "task.execution.remove";
+
 
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

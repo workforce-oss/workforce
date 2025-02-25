@@ -30,8 +30,7 @@
         }
       },
       "required": [
-        "type",
-        "variables"
+        "type"
       ]
     }
   ],

@@ -26,8 +26,7 @@
         }
       },
       "required": [
-        "type",
-        "variables"
+        "type"
       ]
     }
   ],

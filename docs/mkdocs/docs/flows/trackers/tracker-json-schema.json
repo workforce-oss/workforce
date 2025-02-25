@@ -12,7 +12,8 @@
           "type": "string",
           "enum": [
             "github-board-tracker",
-            "trello-tracker"
+            "trello-tracker",
+            "asana-tracker"
           ]
         },
         "webhooksEnabled": {
@@ -28,10 +29,7 @@
         }
       },
       "required": [
-        "type",
-        "webhooksEnabled",
-        "pollingInterval",
-        "variables"
+        "type"
       ]
     }
   ],

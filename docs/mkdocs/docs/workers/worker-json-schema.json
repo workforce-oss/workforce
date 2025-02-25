@@ -39,10 +39,8 @@
         }
       },
       "required": [
-        "channelUserConfig",
         "skills",
-        "wipLimit",
-        "variables"
+        "wipLimit"
       ]
     }
   ],

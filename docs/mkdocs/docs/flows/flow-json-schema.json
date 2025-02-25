@@ -94,8 +94,7 @@
             }
           },
           "required": [
-            "type",
-            "variables"
+            "type"
           ]
         }
       ]
@@ -133,8 +132,7 @@
           },
           "required": [
             "type",
-            "repository",
-            "variables"
+            "repository"
           ]
         }
       ]
@@ -167,8 +165,7 @@
             }
           },
           "required": [
-            "type",
-            "variables"
+            "type"
           ]
         }
       ]
@@ -267,17 +264,7 @@
           },
           "required": [
             "type",
-            "requiredSkills",
-            "defaultChannel",
-            "tracker",
-            "documentation",
-            "tools",
-            "triggers",
-            "inputs",
-            "outputs",
-            "subtasks",
-            "costLimit",
-            "variables"
+            "requiredSkills"
           ]
         }
       ]
@@ -317,9 +304,7 @@
             }
           },
           "required": [
-            "type",
-            "channel",
-            "variables"
+            "type"
           ]
         }
       ]
@@ -338,7 +323,8 @@
               "type": "string",
               "enum": [
                 "github-board-tracker",
-                "trello-tracker"
+                "trello-tracker",
+                "asana-tracker"
               ]
             },
             "webhooksEnabled": {
@@ -354,10 +340,7 @@
             }
           },
           "required": [
-            "type",
-            "webhooksEnabled",
-            "pollingInterval",
-            "variables"
+            "type"
           ]
         }
       ]

@@ -79,6 +79,7 @@ const App = () => {
         const unauthorizedCallBack = () => {
             Auth.refreshToken().then(() => {
                 Auth.session().then((newSession) => {
+                    WorkforceAPIClient.setAccessToken(newSession.auth.accessToken);
                     setAuthSession({ session: newSession, userId: Auth.getUserId() });
                 }).catch(() => {
                     console.error("Error refreshing token");

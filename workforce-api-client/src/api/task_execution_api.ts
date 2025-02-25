@@ -106,7 +106,7 @@ export class TaskExecutionWorkerChatSessionAPI extends TaskExecutionSubResourceA
         if (!TaskExecutionWorkerChatSessionAPI.instance || options.accessToken !== TaskExecutionWorkerChatSessionAPI.instance.accessToken) {
             TaskExecutionWorkerChatSessionAPI.instance = new TaskExecutionWorkerChatSessionAPI({
                 basePath: options.basePath ?? "/workforce-api",
-                resource: "worker-chat-sessions",
+                resource: "worker-chat-session",
                 objectType: "worker-chat-session",
                 baseUrl: options?.baseUrl,
                 accessToken: options?.accessToken,

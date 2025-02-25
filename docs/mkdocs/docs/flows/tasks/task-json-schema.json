@@ -92,17 +92,7 @@
       },
       "required": [
         "type",
-        "requiredSkills",
-        "defaultChannel",
-        "tracker",
-        "documentation",
-        "tools",
-        "triggers",
-        "inputs",
-        "outputs",
-        "subtasks",
-        "costLimit",
-        "variables"
+        "requiredSkills"
       ]
     }
   ],

@@ -51,9 +51,9 @@ export const TaskExecutionComponent = (props: { taskExecution: TaskExecution }) 
 		}
 		const newChildren = new Map<number, componentData>();
 
-		WorkforceAPIClient.TaskExecutionAPI.WorkRequests
+		WorkforceAPIClient.TaskExecutionAPI.ChatSessions
 			.list({ taskExecutionId: taskExecution.id, orgId: currentOrg?.id })
-			.then((response: any) => {
+			.then((response: ChatSession[]) => {
 				response.forEach((chatSession: ChatSession) => {
 					newChildren[chatSession.id] = {
 						componentType: "WorkerChatSession",

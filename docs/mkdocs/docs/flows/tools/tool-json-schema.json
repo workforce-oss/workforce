@@ -33,9 +33,7 @@
         }
       },
       "required": [
-        "type",
-        "channel",
-        "variables"
+        "type"
       ]
     }
   ],

@@ -140,7 +140,7 @@ describe("Generate API Schema", () => {
                 continue;
             }
 
-            const subtypes = ConfigFactory.getSubtypesForType(objectType).filter((subtype) => !subtype.startsWith("mock"));
+            const subtypes = ConfigFactory.getSubtypesForType(objectType).filter((subtype) => !subtype.startsWith("mock") && !subtype.startsWith("custom"));
 
             subtypes.sort();
 
@@ -348,6 +348,19 @@ describe("Generate API Schema", () => {
         }
         fs.writeFileSync("flow-json-schema.json", JSON.stringify(flowJsonSchema, null, 2));
 
+        const vscodeJsonSchema = vscodeSchema() as Record<string, any>;
+        vscodeJsonSchema["$defs"] = {
+            channel: standaloneChannelSchema,
+            documentation: standaloneDocumentationSchema,
+            resource: standaloneResourceSchema,
+            task: standaloneTaskSchema,
+            tool: standaloneToolSchema,
+            tracker: standaloneTrackerSchema,
+            ...standaloneBaseSchemas,
+            ...standaloneTaskSchemas,
+        }
+        fs.writeFileSync("vscode-json-schema.json", JSON.stringify(vscodeJsonSchema, null, 2));
+
         standaloneChannelSchema["$defs"] = {
             ...standaloneBaseSchemas
         }
@@ -460,6 +473,38 @@ function orgUserSchema() {
     }
 }
 
+// The vscode json schema is like the flow schema, but with the root containing an optional flows: array instead of at the root level
+function vscodeSchema() {
+    return {
+        title: "Flow File",
+        description: "A flow is a collection of objects and their relationship that define a process.",
+        type: "object",
+        properties: {
+            flows: {
+                type: "array",
+                items: {
+                    type: "object",
+
+                    properties: {
+                        id: { type: "string", format: "uuid", description: "The unique identifier for the object", readOnly: true },
+                        orgId: { type: "string", format: "uuid", description: "The unique identifier for the organization the object belongs to.", readOnly: true },
+                        name: { type: "string" },
+                        description: { type: "string" },
+                        status: { type: "string", enum: ["active", "inactive"] },
+                        channels: { type: "array", items: { $ref: `${specRef("json-schema")}/channel` } },
+                        documentation: { type: "array", items: { $ref: `${specRef("json-schema")}/documentation` } },
+                        resources: { type: "array", items: { $ref: `${specRef("json-schema")}/resource` } },
+                        tasks: { type: "array", items: { $ref: `${specRef("json-schema")}/task` } },
+                        tools: { type: "array", items: { $ref: `${specRef("json-schema")}/tool` } },
+                        trackers: { type: "array", items: { $ref: `${specRef("json-schema")}/tracker` } },
+                    },
+                    required: ["name", "description", "status"],
+                },
+            },
+        },
+    }
+}
+
 function flowSchema(type: "json-schema" | "openapi" = "openapi") {
     return type === "openapi" ? {
         title: "Flow",
@@ -511,7 +556,7 @@ function skillSchema() {
             name: { type: "string" },
             description: { type: "string" },
         },
-        required: ["name", "description", "orgId"],
+        required: ["name", "description"],
 
     }
 }
@@ -529,7 +574,7 @@ function channelSchema(type: "json-schema" | "openapi" = "openapi") {
                     type: { type: "string", enum: subtypes },
                     variables: variablesRef(subtypes, type),
                 },
-                required: ["type", "variables"],
+                required: ["type"],
             },
         ],
     } as Record<string, any>;
@@ -554,7 +599,7 @@ function documentRepositorySchema(type: "json-schema" | "openapi" = "openapi") {
                     documentChunkStrategy: { type: "string", enum: documentChunkStrategyTypes, description: "The strategy to use for chunking documents." },
                     variables: variablesRef(subtypes, type),
                 },
-                required: ["type", "variables"],
+                required: ["type"],
             },
         ],
     } as Record<string, any>;
@@ -577,7 +622,7 @@ function documentationSchema(type: "json-schema" | "openapi" = "openapi") {
                     documents: { type: "array", items: { type: "string" }, description: "The list of documents from the repository to use. Null or Empty means all" },
                     variables: variablesRef(subtypes, type),
                 },
-                required: ["type", "repository", "variables"],
+                required: ["type", "repository"],
             },
         ],
     } as Record<string, any>;
@@ -599,7 +644,7 @@ function resourceSchema(type: "json-schema" | "openapi" = "openapi") {
                     example: { type: "string", description: "An example value of an output for the resource." },
                     variables: variablesRef(subtypes, type),
                 },
-                required: ["type", "variables"],
+                required: ["type"],
             },
         ],
     } as Record<string, any>;
@@ -639,7 +684,7 @@ function taskSchema(type: "json-schema" | "openapi" = "openapi") {
                     costLimit: { type: "number", description: "The cost limit for each execution of this task." },
                     variables: variablesRef(subtypes, type),
                 },
-                required: ["type", "requiredSkills", "defaultChannel", "tracker", "documentation", "tools", "triggers", "inputs", "outputs", "subtasks", "costLimit", "variables"],
+                required: ["type", "requiredSkills"],
             },
         ]
     } as Record<string, any>;
@@ -661,7 +706,7 @@ function toolSchema(type: "json-schema" | "openapi" = "openapi") {
                     channel: { type: "string", description: "The channel for the tool to use for dynamic user interaction" },
                     variables: variablesRef(subtypes, type),
                 },
-                required: ["type", "channel", "variables"],
+                required: ["type"],
             },
         ],
     } as Record<string, any>;
@@ -684,7 +729,7 @@ function trackerSchema(type: "json-schema" | "openapi" = "openapi") {
                     pollingInterval: { type: "number", description: "The interval in seconds to poll for updates if webhooks are not enabled" },
                     variables: variablesRef(subtypes, type),
                 },
-                required: ["type", "webhooksEnabled", "pollingInterval", "variables"],
+                required: ["type"],
             },
         ],
     } as Record<string, any>;
@@ -717,7 +762,7 @@ function workerSchema(type: "json-schema" | "openapi" = "openapi") {
                     wipLimit: { type: "number", description: "The number of tasks a worker can have in progress at a time." },
                     variables: variablesRef(subtypes),
                 },
-                required: ["channelUserConfig", "skills", "wipLimit", "variables"],
+                required: ["skills", "wipLimit"],
             },
         ],
     } as Record<string, any>;
@@ -737,7 +782,7 @@ function credentialSchema(subtypes: string[], root?: boolean, type: "json-schema
                     type: { type: "string"},
                     variables: credentialsRef(subtypes, type),
                 },
-                required: ["type", "variables"],
+                required: ["type"],
             },
         ],
     } as Record<string, any>;
