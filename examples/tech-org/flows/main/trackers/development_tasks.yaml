@@ -1,0 +1,9 @@
+name: Development Tasks
+description: A Github Board Tracker.
+type: github-board-tracker
+variables:
+  to_do_column: New Development Task
+  in_progress_column: In Progress
+  done_column: Done
+  org_name: {{GITHUB_TRACKER_ORG_NAME}}
+  project_name: {{GITHUB_BUG_PROJECT_NAME}}

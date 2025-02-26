@@ -1,0 +1,10 @@
+name: Customer Success Feature Instructions
+description: A Github resource.
+type: github-repo-resource
+credential: github-repo
+variables:
+  path_template: {{CUSTOMER_SUCCESS_INSTRUCTION_FEATURE_PATH}}
+  repo: {{INSTRUCTION_REPO}}
+  owner: {{INSTRUCTION_OWNER}}
+  org_name: {{INSTRUCTION_ORG_NAME}}
+  branch: {{INSTRUCTION_BRANCH}}

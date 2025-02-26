@@ -1,0 +1,18 @@
+name: Product Idea
+description: Create a product idea
+type: simple-task
+requiredSkills:
+  - conversation
+purpose: Create a product idea from the extracted requirements.
+inputs:
+  role: Customer Success Role
+  instructions: Customer Success Product Idea Instructions
+  message: Customer Success Chat
+outputs:
+  - Product Ideas
+variables:
+  system_message_template: |-
+    {{role}}
+    {{instructions}}
+  prompt_template: |-
+    {{message}}

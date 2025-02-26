@@ -1,0 +1,8 @@
+name: Native Channel
+description: Native Channel
+type: native-channel
+variables:
+  channel_name: {{NATIVE_CHANNEL_NAME}}
+  anonymous_access: {{NATIVE_CHANNEL_ANONYMOUS}}
+  oauth2_issuer_uri: {{NATIVE_CHANNEL_OAUTH2_ISSUER_URI}}
+  oauth2_audience: {{NATIVE_CHANNEL_OAUTH2_AUDIENCE}}

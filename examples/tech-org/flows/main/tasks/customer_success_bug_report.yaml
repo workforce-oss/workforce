@@ -1,0 +1,18 @@
+name: Bug Report
+description: Create a bug report
+type: simple-task
+requiredSkills:
+  - conversation
+purpose: Create a bug report from the extracted requirements.
+inputs:
+  role: Customer Success Role
+  instructions: Customer Success Bug Report Instructions
+  message: Customer Success Chat
+outputs:
+  - Bug Reports
+variables:
+  system_message_template: |-
+    {{role}}
+    {{instructions}}
+  prompt_template: |-
+    {{message}}
