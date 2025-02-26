@@ -23,7 +23,7 @@ export abstract class WebsocketAPI {
 	private authed: boolean = false;
 	private preauthQueue: any[] = [];
 	protected currentAuthToken?: string;
-	private unAuthorizedCallBack?: () => void;
+	protected unAuthorizedCallBack?: () => void;
 	protected callbacks: Map<string, ((data: any) => void)[]> = new Map();
 
 

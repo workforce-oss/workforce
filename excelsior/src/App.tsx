@@ -36,7 +36,8 @@ const sessionId = uuidv4();
 let orgId = '5104753b-89e5-42c6-9f63-23140029aa50';
 let channelId = 'f45dacdc-76fc-4fb1-88ed-71d8895e4c52';
 let anonymous = 'false';
-const workforceUrl = 'localhost:8084';
+const workforceUrl = 'http://localhost:8084';
+const workforceSocketUrl = 'ws://localhost:8084';
 const workforceAuthUrl = 'http://localhost:8084/insecure';
 
 const App = () => {
@@ -94,8 +95,8 @@ const App = () => {
         WorkforceAPIClient.init({
             accessToken: authSession.session?.auth.accessToken,
             basePath: `/workforce-api`,
-            baseUrl: `http://${workforceUrl}`,
-            baseSocketUrl: `http://${workforceUrl}`,
+            baseUrl: `${workforceUrl}`,
+            baseSocketUrl: `${workforceSocketUrl}`,
             unauthorizedCallBack
         })
 
@@ -196,7 +197,7 @@ const App = () => {
     }, [apiVersion]);
 
     useEffect(() => {
-        if (!authSession?.userId || !taskExecutionSocketAPI) {
+        if (!authSession?.userId || !taskExecutionSocketAPI || !apiVersion) {
             return;
         }
 
@@ -214,7 +215,7 @@ const App = () => {
 
 
     useEffect(() => {
-        if (!authSession?.userId || !taskExecutionApi) {
+        if (!authSession?.userId || !taskExecutionApi || !apiVersion) {
             return;
         }
         taskExecutionApi.list({ orgId, queryParams: {userId: authSession.userId }}).then((response) => {

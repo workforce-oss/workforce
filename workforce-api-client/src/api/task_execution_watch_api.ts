@@ -56,6 +56,7 @@ export class TaskExecutionWatchAPI extends WebsocketAPI {
             return;
         } else if (data.success === false) {
             console.log("Auth failed");
+            this.unAuthorizedCallBack?.();
             return;
         }
         if (Array.isArray(data)) {

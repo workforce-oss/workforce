@@ -54,6 +54,7 @@ export class NativeChatSocketAPI extends WebsocketAPI {
             return;
         } else if (data.success === false) {
             console.log("Auth failed");
+            this.unAuthorizedCallBack?.();
             return;
         }
         super.handleMessages(data);
