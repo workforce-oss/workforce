@@ -69,9 +69,11 @@ deleteCommands.action(deleteResource);
 const pushCommand = cli
 .command("push")
 .description("Push resources")
-.argument("<path>", "Path to the file containing the resources to push")
+.argument("<path>", "Path to the file or folder containing the resources to push")
 .option("-a, --api [url]", apiString, process.env.WORKFORCE_API_URL)
 .option("-o, --org [org]", orgString, process.env.WORKFORCE_ORG_ID)
+.option("-v, --vars-file [vars-file]", "Path to the file containing variables to replace in the resources file(s)")
+.option("-d, --dry-run", "Dry run - don't actually push the resources")
 
 pushCommand.action(push);
 
