@@ -1,0 +1,24 @@
+name: feature-analysis
+description: Analyze the feature to understand the best implementation
+type: simple-task
+purpose: Analyze the bug to understand the root cause.
+costLimit: 2.00
+requiredSkills:
+  - conversation
+inputs:
+  role: software-engineering-role
+  instructions: software-engineering-instructions-feature-analysis
+tracker: feature-request-ticket
+tools:
+  - name: coding-tool-local
+  - name: send-collab-url
+outputs:
+  - development-task-ticket
+variables:
+  prompt_template: |-
+    ### Ticket Id: {{ticket.id}}
+    ### Ticket Name: {{ticket.name}}
+    ### Ticket Description: {{ticket.description}}
+  system_message_template: |-
+    {{role}}
+    {{instructions}}

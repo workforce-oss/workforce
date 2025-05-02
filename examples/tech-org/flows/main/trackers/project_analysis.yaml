@@ -1,9 +1,10 @@
-name: Product Ideas
+name: project-analysis-ticket
 description: A Github Board Tracker.
 type: github-board-tracker
+webhooksEnabled: false
 variables:
-  to_do_column: New Idea
+  to_do_column: New Project
   in_progress_column: In Progress
   done_column: Done
   org_name: {{GITHUB_TRACKER_ORG_NAME}}
-  project_name: {{GITHUB_PRODUCT_IDEA_PROJECT_NAME}}
+  project_name: {{GITHUB_BUG_PROJECT_NAME}}

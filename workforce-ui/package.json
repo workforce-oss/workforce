@@ -39,7 +39,7 @@
   "scripts": {
     "start": "PUBLIC_URL=workforce-ui react-scripts start --port=3000",
     "dev": "react-app-rewired start --env=dev --port=3000 --watch",
-    "build": "GENERATE_SOURCEMAP=false react-app-rewired build",
+    "build": "GENERATE_SOURCEMAP=true react-app-rewired build",
     "build:dev": "GENERATE_SOURCEMAP=true react-app-rewired build",
     "test": "react-app-rewired test",
     "eject": "react-scripts eject"

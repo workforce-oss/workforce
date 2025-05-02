@@ -1,6 +1,7 @@
-name: Product Ideas
+name: product-idea-ticket
 description: A Github Board Tracker.
 type: github-board-tracker
+webhooksEnabled: false
 variables:
   to_do_column: New Product Idea
   in_progress_column: In Progress

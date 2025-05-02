@@ -51,7 +51,7 @@ export class TrackerDb extends BaseModel {
         if (this.credentialId) {
             model.credential = this.credentialId;
         }
-        if (this.webhooksEnabled) {
+        if (this.webhooksEnabled !== undefined && this.webhooksEnabled !== null) {
             model.webhooksEnabled = this.webhooksEnabled;
         }
         return model;
@@ -64,7 +64,7 @@ export class TrackerDb extends BaseModel {
         }
         // We are intentionally not setting to null because of hidden logic in the model
         // Undesireable, but necessary for now
-        if (model.webhooksEnabled) {
+        if (model.webhooksEnabled !== undefined && model.webhooksEnabled !== null) {
             this.webhooksEnabled = model.webhooksEnabled;
         } 
         

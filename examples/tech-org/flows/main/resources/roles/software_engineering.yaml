@@ -1,4 +1,4 @@
-name: Customer Success Role
+name: software-engineering-role
 description: A Github resource.
 type: github-repo-resource
 credential: github-repo
@@ -8,3 +8,4 @@ variables:
   owner: {{INSTRUCTION_OWNER}}
   org_name: {{INSTRUCTION_ORG_NAME}}
   branch: {{INSTRUCTION_BRANCH}}
+  webhooks_enabled: false

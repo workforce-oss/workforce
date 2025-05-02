@@ -1,0 +1,20 @@
+name: product-user-journeys
+description: Define the user journeys for the product.
+type: simple-task
+purpose: Define the user journeys for the product.
+costLimit: 2.00
+requiredSkills:
+  - conversation
+inputs:
+  role: product-management-role
+  instructions: product-instructions-user-journey
+  message: product-idea
+tools:
+  - name: coding-tool-local
+  - name: send-collab-url
+variables:
+  prompt_template: |-
+    {{message}}
+  system_message_template: |-
+    {{role}}
+    {{instructions}}

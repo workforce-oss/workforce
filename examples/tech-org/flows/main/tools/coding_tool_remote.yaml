@@ -1,4 +1,4 @@
-name: Remote Coding Tool
+name: coding-tool-remote
 description: A tool that interacts with the code
 type: coding-tool
 credential: github-coding-tool

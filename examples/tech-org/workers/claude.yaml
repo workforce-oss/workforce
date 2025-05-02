@@ -3,14 +3,13 @@ type: ai-worker
 credential: anthropic
 channelUserConfig:
   native-channel: anthropic-native-channel
-  slack-channel: anthropic-slack
 skills:
-- name: conversation
-- name: sales
-- name: project-management
-- name: architecture
-- name: product
-- name: coding
+- conversation
+- sales
+- project-management
+- architecture
+- product
+- coding
 wipLimit: 25
 variables:
   model: {{ANTHROPIC_WORKER_MODEL}}

@@ -60,6 +60,7 @@ export class GithubBoardTrackerMetadata {
             sensitive: true,
             required: true
         });
+        
 
         return new VariablesSchema(schema, type, subtype);
     }

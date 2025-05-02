@@ -42,7 +42,7 @@ flows:
       path_template: {{BUG_ANALYSIS_INSTRUCTION_PATH}}
       <<: *repo_variables
   trackers:
-  - name: Bug Reports
+  - name: bug-report-ticket
     description: A Github Board Tracker.
     type: github-board-tracker
     variables:
@@ -77,11 +77,11 @@ flows:
     inputs:
       role: Role
       instructions: Bug Analysis Instructions
-    tracker: Bug Reports
+    tracker: bug-report-ticket
     tools:
       - name: Coding Tool
     triggers:
-      - Bug Reports
+      - bug-report-ticket
     outputs:
       - Development Tasks
     variables:

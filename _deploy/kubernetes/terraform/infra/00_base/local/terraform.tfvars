@@ -1,6 +1,6 @@
 cluster_name = "primary"
 istio_enabled = true
-istio_version = "1.18.2"
+istio_version = "1.25.2"
 install_istio_gateway = true
 create_istio_lb_health_check = false
 istio_gateway_service_type = "NodePort"

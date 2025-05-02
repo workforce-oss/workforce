@@ -1,0 +1,22 @@
+name: reference-implementation
+description: Create a reference-implementation of the software architecture.
+type: simple-task
+purpose: Create a reference-implementation of the software architecture.
+costLimit: 2.00
+requiredSkills:
+  - conversation
+inputs:
+  role: software-engineering-role
+  instructions: software-engineering-instructions-reference-implementation
+  message: 
+  - software-architecture
+  - native-channel
+tools:
+  - name: coding-tool-local
+  - name: send-collab-url
+variables:
+  prompt_template: |-
+    {{message}}
+  system_message_template: |-
+    {{role}}
+    {{instructions}}

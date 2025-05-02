@@ -1,0 +1,20 @@
+name: domain-model
+description: Create or modify the domain model for the project.
+type: simple-task
+purpose: Create or modify the domain model for the project.
+costLimit: 2.00
+requiredSkills:
+  - conversation
+inputs:
+  role: software-architecture-role
+  instructions: architecture-instructions-domain-model
+  message: product-idea
+tools:
+  - name: coding-tool-local
+  - name: send-collab-url
+variables:
+  prompt_template: |-
+    {{message}}
+  system_message_template: |-
+    {{role}}
+    {{instructions}}

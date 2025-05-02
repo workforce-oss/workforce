@@ -1,0 +1,11 @@
+name: architecture-instructions-api-design
+description: A Github resource.
+type: github-repo-resource
+credential: github-repo
+variables:
+  path_template: {{ARCHITECTURE_INSTRUCTION_API_DESIGN_PATH}}
+  repo: {{INSTRUCTION_REPO}}
+  owner: {{INSTRUCTION_OWNER}}
+  org_name: {{INSTRUCTION_ORG_NAME}}
+  branch: {{INSTRUCTION_BRANCH}}
+  webhooks_enabled: false

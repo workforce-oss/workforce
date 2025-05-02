@@ -1,0 +1,39 @@
+name: product-idea
+description: Define the software architecture for the project.
+type: simple-task
+purpose: Define the software architecture for the project.
+costLimit: 2.00
+requiredSkills:
+  - conversation
+tracker: product-idea-ticket
+inputs:
+  role: product-management-role
+  message: native-channel
+outputs:
+  - project-analysis-ticket
+tools:
+  - name: coding-tool-local
+  - name: send-collab-url
+subtasks:
+- name: product-definition
+- name: product-user-journeys
+- name: software-architecture
+- name: domain-model
+- name: api-design
+variables:
+  prompt_template: |-
+    ### Ticket Id: {{ticket.id}}
+    ### Ticket Name: {{ticket.name}}
+    ### Ticket Description: {{ticket.description}}
+    
+    {{message}}
+  system_message_template: |-
+    {{role}}
+    Your goal is to coordinate everything needed to implement a new product idea.
+
+    1. Create a Product Definition
+    2. Create core user journeys
+    3. Create a domain model
+    4. Define the software architecture
+    5. Create an API Design
+    

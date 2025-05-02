@@ -1,0 +1,11 @@
+name: software-development-instructions-bug-fix
+description: A Github resource.
+type: github-repo-resource
+credential: github-repo
+variables:
+  path_template: {{SOFTWARE_DEVELOPMENT_INSTRUCTION_BUG_FIX_PATH}}
+  repo: {{INSTRUCTION_REPO}}
+  owner: {{INSTRUCTION_OWNER}}
+  org_name: {{INSTRUCTION_ORG_NAME}}
+  branch: {{INSTRUCTION_BRANCH}}
+  webhooks_enabled: false

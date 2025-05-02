@@ -23,7 +23,7 @@ export const WorkerListComponent = () => {
 	return (
 		<div style={{ padding: 20, maxWidth: 720 }}>
 			{workers.map((worker) => {
-				return <WorkerComponent key={worker.name} config={worker} />;
+				return <WorkerComponent key={worker.id} config={worker} />;
 			})}
 			<WorkerAddComponent key={"add"} />
 		</div>

@@ -1,0 +1,20 @@
+name: product-definition
+description: Define the software architecture for the project.
+type: simple-task
+purpose: Define the software architecture for the project.
+costLimit: 2.00
+requiredSkills:
+  - conversation
+inputs:
+  role: product-management-role
+  instructions: product-instructions-definition
+  message: product-idea
+tools:
+  - name: coding-tool-local
+  - name: send-collab-url
+variables:
+  prompt_template: |-
+    {{message}}
+  system_message_template: |-
+    {{role}}
+    {{instructions}}

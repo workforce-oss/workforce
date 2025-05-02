@@ -5,6 +5,8 @@ module "base" {
   install_istio_gateway        = var.install_istio_gateway
   istio_version                = var.istio_version
   istio_gateway_service_type   = var.istio_gateway_service_type
+  
+
   create_istio_lb_health_check = var.create_istio_lb_health_check
   install_nvidia_driver        = var.install_nvidia_driver
   install_nvidia_toolkit       = var.install_nvidia_toolkit

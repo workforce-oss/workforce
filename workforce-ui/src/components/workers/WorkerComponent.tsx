@@ -171,7 +171,7 @@ export const WorkerComponent = (props: { config: WorkerConfig }) => {
 						<b>Channel Tokens</b>
 					</Grid>
 					{channelTypes
-						.filter((channelType) => !channelType.startsWith("mock"))
+						.filter((channelType) => !channelType.startsWith("mock") && !channelType.startsWith("custom"))
 						.map((channelType) => (
 							<Grid item xs={12} key={channelType}>
 								<TextField

@@ -1,0 +1,11 @@
+name: product-instructions-market-fit
+description: A Github resource.
+type: github-repo-resource
+credential: github-repo
+variables:
+  path_template: {{PRODUCT_INSTRUCTION_MARKET_FIT_PATH}}
+  repo: {{INSTRUCTION_REPO}}
+  owner: {{INSTRUCTION_OWNER}}
+  org_name: {{INSTRUCTION_ORG_NAME}}
+  branch: {{INSTRUCTION_BRANCH}}
+  webhooks_enabled: false

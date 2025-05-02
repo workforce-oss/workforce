@@ -1,19 +1,19 @@
-name: Customer Success Chat
+name: customer-success-chat
 description: Extract Requirements
 type: simple-task
 purpose: Extract requirements from the customer.
 requiredSkills:
   - conversation
 inputs:
-  message: Native Channel
-  role: Customer Success Role
-  chat_instructions: Customer Success Chat Instructions
+  message: native-channel
+  role: customer-success-role
+  chat_instructions: customer-success-instructions-chat
 triggers:
-  - Native Channel
+  - native-channel
 subtasks:
-  - name: Bug Report
-  - name: Feature Request
-  - name: Product Idea
+  - name: create-bug-report
+  - name: create-feature-request
+  - name: create-product-idea
 variables:
   system_message_template: |-
     {{role}}

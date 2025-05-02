@@ -1,6 +1,7 @@
-name: Feature Requests
+name: feature-request-ticket
 description: A Github Board Tracker.
 type: github-board-tracker
+webhooksEnabled: false
 variables:
   to_do_column: New Feature
   in_progress_column: In Progress

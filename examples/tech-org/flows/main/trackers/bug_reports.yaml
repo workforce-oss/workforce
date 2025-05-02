@@ -1,6 +1,7 @@
-name: Bug Reports
+name: bug-report-ticket
 description: A Github Board Tracker.
 type: github-board-tracker
+webhooksEnabled: false
 variables:
   to_do_column: New Bug Report
   in_progress_column: In Progress

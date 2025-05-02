@@ -70,7 +70,7 @@ flows:
     variables:
       to_do_column: New Idea
       <<: *tracker_variables
-  - name: Bug Reports
+  - name: bug-report-ticket
     description: A Github Board Tracker.
     type: github-board-tracker
     variables:
@@ -148,7 +148,7 @@ flows:
       instructions: Bug Instructions
       message: Chat
     outputs:
-      - Bug Reports
+      - bug-report-ticket
     variables:
       system_message_template: |-
         {{role}}

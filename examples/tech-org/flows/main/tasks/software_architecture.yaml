@@ -1,0 +1,22 @@
+name: software-architecture
+description: Define the software architecture for the project.
+type: simple-task
+purpose: Define the software architecture for the project.
+costLimit: 2.00
+requiredSkills:
+  - conversation
+inputs:
+  role: software-architecture-role
+  instructions: architecture-instructions-software-architecture
+  message: product-idea
+tools:
+  - name: coding-tool-local
+  - name: send-collab-url
+subtasks:
+- name: reference-implementation
+variables:
+  prompt_template: |-
+    {{message}}
+  system_message_template: |-
+    {{role}}
+    {{instructions}}

@@ -1,4 +1,4 @@
-name: Local Coding Tool
+name: coding-tool-local
 description: A tool that interacts with the code
 type: coding-tool
 credential: github-coding-tool

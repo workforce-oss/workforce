@@ -1,4 +1,4 @@
-name: Send Collab Url
+name: send-collab-url
 description: Send a collab url to the Channel
 type: message-channel-tool
 channel: native-channel

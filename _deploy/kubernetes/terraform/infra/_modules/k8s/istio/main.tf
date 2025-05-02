@@ -10,6 +10,11 @@ resource "helm_release" "base" {
   version          = var.istio_version
   namespace        = "istio-system"
   create_namespace = true
+
+  set {
+    name = "minAvailable"
+    value = var.scale_to_zero ? "0" : "1"
+  }
 }
 
 resource "helm_release" "istiod" {
@@ -22,7 +27,7 @@ resource "helm_release" "istiod" {
   depends_on = [helm_release.base]
 
   set {
-    name = "global.defaultPodDisruptionBudget.minAvailable"
+    name = "minAvailable"
     value = var.scale_to_zero ? "0" : "1"
   }
 }

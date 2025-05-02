@@ -1,0 +1,25 @@
+name: project-analysis
+description: Analyze the project to understand the best implementation
+type: simple-task
+purpose: Analyze the project to understand the best implementation.
+costLimit: 2.00
+trackers:
+  - project-analysis-ticket
+requiredSkills:
+  - conversation
+inputs:
+  role: software-engineering-role
+  instructions: software-engineering-instructions-project-analysis
+outputs:
+  - development-task-ticket
+tools:
+  - name: coding-tool-local
+  - name: send-collab-url
+variables:
+  prompt_template: |-
+    ### Ticket Id: {{ticket.id}}
+    ### Ticket Name: {{ticket.name}}
+    ### Ticket Description: {{ticket.description}}
+  system_message_template: |-
+    {{role}}
+    {{instructions}}
